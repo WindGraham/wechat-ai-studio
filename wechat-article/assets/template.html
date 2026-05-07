@@ -44,10 +44,14 @@
 <!-- ==================== 章节 01（大号数字+标题） ==================== -->
 <section style="margin: 22px 15px 12px; box-sizing: border-box;">
   <section style="display: flex; flex-flow: row; box-sizing: border-box;">
-    <section style="display: inline-block; width: 50px; vertical-align: top; align-self: flex-start; flex: 0 0 auto; height: auto; box-sizing: border-box;">
+    <!-- 左边：大号数字，右对齐，距离竖线 20px -->
+    <section style="display: inline-block; width: 50px; vertical-align: top; align-self: flex-start; flex: 0 0 auto; height: auto; box-sizing: border-box; text-align: right; padding-right: 20px;">
       <p style="white-space: normal; margin: 0; padding: 0; font-size: 40px; color: rgb(78, 128, 88); line-height: 1; font-weight: bold;">01</p>
     </section>
-    <section style="display: inline-block; width: auto; vertical-align: top; align-self: flex-start; flex: 1 1 auto; height: auto; padding-left: 12px; box-sizing: border-box; border-left: 2px solid rgb(78, 128, 88);">
+    <!-- 中间：竖线 -->
+    <section style="display: inline-block; width: 2px; vertical-align: top; align-self: stretch; flex: 0 0 auto; background-color: rgb(78, 128, 88); box-sizing: border-box;"></section>
+    <!-- 右边：标题+说明，左对齐，距离竖线 20px -->
+    <section style="display: inline-block; width: auto; vertical-align: top; align-self: flex-start; flex: 1 1 auto; height: auto; padding-left: 20px; box-sizing: border-box; text-align: left;">
       <p style="white-space: normal; margin: 0; padding: 0; font-size: 17px; color: rgb(78, 128, 88);"><strong>第一节标题</strong></p>
       <p style="white-space: normal; margin: 4px 0 0; padding: 0; font-size: 11px; color: rgb(150, 150, 150); letter-spacing: 1px;">SECTION TITLE IN ENGLISH</p>
     </section>
