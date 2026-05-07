@@ -17,8 +17,8 @@ Do not attempt account login, WeChat material-library upload, automatic publishi
 
 1. Read `references/wechat-rules.md` for hard code constraints
 2. Read `references/editor-features.md` for basic capabilities vs. special layout capabilities
-3. Read `references/formatting-guide.md` for adaptable article habits and typography defaults
-4. Read `references/interaction-workflow.md` before starting a new layout project or revising an existing one with the user
+3. **Must-read** `references/formatting-guide.md` for editorial habits (e.g., image grouping rules) and typography defaults
+4. **Must-read** `references/interaction-workflow.md` before starting a new layout project or revising an existing one with the user
 5. Read `references/image-url-workflow.md` whenever local images appear; public HTTPS image URLs can stay unchanged
 6. Read `references/refined-layout-blocks.md` when the user asks for richer, more polished, magazine-like, visual, or reference-matched layout
 7. Read `references/screenshot-check.md` before reporting a layout draft as ready for review
