@@ -2,7 +2,9 @@
 
 面向 AI Agent 的微信公众号文章 HTML 排版技能包。
 
-这个仓库不是网页编辑器、Markdown 转换器，也不是自动发布工具。它的核心价值是把微信公众号富文本编辑器的 HTML/CSS 兼容规则、移动端排版方法、常见版式和可复用模板整理成一个 skill，让 Codex、Claude Code 等 AI Agent 能稳定生成可以粘贴到公众号编辑器里的 HTML。
+这个仓库不是网页编辑器、Markdown 转换器，也不是自动发布工具。它的核心价值是把微信公众号富文本编辑器的 HTML/CSS 兼容规则、移动端排版方法、常见版式和可复用模板整理成一个 skill，让各类 CLI AI Agent 稳定生成可以粘贴到公众号编辑器里的 HTML。
+
+适用的工具包括但不限于 Codex、Claude Code、Kimi Code、OpenCode、OpenClaw 等。只要你的 Agent 支持读取项目内的 skill/规则文件，就可以复用这里的内容。
 
 ## Skill
 
@@ -45,13 +47,13 @@
 
 ## 安装
 
-把 skill 文件夹复制到 Codex skills 目录：
+如果你的 CLI Agent 支持本地 skills 目录，可以把 `wechat-html` 文件夹复制进去。以 Codex 为例：
 
 ```bash
 cp -R wechat-html "${CODEX_HOME:-$HOME/.codex}/skills/"
 ```
 
-重启 Codex 后，新的 skill 元数据才会被加载。
+重启对应的 CLI Agent 后，新的 skill 元数据才会被加载。不同工具的 skills 目录和加载方式可能不同，也可以直接让 Agent 阅读本仓库里的 `wechat-html/SKILL.md` 和 `references/`。
 
 也可以用 `$skill-installer` 从 GitHub 安装：
 
@@ -61,30 +63,16 @@ $skill-installer install https://github.com/WindGraham/wechat-article-skills/tre
 
 ## 使用方式
 
-示例：
-
-```text
-Use $wechat-html to turn this article into WeChat Official Account HTML with a clean mobile layout.
-```
-
-更多示例：
-
-```text
-Use $wechat-html to create a WeChat article layout for this event announcement. Keep the style minimal, use blue as the theme color, and include image placeholders.
-```
-
-```text
-Use $wechat-html to convert this article into paste-ready WeChat HTML. Use 15px body text, no first-line indent, and include a simple source note at the end.
-```
-
-```text
-Use $wechat-html to design a magazine-like article layout with a hero image, editor's note, section dividers, staggered image grid, and optional credits.
-```
-
-如果你用中文，也可以这样说：
-
 ```text
 使用 $wechat-html，把下面这篇文章排成适合微信公众号编辑器粘贴的 HTML。主题色用绿色，正文 16px，首行缩进 2em，图片先用占位 URL。
+```
+
+```text
+阅读 wechat-html/SKILL.md，按其中规则把这篇活动推送排成公众号 HTML。风格简洁，主题色蓝色，包含标题区、活动信息卡片、正文段落和图片占位。
+```
+
+```text
+使用这个仓库里的 wechat-html skill，生成一段可以复制进微信公众号编辑器的 HTML。正文左对齐，不要首行缩进，文末加一个来源说明。
 ```
 
 ## 输出应该是什么样
