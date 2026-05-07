@@ -72,6 +72,14 @@ Guidance:
 - Do not pair a narrow vertical image with long paragraphs; long text beside a narrow image becomes cramped on mobile.
 - Preserve user-provided images, but choose framing and width based on aspect ratio.
 
+### Image Grouping Habits
+
+When multiple images are placed side-by-side (e.g., two-column, three-column) or arranged in a staggered/overlapping layout:
+
+- **Same height is preferred**: Images in the same row or adjacent group should ideally share the same rendered height. Uneven heights make the layout look accidental and break visual rhythm.
+- **Same height and width is ideal**: When possible, crop or scale images so they are identical in both dimensions. This produces the cleanest, most intentional look.
+- **At minimum, align the edges**: If exact same-size is not possible due to source aspect ratios, aim for consistent top or bottom alignment so the group still feels cohesive.
+
 ## Footer and Credits
 
 Footer blocks are optional. Include only the fields the user provides.
