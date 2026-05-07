@@ -1,6 +1,6 @@
 ---
 name: wechat-article
-description: Generate WeChat Official Account (微信公众号) article HTML. Use when the user needs to create paste-ready HTML content for WeChat public account articles, WeChat rich-text editor compatible layouts, mobile-first article pages, or public image URLs for local images before pasting into the WeChat editor. Covers technical rules (tag whitelist, CSS restrictions), visual design patterns (borders, frames, dividers, decorations), adaptable formatting guidance, reference screenshot style matching, and CLI image-publication workflows.
+description: Generate and iteratively refine WeChat Official Account (微信公众号) article HTML from user-provided content and images. Use when the user needs paste-ready WeChat rich-text HTML, mobile-first article layout, refined image/text typesetting, reference screenshot style matching, local image URL publication, local git versioning for layout drafts, or screenshot-based visual checks. Covers inline-style compatibility rules, reusable refined layout capability blocks, user collaboration workflow, image URL preflight/finalization, and paste-readiness checks.
 ---
 
 # WeChat Push Article HTML Generator
@@ -11,40 +11,44 @@ Generate HTML that renders correctly in WeChat's rich-text editor and looks good
 
 Use this skill to produce paste-ready HTML fragments for WeChat Official Account articles. The output should be self-contained HTML with inline styles, not a full standalone web app.
 
-Do not attempt account login, media upload, automatic publishing, browser automation, or draft submission unless the user provides a separate tool/workflow for those tasks. This skill covers layout generation and compatibility rules only.
+Do not attempt account login, WeChat material-library upload, automatic publishing, browser automation, or draft submission unless the user provides a separate tool/workflow for those tasks. This skill covers layout generation, public image URL handling, local draft versioning, visual checks, and compatibility rules.
 
 ## Quick Start
 
 1. Read `references/wechat-rules.md` for hard code constraints
 2. Read `references/editor-features.md` for basic capabilities vs. special layout capabilities
 3. Read `references/formatting-guide.md` for adaptable article habits and typography defaults
-4. Read `references/visual-patterns.md` only when a more designed or reference-matched layout is needed
-5. Use `references/generation-checklist.md` before returning final HTML
-6. Use `assets/template.html` as starting point
-7. Replace content placeholders with actual text/images
-8. If the article uses local image files and the user wants paste-ready WeChat editor HTML, use the image publication workflow before final output.
+4. Read `references/interaction-workflow.md` before starting a new layout project or revising an existing one with the user
+5. Read `references/image-url-workflow.md` whenever local images appear; public HTTPS image URLs can stay unchanged
+6. Read `references/refined-layout-blocks.md` when the user asks for richer, more polished, magazine-like, visual, or reference-matched layout
+7. Read `references/screenshot-check.md` before reporting a layout draft as ready for review
+8. Read `references/visual-patterns.md` only when a more designed or reference-matched layout needs lower-level HTML patterns
+9. Use `references/generation-checklist.md` before returning final HTML
+10. Use `assets/template.html` as starting point
+11. Replace content placeholders with actual text/images
 
 ## Knowledge Structure
 
-Keep these four parts separate when generating or revising an article:
+Keep these six parts separate when generating or revising an article:
 
 1. Hard code rules: constraints imposed by the WeChat rich-text editor. These are not optional. Examples: inline styles only, safe tags, mobile root width, no scripts, no free absolute positioning.
-2. Basic capabilities: simple components that can be used freely in most articles. Examples: titles, paragraphs, captions, borders, single images, simple cards, dividers, two-column rows.
-3. Special layout capabilities: more designed patterns for richer visual rhythm. Examples: layered overlap, framed image groups, staggered grids, four-corner frames, circle-character titles, side-image text cards.
-4. Editorial habits: defaults that should follow common WeChat reading conventions but can be changed by user preference. Examples: body text size, line height, letter spacing, paragraph indent, justified alignment, image cropping and grouping.
+2. Collaboration state: user preferences, current draft file, local image URL status, screenshot review status, and local git commits.
+3. Basic capabilities: simple components that can be used freely in most articles. Examples: titles, paragraphs, captions, borders, single images, simple cards, dividers, two-column rows.
+4. Refined layout capability blocks: richer but reusable patterns such as framed image groups, corner cards, compact section labels, light overlap, and decorative dividers. These are abilities to choose from, not a fixed article structure.
+5. Special layout capabilities: more designed patterns for richer visual rhythm. Examples: layered overlap, framed image groups, staggered grids, four-corner frames, circle-character titles, side-image text cards.
+6. Editorial habits: defaults that should follow common WeChat reading conventions but can be changed by user preference. Examples: body text size, line height, letter spacing, paragraph indent, justified alignment, image cropping and grouping.
 
 ## Workflow
 
-1. Identify the article type: essay, announcement, event recap, profile, guide, newsletter, or image-heavy post.
-2. Ask for missing high-impact inputs only when necessary: title, body text, image URLs, theme color, required footer fields.
-3. Choose a layout structure:
-   - Text-heavy: header, intro, section titles, body paragraphs, quote/highlight blocks, footer.
-   - Image-heavy: hero image, framed images, captions, staggered grid, short text cards.
-   - Event/announcement: header, key info card, body sections, callout block, optional contact/source note.
-4. Apply WeChat constraints from `references/wechat-rules.md`.
-5. Choose basic capabilities first; add special layout capabilities only when they serve the article or reference style.
-6. Use `references/formatting-guide.md` for defaults, but override typography, spacing, alignment, and image strategy with user preferences.
-7. Return one clean HTML fragment. Avoid explanatory prose unless the user asks for it.
+1. Preflight local images before layout: upload/verify local images if needed; leave already-public HTTPS image URLs unchanged.
+2. Ask the first-round style questions from `references/interaction-workflow.md` unless the user already gave equivalent preferences.
+3. Identify the article type and image roles, but do not impose a fixed article structure. Choose reusable layout capability blocks that fit the user's preferences and content.
+4. Do not default to a long opening image. Use a large visual opening only when the user asks for it, the reference style requires it, or the content/images clearly benefit from it.
+5. Apply WeChat constraints from `references/wechat-rules.md`.
+6. Choose basic capabilities first; add refined or special layout blocks only when they improve visual rhythm, image presentation, or reference style matching.
+7. After the first draft, initialize local git versioning in the article working directory if appropriate, commit the draft, and commit every later user-requested update.
+8. Use screenshot checks before presenting a draft as ready for review.
+9. When the user approves the layout, run the final image URL pass and keep one final HTML file for WeChat paste.
 
 ## Reference Screenshot Workflow
 
@@ -185,7 +189,7 @@ Default provider: 360 image host via `wzapi`. It requires no account, no domain,
    e. Retry logic: if upload fails, wait 5 seconds and retry once. If it still fails, record the image as failed.
 
 4. Replace paths in HTML: substitute each local `src` or `data-src` with the verified public URL.
-5. Output a separate file, for example `original.uploaded.html`. Do not overwrite the source unless the user explicitly asks.
+5. During an active layout project, update the current working HTML file so local git tracks one file across revisions. Only write a separate uploaded copy if the user asks for one.
 6. Report summary:
    - Success count and uploaded URLs.
    - Failed image paths and reasons.

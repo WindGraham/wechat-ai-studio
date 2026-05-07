@@ -2,7 +2,7 @@
 
 面向 AI Agent 的微信公众号文章 HTML 排版技能包，用来生成可以粘贴到公众号富文本编辑器里的移动端文章 HTML。
 
-这个 skill 汇总了微信公众号编辑器的 HTML/CSS 兼容规则、移动端排版方法、常见文章组件、视觉版式和图片 URL 处理流程。AI Agent 读取这些规则后，可以根据文章内容、风格要求和参考图，产出更稳定的公众号 HTML。
+这个 skill 汇总了微信公众号编辑器的 HTML/CSS 兼容规则、移动端排版方法、常见文章组件、精细排版能力块、图片 URL 处理流程和协作式排版工作流。AI Agent 读取这些规则后，可以根据文章内容、风格要求和参考图，产出更稳定的公众号 HTML。
 
 适用的工具包括 Codex、Claude Code、Kimi Code、OpenCode、OpenClaw 等。只要你的 Agent 支持读取项目内的 skill 或规则文件，就可以复用这里的内容。
 
@@ -19,8 +19,10 @@
 - 按用户习惯调整字号、行距、字间距、首行缩进、两端对齐、图片裁切和图片组合方式
 - 根据参考截图或图片分析风格，并生成相近的公众号 HTML
 - 在缺少主题色、图片数量、排版风格等关键偏好时，引导用户补充，或按文章内容自主决定
+- 支持排版过程中的本地 git 版本管理，每轮调整保留一个本地版本
+- 支持用浏览器截图检查明显的重叠、溢出、空白和图片加载问题
 - 通过生成清单检查微信兼容性、版式稳定性和事实信息
-- 将 HTML 中的本地图片上传到公网图片服务，替换为微信可抓取的 HTTPS 图片 URL，并验证 URL
+- 在排版开始前预检本地图片上传，排版确认后再次生成最终在线图片 URL 版本
 - 提供完整的起始模板 `assets/template.html`
 
 ## 适用场景
@@ -108,6 +110,10 @@ wechat-article/
     editor-features.md
     formatting-guide.md
     generation-checklist.md
+    image-url-workflow.md
+    interaction-workflow.md
+    refined-layout-blocks.md
+    screenshot-check.md
     visual-patterns.md
     wechat-rules.md
 ```
