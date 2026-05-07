@@ -13,6 +13,17 @@ Use this skill to produce paste-ready HTML fragments for WeChat Official Account
 
 Do not attempt account login, WeChat material-library upload, automatic publishing, browser automation, or draft submission unless the user provides a separate tool/workflow for those tasks. This skill covers layout generation, public image URL handling, local draft versioning, visual checks, and compatibility rules.
 
+## Execution Rule (Highest Priority)
+
+Treat this skill as a mandatory checklist, not a suggestion. Do NOT skip steps to speed up response or because the user's request sounds simple.
+
+Specifically:
+1. Before generating ANY HTML, you MUST read `references/interaction-workflow.md` and `references/formatting-guide.md`, and ask the user for missing style preferences unless they already provided equivalent choices.
+2. Before generating the first draft, you MUST initialize local git versioning in the article working directory and commit the draft.
+3. Before presenting a draft as ready for review, you MUST run screenshot checks per `references/screenshot-check.md`.
+4. Before returning final HTML, you MUST use `references/generation-checklist.md`.
+5. Do NOT generate HTML directly without confirming style requirements first, even if the user says "make a push article" or similar.
+
 ## Quick Start
 
 1. Read `references/wechat-rules.md` for hard code constraints
