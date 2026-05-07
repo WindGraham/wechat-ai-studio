@@ -78,6 +78,7 @@ When multiple images are placed side-by-side (e.g., two-column, three-column) or
 
 - **Same height is preferred**: Images in the same row or adjacent group should ideally share the same rendered height. Uneven heights make the layout look accidental and break visual rhythm.
 - **Same height and width is ideal**: When possible, crop or scale images so they are identical in both dimensions. This produces the cleanest, most intentional look.
+- **Achieve through cropping or HTML bounds**: To make images uniform, either crop the source images to the same aspect ratio beforehand, or constrain their rendered bounds with fixed-height containers (`height` + `overflow: hidden`) or matching `width`/`height` inline styles in HTML.
 - **At minimum, align the edges**: If exact same-size is not possible due to source aspect ratios, aim for consistent top or bottom alignment so the group still feels cohesive.
 
 ## Footer and Credits
