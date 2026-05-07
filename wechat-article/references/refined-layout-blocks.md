@@ -291,3 +291,140 @@ Use only when:
 - the static layout is already approved;
 - the effect has a fallback or can be safely removed;
 - the output is tested in the WeChat editor or at least by browser screenshot.
+
+## Capability: Gradient Text
+
+Use for headlines, slogans, or short emphasized text where a color gradient adds visual impact.
+
+Requirements:
+- Always provide a solid `color` fallback for PC WeChat clients that do not support `-webkit-background-clip: text`.
+- Keep the text short; gradient effects lose impact on long paragraphs.
+- Use `display: inline-block` on the text wrapper so the gradient fills the text width.
+
+```html
+<section style="text-align: center; margin: 20px 0; box-sizing: border-box;">
+  <p style="margin: 0; font-size: 24px; font-weight: bold; display: inline-block;">
+    <span style="background-image: linear-gradient(90deg, rgb(0,61,106), rgb(9,108,181)); -webkit-background-clip: text; color: rgb(0,61,106); background-clip: text;">
+      渐变标题文字
+    </span>
+  </p>
+</section>
+```
+
+Fallback rule: the `color` property (here `rgb(0,61,106)`) is the solid color shown when `-webkit-background-clip: text` is not supported.
+
+## Capability: Shadow Card
+
+Use for emphasis blocks, quotes, or feature cards that need to feel slightly elevated.
+
+Requirements:
+- Mobile WeChat renders `box-shadow` well; PC client may lose it. Always pair with a subtle border or background-color difference so the card still works without shadow.
+- Keep shadow values conservative: small blur, low opacity.
+
+```html
+<section style="background-color: rgb(255,255,255); padding: 20px; margin: 15px; box-sizing: border-box; border-left: 4px solid rgb(78,128,88); box-shadow: 0 1px 4px rgba(0,0,0,0.08);">
+  <p style="margin: 0; text-indent: 2em;">卡片内容...</p>
+</section>
+```
+
+## Capability: Text Stroke / Glow
+
+Use for decorative numbers, large initial letters, or short labels.
+
+Requirements:
+- `text-shadow` with multiple directional offsets simulates a stroke. Mobile OK; PC support is weaker. Do not rely on it for critical information.
+- Keep the effect on large text (20px+) so the stroke is visible.
+
+```html
+<p style="margin: 0; font-size: 32px; color: rgb(255,255,255); text-shadow: rgb(0,61,106) 0px 1.4px 0px, rgb(0,61,106) 1px 1px 0px, rgb(0,61,106) -1px 0px 0px, rgb(0,61,106) 0px -1px 0px;">
+  描边文字
+</p>
+```
+
+## Capability: Text Decoration (Underline / Strikethrough)
+
+Use for price comparisons, emphasis, or editorial annotation.
+
+Requirements:
+- Use the shorthand `text-decoration` with color and thickness for better compatibility than split properties.
+
+```html
+<!-- Strikethrough -->
+<p style="margin: 0; font-size: 16px;">
+  <span style="text-decoration: line-through rgb(180,180,180) 1px;">原价 ¥199</span>
+  <span style="color: rgb(200,50,50); font-weight: bold;"> ¥99</span>
+</p>
+
+<!-- Underline -->
+<p style="margin: 0; font-size: 16px;">
+  <span style="text-decoration: underline rgb(0,61,106) 2px;">重点标注文字</span>
+</p>
+```
+
+## Capability: Background Image with Overlay Text
+
+Use for hero banners, section headers, or atmospheric cards where a background image sets the mood.
+
+Requirements:
+- Image must be a public HTTPS URL (or WeChat material-library URL).
+- Use `background-size: cover` or `100%` to fill the container.
+- Place text over the image only if contrast is sufficient; otherwise add a semi-transparent overlay layer.
+
+```html
+<section style="background-image: url('BACKGROUND_IMAGE_URL'); background-size: cover; background-position: center; padding: 40px 20px; box-sizing: border-box; text-align: center;">
+  <p style="margin: 0; font-size: 22px; color: rgb(255,255,255);"><strong>叠加在背景图上的标题</strong></p>
+</section>
+```
+
+With dark overlay for better text readability:
+```html
+<section style="background-image: url('BACKGROUND_IMAGE_URL'); background-size: cover; background-position: center; padding: 40px 20px; box-sizing: border-box; text-align: center;">
+  <section style="background-color: rgba(0,0,0,0.4); padding: 20px; box-sizing: border-box;">
+    <p style="margin: 0; font-size: 22px; color: rgb(255,255,255);"><strong>带遮罩的标题</strong></p>
+  </section>
+</section>
+```
+
+## Capability: Rotated Decoration
+
+Use for playful, dynamic, or reference-matched layouts.
+
+Requirements:
+- Apply `transform: rotate()` only to decorative elements (small shapes, corner labels, accent images), never to body text.
+- Mobile supports rotation well; PC may ignore it. The layout must still work if rotation is not applied.
+
+```html
+<!-- Diamond accent -->
+<section style="display: inline-block; width: 10px; height: 10px; background-color: rgb(255,183,77); transform: rotate(45deg); box-sizing: border-box;"></section>
+
+<!-- Rotated image frame -->
+<section style="display: inline-block; width: 120px; height: 120px; overflow: hidden; transform: rotate(5deg); box-sizing: border-box;">
+  <img src="URL" style="width: 100%; display: block; margin: 0 auto;">
+</section>
+```
+
+## Capability: Aspect Ratio Container (Padding Hack)
+
+Use when an image or container must maintain a fixed aspect ratio (e.g., 16:9, 1:1, 4:3) regardless of source image dimensions.
+
+Requirements:
+- Set `height: 0` and use `padding-top` as a percentage of width to create the ratio.
+- Place the actual content inside with `position: relative` if needed, but since absolute positioning is avoided, use `margin-top: -NN%` tricks carefully or simply place content after the ratio container.
+
+```html
+<!-- 1:1 square container -->
+<section style="width: 100%; height: 0; padding-top: 100%; background-image: url('URL'); background-size: cover; background-position: center; box-sizing: border-box;"></section>
+
+<!-- 16:9 container -->
+<section style="width: 100%; height: 0; padding-top: 56.25%; background-image: url('URL'); background-size: cover; background-position: center; box-sizing: border-box;"></section>
+```
+
+For image + caption inside a fixed-ratio frame, wrap the padding container and place the caption after it:
+```html
+<section style="width: 80%; margin: 0 auto; box-sizing: border-box;">
+  <section style="width: 100%; height: 0; padding-top: 75%; overflow: hidden; border-radius: 12px; box-sizing: border-box;">
+    <img src="URL" style="width: 100%; display: block; margin: -75% 0 0 0;">
+  </section>
+  <p style="margin: 8px 0 0; font-size: 14px; color: rgb(100,100,100); text-align: center;">图注</p>
+</section>
+```

@@ -290,12 +290,44 @@ Root container pattern:
 - **Images**: `<img>` (must have `width: 100%; max-width: 100%`)
 - **FORBIDDEN**: `<script>`, `<style>`, `<iframe>`, `<h1-h6>`, `<table>`, `<ul>/<ol>`
 
-### CSS Safe List
-- **Layout**: `display: flex`, `display: inline-block`, `flex-flow`, `justify-content`, `align-self`
-- **Sizing**: `width`, `height`, `max-width`, `margin`, `padding`
-- **Text**: `font-size`, `color`, `line-height`, `text-align`, `text-indent`, `letter-spacing`
-- **Decoration**: `background-color`, `border-*`, `border-radius`, `opacity`
-- **FORBIDDEN**: `position: absolute/fixed`, `animation`, `transform` (use with caution), `grid`
+### CSS Property Safety Levels
+
+Properties are grouped by safety based on extensive testing in the WeChat editor.
+
+#### Safe — Use freely
+These properties are stable in both mobile and PC WeChat clients:
+
+- **Layout**: `display` (`flex`, `inline-block`, `block`), `flex-flow`, `justify-content`, `align-self`, `flex`, `width`, `height`, `max-width`, `min-width`, `margin`, `padding`, `vertical-align`, `overflow`, `box-sizing`
+- **Text**: `font-size`, `color`, `line-height`, `text-align`, `text-indent`, `letter-spacing`, `white-space`, `font-style`, `font-weight`, `word-break`
+- **Decoration**: `background-color`, `background-image` (public HTTPS URLs only), `background-position`, `background-repeat`, `background-size`, `background-attachment`, `border-*`, `border-radius`, `opacity`
+- **Container**: `section`, `p`, `span`, `strong`, `em`, `br`, `img`
+
+#### Caution — Use with care
+These work in mobile WeChat but may render differently or fail in PC client. Always provide a safe fallback:
+
+| Property | Notes |
+|:---|:---|
+| `transform` (and vendor prefixes) | Rotation and translation work on mobile; PC may ignore or render poorly. Avoid for critical content. |
+| `box-shadow` | Mobile OK; PC may lose shadow. Fallback: solid border or layered background blocks. |
+| `text-shadow` | Mobile OK; PC support weaker. Fallback: none or bold color contrast. |
+| `-webkit-background-clip: text` | Gradient text effect. Mobile OK; PC may show transparent or solid color. Always set a solid `color` fallback. |
+| `z-index` | Only effective with non-static positioning. In normal flow, use document order + negative margin instead. |
+| `float` | Can break inline-block/flex flow. Prefer inline-block columns. |
+| `text-decoration` (and split properties) | Use shorthand `text-decoration: line-through/underline color thickness` for better compatibility. |
+| Negative `margin` (e.g., `margin-top: -40px`) | Safe for overlap effects. Keep magnitude under ~120px to avoid editor clipping. |
+
+#### Avoid — Do not use
+
+| Property | Reason |
+|:---|:---|
+| `position: absolute` / `position: fixed` | Editor forces to `static`; layout will break. |
+| `animation` / `@keyframes` / `transition` | Filtered by WeChat editor. |
+| `display: grid` / `grid-template-*` | Poor PC client support; use inline-block instead. |
+| `pointer-events` / `user-select` / `-webkit-tap-highlight-color` | No meaningful effect in WeChat articles; may be filtered. |
+| `transform-style: preserve-3d` / `perspective` | 3D transforms unsupported in WeChat. |
+| `direction: rtl` | Can cause unexpected line breaking with Chinese text. |
+| `font-family` with custom fonts | External fonts not loaded; falls back to system default. |
+| `filter` (CSS filters) | Not supported in WeChat editor. |
 
 ### Flex Two-Column Layout (Critical)
 

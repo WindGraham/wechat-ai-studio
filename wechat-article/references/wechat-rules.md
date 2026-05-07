@@ -11,8 +11,11 @@ This file contains hard compatibility rules for HTML that will be pasted into th
 - Avoid `<script>`, `<iframe>`, `<table>`, `<form>`, `<input>`, and interactive controls.
 - Avoid `position: absolute`, `position: fixed`, CSS animation, CSS transition, `filter`, and layout that depends on JavaScript.
 - Prefer `display: inline-block` rows over `display: flex`; do not use CSS grid for final paste-ready HTML.
-- Every image should include `width: 100%; max-width: 100%; display: block; margin: 0 auto;` unless a narrower image is intentional.
+- Every `<img>` should include `width: 100%; max-width: 100%; display: block; margin: 0 auto;` unless a narrower image is intentional.
 - Use `box-sizing: border-box` on layout blocks when padding or borders are involved.
+- Use `overflow: hidden` on image containers when `border-radius` clipping is needed.
+- `background-image` is safe when the URL is a public HTTPS image (or WeChat material-library URL). It can be used for decorative backgrounds, hero banners, and texture fills.
+- Use `overflow: hidden` on image containers when border-radius or clipping is needed.
 
 ## Alignment Rules (Critical for PC View)
 

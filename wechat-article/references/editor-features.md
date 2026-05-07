@@ -32,7 +32,7 @@
 | 主副标题 | ✅ | 上下两个 `<p>`，不同字号 |
 | 编号标题 | ✅ | 大号数字 + 标题文字组合 |
 | 竖排标题 | ⚠️ | `writing-mode: vertical-rl` 微信支持度未知，建议避免 |
-| 渐变标题 | ⚠️ | `background-clip: text` 微信可能不支持，降级为纯色 |
+| 渐变标题 | ✅ | `-webkit-background-clip: text` + `linear-gradient`；PC 端可能降级为纯色，需设置 `color` fallback |
 | 动态标题 | ❌ | `animation` 被微信过滤 |
 | 文字纹理 | ❌ | 复杂纹理无法实现 |
 | 文字阴影 | ⚠️ | `text-shadow` 部分支持，效果有限 |
@@ -47,7 +47,7 @@
 | 边框卡片 | ✅ | `border` + `padding` |
 | 左侧色条卡片 | ✅ | `border-left` |
 | 上下边框卡片 | ✅ | `border-top` + `border-bottom` |
-| 阴影卡片 | ⚠️ | `box-shadow` 支持度低，用边框替代 |
+| 阴影卡片 | ✅ | `box-shadow` 移动端支持良好；PC 端可能丢失，提供边框 fallback |
 | 圆角卡片 | ✅ | `border-radius` |
 | 图文并排卡片 | ✅ | inline-block 双栏 |
 
@@ -62,7 +62,7 @@
 | 边框图片 | ✅ | 外层 section 加 `border` |
 | 双线/相框图片 | ✅ | 外层 section 加 `border-style: double` 或双层边框 |
 | 不对称圆角 | ✅ | `border-top-left-radius` + `border-bottom-right-radius` |
-| 图片阴影 | ⚠️ | 用外层色块替代 `box-shadow` |
+| 图片阴影 | ✅ | `box-shadow` 移动端支持；PC 端可用白色边框 + 负 margin 模拟 |
 | 双图并排 | ✅ | inline-block 双栏（见 Alignment Rules） |
 | 图片滤镜 | ❌ | `filter` 不支持 |
 | 图片裁剪形状 | ⚠️ | 仅支持 `border-radius` 矩形裁剪，复杂形状不支持 |
@@ -172,8 +172,8 @@
 | 主题色切换 | ⚠️ | AI 生成时可全局替换颜色值 |
 | 加粗 | ✅ | `<strong>` |
 | 斜体 | ✅ | `<em>` |
-| 下划线 | ⚠️ | `text-decoration` 支持度未知，建议避免 |
-| 删除线 | ⚠️ | 同上 |
+| 下划线 | ✅ | `text-decoration: underline color thickness` |
+| 删除线 | ✅ | `text-decoration: line-through color thickness` |
 | 上标/下标 | ⚠️ | 微信支持度未知 |
 
 ---
