@@ -1,6 +1,6 @@
 ---
-name: wechat-html
-description: Generate WeChat Official Account (微信公众号) push article HTML. Use when the user needs to create HTML content for WeChat public account articles, WeChat rich-text editor compatible HTML, or mobile-first article layouts. Covers technical rules (tag whitelist, CSS restrictions), visual design patterns (borders, frames, dividers, decorations), and adaptable formatting guidance for typography, spacing, alignment, and footer blocks.
+name: wechat-article
+description: Generate WeChat Official Account (微信公众号) article HTML. Use when the user needs to create paste-ready HTML content for WeChat public account articles, WeChat rich-text editor compatible layouts, or mobile-first article pages. Covers technical rules (tag whitelist, CSS restrictions), visual design patterns (borders, frames, dividers, decorations), and adaptable formatting guidance for typography, spacing, alignment, and footer blocks.
 ---
 
 # WeChat Push Article HTML Generator

@@ -1,8 +1,8 @@
 interface:
-  display_name: "WeChat HTML"
+  display_name: "WeChat Article"
   short_description: "Generate WeChat-compatible article HTML"
   brand_color: "#4E8058"
-  default_prompt: "Use $wechat-html to format this article as WeChat Official Account HTML."
+  default_prompt: "Use $wechat-article to format this article as WeChat Official Account HTML."
 
 policy:
   allow_implicit_invocation: true
