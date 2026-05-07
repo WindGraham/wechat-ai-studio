@@ -235,7 +235,7 @@ Structure formula: `card container with background/border -> paragraph block wit
 
 ## Pattern 25: Tilted Elements (Transform)
 
-Use `transform: rotate()` sparingly. WeChat editor support is partial.
+`transform: rotate()` and `rotateZ()` are safe for decorative frames and images in mobile WeChat; PC client may render them slightly differently but generally retains the effect.
 
 Structure formula: `slightly rotated outer frame -> counter-rotated inner image/content wrapper`.
 
@@ -248,7 +248,11 @@ Structure formula: `slightly rotated outer frame -> counter-rotated inner image/
 </section>
 ```
 
-**Note**: Counter-rotate the inner element to keep the image straight while the frame is tilted. Small angles (1-3deg) work best.
+**Rules**:
+- Counter-rotate the inner element to keep the image straight while the frame is tilted.
+- Small angles (1-5deg) work best; larger tilts (15deg+) are acceptable for playful designs but keep text readable.
+- Only use 2D rotation (`rotate`, `rotateZ`). Avoid `rotateX`, `rotateY`, and `perspective` — these either flatten or disappear in WeChat.
+- Never rotate body text; apply rotation only to frames, images, or small decorative shapes.
 
 ## Pattern 26: Decorative Divider with Stickers
 

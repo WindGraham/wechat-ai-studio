@@ -307,7 +307,8 @@ These work in mobile WeChat but may render differently or fail in PC client. Alw
 
 | Property | Notes |
 |:---|:---|
-| `transform` (and vendor prefixes) | Rotation and translation work on mobile; PC may ignore or render poorly. Avoid for critical content. |
+| `transform: rotate()`, `rotateZ()`, `translate()`, `translate3d()`, `scale()` | 2D transforms are stable on mobile and mostly retain on PC. Safe for decorative elements (tilted frames, rotated shapes, micro-offsets). Do NOT use for critical text readability. |
+| `transform: rotateX()`, `rotateY()`, `perspective()` | 3D transforms are unsupported or render as flat/blank in WeChat. `perspective(0px)` is mathematically invalid (zero distance = invisible). Avoid entirely. |
 | `box-shadow` | Mobile OK; PC may lose shadow. Fallback: solid border or layered background blocks. |
 | `text-shadow` | Mobile OK; PC support weaker. Fallback: none or bold color contrast. |
 | `-webkit-background-clip: text` | Gradient text effect. Mobile OK; PC may show transparent or solid color. Always set a solid `color` fallback. |
@@ -324,7 +325,7 @@ These work in mobile WeChat but may render differently or fail in PC client. Alw
 | `animation` / `@keyframes` / `transition` | Filtered by WeChat editor. |
 | `display: grid` / `grid-template-*` | Poor PC client support; use inline-block instead. |
 | `pointer-events` / `user-select` / `-webkit-tap-highlight-color` | No meaningful effect in WeChat articles; may be filtered. |
-| `transform-style: preserve-3d` / `perspective` | 3D transforms unsupported in WeChat. |
+| `transform-style: preserve-3d` / `perspective` | 3D transforms unsupported in WeChat. `perspective(0px)` produces no visible effect. |
 | `direction: rtl` | Can cause unexpected line breaking with Chinese text. |
 | `font-family` with custom fonts | External fonts not loaded; falls back to system default. |
 | `filter` (CSS filters) | Not supported in WeChat editor. |

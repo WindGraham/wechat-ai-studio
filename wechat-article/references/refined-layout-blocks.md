@@ -271,26 +271,36 @@ Skeleton:
 
 ## Capability: Light Transform
 
-Use only after the static layout is accepted or when reference matching requires it.
+2D transforms (`rotate`, `rotateZ`, `translate`, `translate3d`, `scale`) are safe for decorative effects. Use freely for:
 
-Allowed first:
+- small `rotate(45deg)` on decorative shapes (diamonds, corner accents);
+- `rotateZ(5deg~20deg)` on image frames or cards for a dynamic feel;
+- `translate3d(1px~70px, 0, 0)` for pixel-perfect alignment adjustments;
+- `scale(0.95~1.05)` for subtle zoom effects.
 
-- small `rotate()` on a label or decorative image;
-- small `translate()` for sticker-like accents;
-- do not use transform for core text readability.
+Rules:
+- Only apply to decorative elements or image containers, never to body text.
+- Avoid `rotateX()`, `rotateY()`, and `perspective()` — these are 3D transforms that either render poorly or produce no visible effect (`perspective(0px)` is mathematically invalid).
+- Keep angles small for frames (under 20°); large tilts hurt readability.
+- Do not combine multiple transform functions in one declaration; use nested wrappers if needed.
 
-Avoid transform-heavy layout for the first draft.
+## Capability: SVG As Container
 
-## Capability: SVG Or Motion
+SVG in WeChat articles serves best as a **static container** or **background image carrier**, not as animated or vector-drawing content.
 
-Treat SVG and motion as advanced capability blocks. Do not use them by default.
+What works:
+- Simple `<svg>` wrapper with `background-image` for texture or decorative fills.
+- Static SVG icons or shapes (basic `<rect>`, `<circle>`) — likely retained by the editor.
 
-Use only when:
+What fails:
+- **SMIL animation** (`<animateTransform>`, `<animate>`) is filtered by the WeChat editor. Pasted result is a static frame or blank.
+- **`<foreignObject>`** embedding HTML/images is high-risk; the wrapper may be stripped, causing layout collapse.
+- Complex nested SVG structures (multi-layer `<g>` with transforms) may be flattened or broken.
 
-- the user explicitly asks for motion or SVG;
-- the static layout is already approved;
-- the effect has a fallback or can be safely removed;
-- the output is tested in the WeChat editor or at least by browser screenshot.
+Guidance:
+- Prefer plain `<section>` with `background-image` over `<svg>` for background fills.
+- If the user asks for an SVG-like effect (rotating badges, geometric shapes), implement with CSS `transform` + `border-radius` instead.
+- Never rely on SVG animation for critical content. Provide a static fallback.
 
 ## Capability: Gradient Text
 
