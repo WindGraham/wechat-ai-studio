@@ -1,6 +1,6 @@
 ---
 name: wechat-article
-description: Generate WeChat Official Account (微信公众号) article HTML. Use when the user needs to create paste-ready HTML content for WeChat public account articles, WeChat rich-text editor compatible layouts, or mobile-first article pages. Covers technical rules (tag whitelist, CSS restrictions), visual design patterns (borders, frames, dividers, decorations), and adaptable formatting guidance for typography, spacing, alignment, and footer blocks.
+description: Generate WeChat Official Account (微信公众号) article HTML. Use when the user needs to create paste-ready HTML content for WeChat public account articles, WeChat rich-text editor compatible layouts, mobile-first article pages, or temporary public image URLs for local images before pasting into the WeChat editor. Covers technical rules (tag whitelist, CSS restrictions), visual design patterns (borders, frames, dividers, decorations), adaptable formatting guidance, reference screenshot style matching, and short-lived local image publishing via CLI tunnel workflows.
 ---
 
 # WeChat Push Article HTML Generator
@@ -21,6 +21,7 @@ Do not attempt account login, media upload, automatic publishing, browser automa
 4. Read `references/editor-features.md` for feature capability matrix
 5. Use `assets/template.html` as starting point
 6. Replace content placeholders with actual text/images
+7. If the article uses local image files and the user wants paste-ready WeChat editor HTML, use the temporary public image workflow before final output.
 
 ## Workflow
 
@@ -34,6 +35,131 @@ Do not attempt account login, media upload, automatic publishing, browser automa
 5. Use `references/formatting-guide.md` for defaults, but override typography and spacing with user preferences.
 6. Use `references/visual-patterns.md` only when the user wants a more designed, magazine-like layout.
 7. Return one clean HTML fragment. Avoid explanatory prose unless the user asks for it.
+
+## Reference Screenshot Workflow
+
+Use this workflow when the user provides a screenshot, reference image, or says they want "this style", "similar to this", "match this layout", or "generate a WeChat article in the style of this image".
+
+1. Analyze the reference visually before writing HTML:
+   - Overall structure: header, title area, intro card, body sections, image groups, footer.
+   - Color palette: dominant background, theme color, accent color, text colors.
+   - Typography hierarchy: title size, subtitle style, body size, caption size, weight, alignment.
+   - Spacing rhythm: outer padding, card margins, paragraph spacing, section breaks.
+   - Visual devices: borders, rounded corners, dividers, labels, icons, dots, frames, shadows, decorative shapes.
+   - Image treatment: full-width, framed, rounded, staggered, overlapped, grid, captioned, or image-heavy.
+2. Translate the style into WeChat-safe HTML:
+   - Use `section` containers and inline styles only.
+   - Use the required 375px mobile-first root container.
+   - Use `inline-block` rows and negative margins instead of absolute positioning.
+   - Replace unsupported effects with compatible approximations.
+3. Preserve content separately from style:
+   - Keep user-provided wording and facts unchanged unless rewriting is requested.
+   - Use neutral placeholders for missing image URLs.
+   - Do not invent authors, organizations, QR codes, dates, contacts, or publication metadata.
+4. If exact replication is not possible in WeChat, preserve the visual intent first:
+   - Approximate shadows with borders or layered background blocks.
+   - Approximate complex positioning with normal-flow layers and negative margins.
+   - Approximate complex shapes with border radius, small inline-block decorations, or image placeholders.
+   - Drop animation, interactivity, filters, fixed/absolute positioning, and unsupported tags.
+5. Return either:
+   - One clean paste-ready HTML fragment when the task is clear.
+   - A short style summary followed by the HTML when the user asks for explanation or when important visual compromises were made.
+
+## Clarifying Style Requirements
+
+If the user asks for a WeChat article but does not provide enough style direction, ask concise follow-up questions before generating HTML. Continue asking until either the key style choices are known or the user says to decide based on the article content.
+
+Ask only for high-impact missing information. Prefer one compact question with grouped choices instead of a long questionnaire.
+
+High-impact inputs:
+- Article content: title, body text, section headings, required source notes.
+- Article purpose and tone: formal, warm, lively, academic, promotional, event-oriented, newsletter-like, or minimalist.
+- Color direction: brand color, preferred theme color, light/dark background, or "choose based on content".
+- Image strategy: no images, placeholders, user-provided image URLs, image-heavy layout, single hero image, inline images, grid, staggered, or overlap.
+- Layout density: clean text-first, card-based, magazine-like, lively decorative, or compact announcement.
+- Footer fields: author, editor, source, organization, date, QR code/logo URL, or omit footer.
+
+Recommended follow-up question format:
+
+```text
+Before I generate the WeChat HTML, I need a few style choices:
+1. Tone: formal / warm / lively / minimalist / decide based on content
+2. Theme color: provide a color / use brand color / decide based on content
+3. Images: none / placeholders / use provided URLs / image-heavy
+4. Layout: text-first / card-based / magazine-like / layered-overlap / decide based on content
+```
+
+Decision rule:
+- If the user answers with concrete preferences, follow them.
+- If the user says "you decide", "based on the content", "随你", "按内容定", or similar, choose a style that fits the article type and proceed without asking again.
+- If the user provides only article text and asks for direct output, make reasonable defaults based on the content instead of blocking on minor style details.
+- Ask again only when a missing input affects factual correctness or cannot be safely guessed, such as required footer names, real image URLs, event time/place, contact details, or official organization identity.
+
+## Temporary Public Image URLs for WeChat Paste
+
+Use this workflow when the user has local image files in the HTML and wants to copy the generated HTML into the WeChat editor so WeChat can fetch the images from public URLs.
+
+Goal: create short-lived public HTTPS URLs for local images, replace local `img src` values in the HTML, and keep the local tunnel running until the user confirms the WeChat editor has loaded or transferred the images.
+
+Preferred approach: local read-only static server bound to `127.0.0.1` plus a Cloudflare Quick Tunnel (`trycloudflare.com`). Quick Tunnels do not require a Cloudflare account, domain, DNS setup, or browser login, but they do require the `cloudflared` CLI to be installed.
+
+### When to Use
+
+Use this for short editing sessions only:
+- The user wants to paste HTML into the WeChat editor.
+- The HTML contains local image paths such as `/home/.../image.jpg`, `file:///.../image.jpg`, or relative image paths.
+- The user only needs the public image URLs long enough for WeChat to fetch or transfer the images.
+
+Do not present this as a permanent image hosting solution. For long-term hosting, recommend a proper object store/CDN or WeChat material library.
+
+### CLI Workflow
+
+1. Inspect the HTML and collect local image sources from `<img src="...">`.
+2. Resolve relative paths against the HTML file's directory.
+3. Create a temporary public directory containing only the images that need to be exposed. Do not expose the user's home directory, project root, source tree, credentials, or unrelated files.
+4. Start a local static file server from that temporary image directory:
+
+```bash
+python3 -m http.server 8000 --bind 127.0.0.1
+```
+
+5. Start a Cloudflare Quick Tunnel pointing at the local server:
+
+```bash
+cloudflared tunnel --url http://127.0.0.1:8000
+```
+
+6. Read the generated `https://...trycloudflare.com` URL from `cloudflared` output.
+7. Replace each local image `src` in the HTML with the public tunnel URL plus the URL-encoded image filename.
+8. Write a separate output HTML file, for example `original.public.html`. Do not overwrite the source unless the user explicitly asks.
+9. Keep both the static server and tunnel process running while the user copies the HTML into WeChat and verifies that the images appear.
+10. After confirmation, stop the server and tunnel.
+
+### Safety Rules
+
+- Bind the local HTTP server to `127.0.0.1`, not `0.0.0.0`.
+- Serve only a temporary directory containing the intended image files.
+- Prefer copied images with sanitized filenames such as `image-01.jpg`; avoid exposing original directories with private names.
+- Keep the tunnel alive only for the current editing session.
+- Tell the user that if the tunnel is closed before WeChat fetches the images, the images may fail to load.
+- If `cloudflared` is missing, install it only with the user's approval when the environment requires installation or network access.
+
+### URL Replacement Rules
+
+- Encode filenames for URLs, especially spaces and non-ASCII characters.
+- Preserve non-image parts of the HTML exactly.
+- Keep existing remote `https://...` image URLs unchanged unless the user asks to rehost them.
+- Use public URLs only in the final paste-ready HTML.
+
+Example replacement:
+
+```html
+<!-- Before -->
+<img src="/home/user/article/images/cover.png">
+
+<!-- After -->
+<img src="https://example.trycloudflare.com/image-01.png">
+```
 
 ## Output Contract
 
