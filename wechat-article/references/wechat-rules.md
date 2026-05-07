@@ -1,3 +1,18 @@
+# WeChat Rich-Text Code Rules
+
+This file contains hard compatibility rules for HTML that will be pasted into the WeChat Official Account rich-text editor. These rules are different from visual capability guidance and editorial habits: do not relax them unless the user is deliberately testing editor behavior.
+
+## Safe HTML Contract
+
+- Use one root `<section>` with `width: 100%; max-width: 375px; margin-left: auto; margin-right: auto;`.
+- Use inline styles only. Do not emit `<style>` blocks or external CSS.
+- Prefer `<section>` for layout containers.
+- Use `<p>`, `<span>`, `<strong>`, `<em>`, `<br>`, and `<img>` for content.
+- Avoid `<script>`, `<iframe>`, `<table>`, `<form>`, `<input>`, and interactive controls.
+- Avoid `position: absolute`, `position: fixed`, CSS animation, CSS transition, `filter`, and layout that depends on JavaScript.
+- Prefer `display: inline-block` rows over `display: flex`; do not use CSS grid for final paste-ready HTML.
+- Every image should include `width: 100%; max-width: 100%; display: block; margin: 0 auto;` unless a narrower image is intentional.
+- Use `box-sizing: border-box` on layout blocks when padding or borders are involved.
 
 ## Alignment Rules (Critical for PC View)
 

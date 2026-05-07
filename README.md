@@ -18,15 +18,14 @@
 
 ## 包含什么
 
-- 微信公众号编辑器安全的 HTML 标签和内联 CSS 规则
-- 375px 移动端优先布局
-- 手机端和 PC 端都尽量稳定的居中规则
-- 图片、注释、分割线、引用块、落款、双栏和三栏布局
-- 层叠、错落图片、异形装饰、三图皇冠布局等视觉版式
+- 硬性代码规则：微信公众号编辑器安全的 HTML 标签、内联 CSS、375px 移动端优先布局、手机端和 PC 端都尽量稳定的居中规则
+- 基础能力：图片、注释、分割线、引用块、落款、双栏和三栏布局等常规文章组件
+- 特殊排版能力：层叠、错落图片、异形装饰、三图皇冠布局、四角框、纹理背景等视觉版式
+- 可调整的排版习惯：字号、行距、字间距、首行缩进、两端对齐、图片裁切和图片组合方式
 - 根据用户提供的参考截图/图片，分析并生成相近风格的公众号 HTML
 - 当用户没有说明色彩、图片数量、排版风格等关键偏好时，引导补充或按内容自主决定
+- 生成前后的兼容性与排版自检清单
 - 将 HTML 中的本地图片临时暴露为公网 HTTPS URL，便于粘贴到微信公众号编辑器时自动拉取
-- 可按用户习惯调整的字号、行距、缩进、页边距和尾部信息
 - 一个完整的 HTML 模板 `assets/template.html`
 
 ## 适合什么时候用
@@ -71,7 +70,7 @@ $skill-installer install https://github.com/WindGraham/wechat-article-skills/tre
 ```
 
 ```text
-阅读 wechat-article/SKILL.md，按其中规则把这篇活动推送排成公众号 HTML。风格简洁，主题色蓝色，包含标题区、活动信息卡片、正文段落和图片占位。
+阅读 wechat-article/SKILL.md，按其中规则把这篇推送排成公众号 HTML。风格简洁，主题色蓝色，包含标题区、信息卡片、正文段落和图片占位。
 ```
 
 ```text
@@ -120,6 +119,7 @@ wechat-article/
   references/
     editor-features.md
     formatting-guide.md
+    generation-checklist.md
     visual-patterns.md
     wechat-rules.md
 ```

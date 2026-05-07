@@ -3,6 +3,8 @@
 
 Multiple layers stacked with negative margins. Common pattern: background wallpaper + frame + image.
 
+Structure formula: `outer color block -> inner frame/image wrapper -> image`.
+
 ```html
 <!-- Layer 1: Background "wallpaper" block -->
 <section style="display: inline-block; width: 90%; vertical-align: top; background-color: rgb(255, 183, 77); padding: 15px; box-sizing: border-box;">
@@ -16,6 +18,8 @@ Multiple layers stacked with negative margins. Common pattern: background wallpa
 ## Pattern 18: Negative Margin Overlap (Layering)
 
 Create depth by overlapping elements upward.
+
+Structure formula: `base block -> following overlay block with negative top margin -> optional spacer/decoration`.
 
 ### Large Overlap (-40px to -60px)
 ```html
@@ -53,6 +57,8 @@ Create depth by overlapping elements upward.
 
 Place one image visually on top of another by rendering it after the base image and pulling it upward with negative margin. Use `text-align` on the overlay wrapper to choose left, center, or right placement.
 
+Structure formula: `base image -> overlay wrapper with negative margin -> smaller image`.
+
 ```html
 <section style="text-align: center; padding: 0 15px; box-sizing: border-box;">
   <section style="line-height: 0; box-sizing: border-box;">
@@ -76,6 +82,8 @@ Rules:
 ## Pattern 20: Corner Image Over Text Card
 
 Place a small image or decoration over a text card corner. The text card must reserve space with padding so text does not run under the image.
+
+Structure formula: `padded text card -> corner overlay wrapper -> small image/decoration`.
 
 ```html
 <section style="margin: 25px 15px 0; box-sizing: border-box;">
@@ -102,6 +110,8 @@ Rules:
 ## Pattern 21: Staggered Image Grid (Interlaced Layout)
 
 Multiple images arranged in staggered left-right positions with different vertical offsets.
+
+Structure formula: `row of inline-block columns -> selected columns get padding-top -> repeat with alternate widths`.
 
 **⚠️ WeChat PC client does NOT support `display: flex`. Use `display: inline-block` instead.**
 
@@ -145,6 +155,8 @@ Multiple images arranged in staggered left-right positions with different vertic
 
 One row with three images where the left and right images sit lower and the center image sits higher. This is useful for activity photos, portrait groups, product details, and visual rhythm between text sections.
 
+Structure formula: `left narrow image with top padding -> center emphasized image -> right narrow image with top padding`.
+
 **Use inline-block, not flex.** Three columns are tight on a 375px WeChat canvas, so keep total width at or below 96%.
 
 ```html
@@ -181,6 +193,8 @@ One row with three images where the left and right images sit lower and the cent
 
 ## Pattern 23: Asymmetric Shapes (Beyond Rectangles)
 
+Structure formula: `small inline-block shape -> asymmetric radius or light transform -> optional inner symbol`.
+
 ### Diamond (Rotated Square)
 ```html
 <section style="display: inline-block; width: 10px; height: 10px; vertical-align: middle; background-color: rgb(255, 183, 77); border-radius: 2px; transform: rotate(45deg); box-sizing: border-box;">
@@ -203,6 +217,8 @@ One row with three images where the left and right images sit lower and the cent
 
 ## Pattern 24: Text Background Cards (Letter Paper Feel)
 
+Structure formula: `card container with background/border -> paragraph block with body text rules`.
+
 ### Card with Colored Top/Bottom Borders
 ```html
 <section style="background-color: rgb(255, 255, 255); padding: 20px; margin: 10px 15px; box-sizing: border-box; border-top: 3px solid rgb(255, 183, 77); border-bottom: 3px solid rgb(78, 128, 88);">
@@ -221,6 +237,8 @@ One row with three images where the left and right images sit lower and the cent
 
 Use `transform: rotate()` sparingly. WeChat editor support is partial.
 
+Structure formula: `slightly rotated outer frame -> counter-rotated inner image/content wrapper`.
+
 ```html
 <!-- Tilted frame with counter-rotated image -->
 <section style="display: inline-block; width: 100%; vertical-align: top; background-color: rgb(168, 213, 168); padding: 12px; box-sizing: border-box; transform: rotate(-2deg);">
@@ -233,6 +251,8 @@ Use `transform: rotate()` sparingly. WeChat editor support is partial.
 **Note**: Counter-rotate the inner element to keep the image straight while the frame is tilted. Small angles (1-3deg) work best.
 
 ## Pattern 26: Decorative Divider with Stickers
+
+Structure formula: `inline decoration -> short line -> inline decoration`.
 
 ### Diamond + Line + Diamond
 ```html
@@ -276,6 +296,8 @@ Use `transform: rotate()` sparingly. WeChat editor support is partial.
 
 Some article designs use a unified background color for the entire page, with content blocks layered on top.
 
+Structure formula: `root background container -> repeated content blocks/cards -> optional full-color section`.
+
 ```html
 <!-- Root container with page background (NOT pure white) -->
 <section style="max-width: 375px; margin: 0 auto; background-color: rgb(245, 245, 235); box-sizing: border-box;">
@@ -293,6 +315,208 @@ Some article designs use a unified background color for the entire page, with co
 </section>
 ```
 
+## Pattern 28: Textured Paper Background
+
+Use a low-contrast repeat texture as the page background, with solid or near-solid content blocks above it so text remains readable.
+
+Structure formula: `root texture background -> readable solid content block -> text/image content`.
+
+```html
+<section style="width: 100%; max-width: 375px; margin-left: auto; margin-right: auto; background-color: rgb(248, 245, 238); background-image: url('TEXTURE_URL'); background-repeat: repeat; background-size: auto; padding: 24px 10px; box-sizing: border-box; text-align: center;">
+  <section style="background-color: rgb(255, 253, 248); padding: 18px 14px; box-sizing: border-box;">
+    <p style="margin: 0; padding: 0; font-size: 15px; line-height: 1.9; color: rgb(74, 58, 46); text-align: justify; text-indent: 2em;">
+      正文内容...
+    </p>
+  </section>
+</section>
+```
+
+Rules:
+- Keep the root centered with both `width: 100%` and `max-width: 375px`.
+- Use `background-color` as a fallback in case the texture image fails.
+- Avoid dark, busy, or photographic textures behind long text.
+- Do not depend on `background-attachment` or complex background positioning.
+
+## Pattern 29: Circle Character Title
+
+Split a short title into individual characters inside equal-size circles.
+
+Structure formula: `centered row -> repeated fixed-size circle -> one character per circle`.
+
+```html
+<section style="text-align: center; margin: 12px 0 8px; box-sizing: border-box;">
+  <section style="display: inline-block; width: 36px; height: 36px; line-height: 36px; vertical-align: top; margin: 0 4px; border-radius: 100%; background-color: rgb(134, 96, 71); box-sizing: border-box;">
+    <span style="font-size: 18px; color: rgb(255,255,255);"><strong>标</strong></span>
+  </section>
+  <section style="display: inline-block; width: 36px; height: 36px; line-height: 36px; vertical-align: top; margin: 0 4px; border-radius: 100%; background-color: rgb(168, 101, 47); box-sizing: border-box;">
+    <span style="font-size: 18px; color: rgb(255,255,255);"><strong>题</strong></span>
+  </section>
+  <section style="display: inline-block; width: 36px; height: 36px; line-height: 36px; vertical-align: top; margin: 0 4px; border-radius: 100%; background-color: rgb(134, 96, 71); box-sizing: border-box;">
+    <span style="font-size: 18px; color: rgb(255,255,255);"><strong>文</strong></span>
+  </section>
+  <section style="display: inline-block; width: 36px; height: 36px; line-height: 36px; vertical-align: top; margin: 0 4px; border-radius: 100%; background-color: rgb(168, 101, 47); box-sizing: border-box;">
+    <span style="font-size: 18px; color: rgb(255,255,255);"><strong>字</strong></span>
+  </section>
+</section>
+```
+
+Rules:
+- Use only for short titles, usually 2-6 Chinese characters.
+- Set equal `width`, `height`, and `line-height` to keep circles stable.
+- Keep each circle as `inline-block`; do not use `grid`.
+- Add a simple divider below when the title area needs balance.
+
+## Pattern 30: Four-Corner Frame
+
+Create a framed container with a thin outer border and four L-shaped corner marks. This is a safe replacement for absolute-positioned corner decorations.
+
+Structure formula: `outer border -> top corner row -> padded content -> bottom corner row`.
+
+```html
+<section style="margin: 22px 10px 0; padding: 8px; border: 1px solid rgb(134, 96, 71); box-sizing: border-box;">
+  <section style="text-align: left; height: 18px; line-height: 0; box-sizing: border-box;">
+    <section style="display: inline-block; width: 16px; height: 16px; border-top: 3px solid rgb(134, 96, 71); border-left: 3px solid rgb(134, 96, 71); box-sizing: border-box;"></section>
+    <section style="display: inline-block; width: 100%; max-width: 295px; height: 1px; box-sizing: border-box;"></section>
+    <section style="display: inline-block; width: 16px; height: 16px; border-top: 3px solid rgb(134, 96, 71); border-right: 3px solid rgb(134, 96, 71); box-sizing: border-box;"></section>
+  </section>
+
+  <section style="padding: 22px 12px; box-sizing: border-box;">
+    <!-- main content -->
+  </section>
+
+  <section style="text-align: left; height: 18px; line-height: 0; box-sizing: border-box;">
+    <section style="display: inline-block; width: 16px; height: 16px; border-bottom: 3px solid rgb(134, 96, 71); border-left: 3px solid rgb(134, 96, 71); box-sizing: border-box;"></section>
+    <section style="display: inline-block; width: 100%; max-width: 295px; height: 1px; box-sizing: border-box;"></section>
+    <section style="display: inline-block; width: 16px; height: 16px; border-bottom: 3px solid rgb(134, 96, 71); border-right: 3px solid rgb(134, 96, 71); box-sizing: border-box;"></section>
+  </section>
+</section>
+```
+
+Rules:
+- Keep the frame inside the 375px root; use `margin: 0 10px` or similar side padding.
+- Use inner padding so text and images do not touch the corner marks.
+- If exact corner alignment matters, prefer four normal-flow rows/columns over `position: absolute`.
+
+## Pattern 31: Side Image With Short Text
+
+Place one narrow image beside a short text block. This is safer than a free-positioned collage and avoids making a vertical image dominate the full mobile width.
+
+Structure formula: `inline-block narrow image column -> inline-block short text column`.
+
+```html
+<section style="margin: 18px 10px 0; padding: 28px 14px; border: 1px solid rgb(134, 96, 71); box-sizing: border-box; text-align: center;">
+  <section style="display: inline-block; width: 34%; vertical-align: middle; padding: 4px; border: 4px double rgb(134, 96, 71); box-sizing: border-box; line-height: 0;">
+    <img src="IMAGE_URL" style="width: 100%; max-width: 100%; display: block; margin: 0 auto; box-sizing: border-box;">
+  </section><!--
+  --><section style="display: inline-block; width: 58%; vertical-align: middle; padding-left: 18px; box-sizing: border-box; text-align: left;">
+    <p style="margin: 0; padding: 0; font-size: 18px; line-height: 1.85; color: rgb(168, 101, 47); text-align: left;">
+      <strong>短句第一行<br>短句第二行<br>短句第三行<br>短句第四行</strong>
+    </p>
+    <p style="margin: 12px 0 0; padding: 0; font-size: 18px; line-height: 1.8; color: rgb(168, 101, 47); text-align: right;">
+      <strong>右对齐信息</strong>
+    </p>
+    <p style="margin: 4px 0 0; padding: 0; font-size: 18px; line-height: 1.8; color: rgb(168, 101, 47); text-align: right;">
+      <strong>补充信息</strong>
+    </p>
+  </section>
+</section>
+```
+
+Rules:
+- Use this only when the image is narrow enough to sit beside text.
+- Keep total column width conservative: about `34% + 58% + padding-left`.
+- Use `vertical-align: middle` for balanced card-like layouts; use `top` when the text block is taller than the image.
+- Keep text lines short and avoid long paragraphs in the side column.
+
+## Pattern 32: Reference Layout Translation Rules
+
+When using copied article-editor HTML as a reference, preserve the visual idea but rewrite the implementation into WeChat-safe normal flow.
+
+Structure formula: `reference visual intent -> compatible normal-flow blocks -> simplified decoration`.
+
+Translation rules:
+- `display: grid` stacked scenes -> normal-flow sections with negative margins.
+- `display: flex` rows -> `inline-block` rows with `<!-- -->` between columns.
+- `transform: translate3d(...)` -> margins, padding, or text alignment.
+- `position: static; z-index: ...` wrappers -> ordinary section order; render the lower layer first, then the upper layer.
+- SVG decorations -> ignore, replace with simple HTML/CSS dots, lines, circles, corner marks, or use exported PNG images if the SVG is essential.
+- `box-shadow` -> border, double border, offset color block, or a very subtle shadow only when tested.
+- Gradient text/backgrounds -> solid theme colors unless the user specifically asks for the gradient and accepts possible degradation.
+
+## Pattern 33: Two-Corner Quote Block
+
+Use only a top-left and bottom-right corner mark around a text block. This is lighter than a full four-corner frame.
+
+Structure formula: `top-left corner mark -> center text block -> bottom-right corner mark`.
+
+```html
+<section style="text-align: center; margin: 18px 0; box-sizing: border-box;">
+  <section style="display: inline-block; width: 5%; vertical-align: top; height: 18px; border-top: 1px solid rgb(127, 22, 3); border-left: 1px solid rgb(127, 22, 3); margin-top: -2px; box-sizing: border-box;"></section><!--
+  --><section style="display: inline-block; width: 84%; vertical-align: top; padding: 8px 10px; box-sizing: border-box;">
+    <p style="white-space: normal; margin: 0; padding: 0; font-size: 15px; line-height: 1.9; color: rgb(73,73,73); text-align: justify; text-indent: 2em;">
+      这里是文本内容...
+    </p>
+  </section><!--
+  --><section style="display: inline-block; width: 5%; vertical-align: bottom; height: 18px; border-bottom: 1px solid rgb(127, 22, 3); border-right: 1px solid rgb(127, 22, 3); margin-bottom: -2px; box-sizing: border-box;"></section>
+</section>
+```
+
+Rules:
+- Keep the center content width around 80%-86% so the side corner marks have space.
+- Use this for repeated short text blocks; it gives rhythm without making every paragraph a heavy card.
+- For long body sections, use a normal text card or plain paragraph instead.
+
+## Pattern 34: Labeled Dotted Divider
+
+Use a short label or small sticker with a dotted line to separate sections.
+
+Structure formula: `short label -> dotted/dashed line -> small dot/sticker`.
+
+```html
+<section style="text-align: center; margin: 22px 0 14px; box-sizing: border-box;">
+  <section style="display: inline-block; width: 52px; vertical-align: middle; box-sizing: border-box;">
+    <p style="white-space: normal; margin: 0; padding: 0; font-size: 14px; line-height: 1.4; color: rgb(134, 96, 71); text-align: left;">
+      标签
+    </p>
+  </section><!--
+  --><section style="display: inline-block; width: 180px; vertical-align: middle; border-top: 2px dotted rgb(134, 96, 71); box-sizing: border-box;"></section><!--
+  --><section style="display: inline-block; width: 34px; vertical-align: middle; text-align: right; box-sizing: border-box;">
+    <section style="display: inline-block; width: 18px; height: 18px; border-radius: 100%; background-color: rgb(134, 96, 71); box-sizing: border-box;"></section>
+  </section>
+</section>
+```
+
+Rules:
+- Keep label text short, usually 2-4 Chinese characters or a compact English word.
+- Use dotted or dashed borders instead of image-based divider textures.
+- If a sticker image is required, use a small `<img>` inside the right wrapper.
+
+## Pattern 35: Tab Header Card
+
+Use a small rounded-top tab connected to a content card.
+
+Structure formula: `small top tab -> connected bordered content card`.
+
+```html
+<section style="margin: 22px 15px 0; box-sizing: border-box; text-align: left;">
+  <section style="display: inline-block; padding: 6px 16px; background-color: rgb(240, 112, 32); border: 2px solid rgb(240, 112, 32); border-bottom: none; border-top-left-radius: 14px; border-top-right-radius: 14px; box-sizing: border-box;">
+    <p style="white-space: normal; margin: 0; padding: 0; font-size: 15px; line-height: 1.4; color: rgb(255,255,255); text-align: center;">
+      <strong>标签标题</strong>
+    </p>
+  </section>
+  <section style="margin-top: -1px; padding: 16px 14px; border: 2px solid rgb(240, 112, 32); border-radius: 0 8px 8px 8px; background-color: rgb(255,255,255); box-sizing: border-box;">
+    <p style="white-space: normal; margin: 0; padding: 0; font-size: 15px; line-height: 1.8; color: rgb(62,62,62); text-align: justify; text-indent: 2em;">
+      卡片正文内容...
+    </p>
+  </section>
+</section>
+```
+
+Rules:
+- Use one tab per section; repeated tabs should share the same color system.
+- Keep tab labels short so they do not wrap.
+- Use `margin-top: -1px` to visually connect the tab and card border.
+
 ## Visual Design Principles
 
 ### Layering Creates Depth
@@ -302,7 +526,7 @@ Some article designs use a unified background color for the entire page, with co
 - **Height: 0 trick**: Pure decoration layers don't affect document flow
 
 ### Stagger Creates Rhythm
-- Use `padding-top` differences on flex columns
+- Use `padding-top` differences on inline-block columns
 - Alternate large/small images left/right
 - Vary border-radius patterns between images
 

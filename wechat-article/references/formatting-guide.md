@@ -2,6 +2,8 @@
 
 Use this file for adaptable formatting guidance. The values below are defaults, not hard requirements. If the user provides brand guidelines, column conventions, font sizes, spacing, or footer rules, follow the user's requirements instead.
 
+This file describes common editorial habits, not hard compatibility rules. Hard HTML/CSS limits belong in `wechat-rules.md`; component capability belongs in `editor-features.md`; richer visual patterns belong in `visual-patterns.md`.
+
 ## Title Area
 
 Common title metadata formats:
@@ -18,6 +20,8 @@ Guidance:
 - Avoid hard-coding organization names, issue numbers, email addresses, or private account details.
 
 ## Body Text
+
+For normal multi-paragraph Chinese body text, the common default is left reading flow with `text-align: justify` and `text-indent: 2em`. This gives a clean article feel while keeping paragraph starts easy to scan. Use centered text only for titles, captions, slogans, short quotes, and decorative labels.
 
 Default body paragraph:
 
@@ -36,10 +40,10 @@ Adaptable defaults:
 | Font size | 15px-16px | Use the user's preference when provided. |
 | Color | rgb(62,62,62) | Theme colors are fine for emphasis. |
 | Page padding | 10px-15px | Increase padding for card layouts. |
-| Letter spacing | 0px | Avoid large tracking for long body text. |
+| Letter spacing | 0px-1px | Keep long body text tight; large tracking makes paragraphs harder to read. |
 | Line height | 1.7-1.9 | Match content density and audience. |
-| Alignment | justify or left | Use `justify` for formal prose, `left` for short paragraphs. |
-| First-line indent | 0 or 2em | Use only when it fits the article style. |
+| Alignment | justify | Use `justify` for normal prose, `left` for short notes or list-like text. |
+| First-line indent | 2em | Use `0` only for captions, cards with very short text, or user-preferred modern layouts. |
 
 Do not simulate indentation with spaces. Use CSS `text-indent` when indentation is needed.
 
@@ -54,6 +58,19 @@ Default image caption:
 ```
 
 Captions are optional. Keep them concise and centered unless the user asks for another style.
+
+## Image Selection and Cropping
+
+For ordinary article flow, wide horizontal images are usually safer than tall un-cropped portraits. Avoid placing a single vertical image by itself as a full-width section: it can become too long; if simply reduced, it often leaves the page feeling empty.
+
+Guidance:
+- Use horizontal or lightly cropped images for full-width hero and section images.
+- Use vertical images in narrower columns, framed cards, or staggered groups instead of full-width single placement.
+- Pair several reduced vertical images together when the article has multiple related photos.
+- Use image-text side-by-side layouts when one vertical image needs context; pair it with a short quote, poem, note, event info, or caption block.
+- If a single vertical image is unavoidable, place it in a 60%-75% width centered frame with a short caption and enough surrounding text.
+- Do not pair a narrow vertical image with long paragraphs; long text beside a narrow image becomes cramped on mobile.
+- Preserve user-provided images, but choose framing and width based on aspect ratio.
 
 ## Footer and Credits
 

@@ -15,13 +15,23 @@ Do not attempt account login, media upload, automatic publishing, browser automa
 
 ## Quick Start
 
-1. Read `references/wechat-rules.md` for technical constraints
-2. Read `references/visual-patterns.md` for visual design patterns
-3. Read `references/formatting-guide.md` for adaptable formatting guidance
-4. Read `references/editor-features.md` for feature capability matrix
-5. Use `assets/template.html` as starting point
-6. Replace content placeholders with actual text/images
-7. If the article uses local image files and the user wants paste-ready WeChat editor HTML, use the temporary public image workflow before final output.
+1. Read `references/wechat-rules.md` for hard code constraints
+2. Read `references/editor-features.md` for basic capabilities vs. special layout capabilities
+3. Read `references/formatting-guide.md` for adaptable article habits and typography defaults
+4. Read `references/visual-patterns.md` only when a more designed or reference-matched layout is needed
+5. Use `references/generation-checklist.md` before returning final HTML
+6. Use `assets/template.html` as starting point
+7. Replace content placeholders with actual text/images
+8. If the article uses local image files and the user wants paste-ready WeChat editor HTML, use the temporary public image workflow before final output.
+
+## Knowledge Structure
+
+Keep these four parts separate when generating or revising an article:
+
+1. Hard code rules: constraints imposed by the WeChat rich-text editor. These are not optional. Examples: inline styles only, safe tags, mobile root width, no scripts, no free absolute positioning.
+2. Basic capabilities: simple components that can be used freely in most articles. Examples: titles, paragraphs, captions, borders, single images, simple cards, dividers, two-column rows.
+3. Special layout capabilities: more designed patterns for richer visual rhythm. Examples: layered overlap, framed image groups, staggered grids, four-corner frames, circle-character titles, side-image text cards.
+4. Editorial habits: defaults that should follow common WeChat reading conventions but can be changed by user preference. Examples: body text size, line height, letter spacing, paragraph indent, justified alignment, image cropping and grouping.
 
 ## Workflow
 
@@ -32,8 +42,8 @@ Do not attempt account login, media upload, automatic publishing, browser automa
    - Image-heavy: hero image, framed images, captions, staggered grid, short text cards.
    - Event/announcement: header, key info card, body sections, callout block, optional contact/source note.
 4. Apply WeChat constraints from `references/wechat-rules.md`.
-5. Use `references/formatting-guide.md` for defaults, but override typography and spacing with user preferences.
-6. Use `references/visual-patterns.md` only when the user wants a more designed, magazine-like layout.
+5. Choose basic capabilities first; add special layout capabilities only when they serve the article or reference style.
+6. Use `references/formatting-guide.md` for defaults, but override typography, spacing, alignment, and image strategy with user preferences.
 7. Return one clean HTML fragment. Avoid explanatory prose unless the user asks for it.
 
 ## Reference Screenshot Workflow
