@@ -112,10 +112,6 @@ wechat-article/
     wechat-rules.md
 ```
 
-## 隐私
-
-仓库中不包含私人组织名称、账号凭证、邮箱、个人姓名、平台 token 或发布密钥。也不建议把这些信息提交到仓库里。
-
 ## License
 
 MIT
