@@ -1,0 +1,175 @@
+
+## Alignment Rules (Critical for PC View)
+
+WeChat mobile app width = 375px. WeChat PC client width > 375px. **Alignment must work in both.**
+
+### Root Container (Must Be Centered)
+
+```html
+<section style="width: 100%; max-width: 375px; margin-left: auto; margin-right: auto; text-align: center;">
+  <!-- all content -->
+</section>
+```
+
+| Property | Value | Why |
+|:---|:---|:---|
+| `width` | `100%` | Fill available width on mobile |
+| `max-width` | `375px` | Limit to mobile width on PC |
+| `margin-left/right` | `auto` | Force centering (more reliable than `margin: 0 auto`) |
+| `text-align` | `center` | Default all children to center |
+
+**Do NOT use** `margin: 0 auto` alone — it may fail in WeChat PC client.
+
+### Text Paragraphs (Override Root Center)
+
+```html
+<p style="text-align: left; text-indent: 2em;">
+  正文内容...
+</p>
+```
+
+Root container sets `text-align: center`. Paragraphs must explicitly override to `left` for proper reading.
+
+### Text Alignment
+
+Use `text-align` directly on the text block that owns the text:
+
+| Alignment | Use For | Pattern |
+|:---|:---|:---|
+| `left` | Body paragraphs, explanations, source notes | `<p style="text-align: left;">...` |
+| `center` | Titles, captions, short slogans, decorative labels | `<p style="text-align: center;">...` |
+| `right` | Credits, dates, signatures | `<section style="text-align: right;">...` |
+| `justify` | Formal long-form Chinese body text | `<p style="text-align: justify;">...` |
+
+Rules:
+- Root containers often use `text-align: center` to center inline-block children. Body paragraphs must override this with `text-align: left` or `text-align: justify`.
+- Use `text-align: justify` only for multi-line prose. It can look odd on very short lines, captions, names, and headings.
+- Use CSS `text-indent` for paragraph indentation. Do not add manual spaces before text.
+
+### Images (Dual Centering)
+
+Always use **both** methods:
+
+```html
+<!-- Method 1: Parent text-align:center + child inline-block -->
+<section style="text-align: center;">
+  <section style="display: inline-block; width: 100%; line-height: 0;">
+    <img src="URL" style="width: 100%; display: block; margin: 0 auto;">
+  </section>
+</section>
+```
+
+| Method | Property | Purpose |
+|:---|:---|:---|
+| Parent | `text-align: center` | Horizontal centering |
+| Image | `margin: 0 auto` | Backup centering (works when parent align fails) |
+| Image | `display: block` | Required for margin:auto to work |
+
+### Flex Layout Compatibility
+
+**`display: flex` is NOT reliably supported in WeChat PC client.** Use `display: inline-block` instead.
+
+### Multi-Element Row Alignment
+
+When placing multiple elements in one row, use `inline-block` children inside a parent container. The parent's `text-align` controls the horizontal alignment of the row as a whole, while each child's `vertical-align` controls how the columns line up vertically.
+
+```html
+<section style="text-align: center; padding: 0 12px; box-sizing: border-box;">
+  <section style="display: inline-block; width: 30%; vertical-align: top; box-sizing: border-box;">
+    <!-- item 1 -->
+  </section><!--
+  --><section style="display: inline-block; width: 30%; vertical-align: top; box-sizing: border-box;">
+    <!-- item 2 -->
+  </section><!--
+  --><section style="display: inline-block; width: 30%; vertical-align: top; box-sizing: border-box;">
+    <!-- item 3 -->
+  </section>
+</section>
+```
+
+Parent alignment:
+- `text-align: left` places the row at the left edge.
+- `text-align: center` centers the row. This is the safest default for image groups.
+- `text-align: right` places the row at the right edge.
+
+Child vertical alignment:
+- `vertical-align: top` aligns item tops. Use this for cards and images.
+- `vertical-align: middle` aligns inline decorations or icons with text.
+- `vertical-align: bottom` is useful for deliberate low/high visual rhythm, but `padding-top` is usually easier to control.
+
+Spacing rules:
+1. Use `<!-- -->` comments between inline-block children to remove whitespace gaps.
+2. Keep total width at or below 96% when there are two or three columns.
+3. Prefer `padding-left` or inner wrappers for gaps. Avoid `padding-right` on a fixed-width left column when the row is close to 100%.
+4. For staggered layouts, use `padding-top` on selected columns instead of `position` or `transform`.
+
+### Inline-Block Two-Column (Safe Method)
+
+```html
+<section style="text-align: center; padding: 0 15px;">
+  <section style="display: inline-block; width: 52%; vertical-align: top; box-sizing: border-box;">
+    <!-- Left column -->
+  </section><!--
+  --><section style="display: inline-block; width: 44%; vertical-align: top; padding-left: 8px; box-sizing: border-box;">
+    <!-- Right column -->
+  </section>
+</section>
+```
+
+**Critical rules:**
+1. **Use `<!-- -->` comment** to eliminate whitespace between inline-block elements
+2. **Total width ≤ 96%** (leave 4% safety margin)
+3. **Use `padding-left` on right column** for spacing (not `padding-right` on left column)
+4. **Never use `padding-right` + `width: 55%`** — it exceeds 100% with box-sizing
+
+### Why `padding-right` Breaks Layout
+
+```html
+<!-- BAD: 55% + 8px padding-right = exceeds container width -->
+<section style="width: 55%; padding-right: 8px;">...</section>
+<section style="width: 45%;">...</section>
+
+<!-- GOOD: 52% + 44% + 8px padding-left = safe -->
+<section style="width: 52%;">...</section>
+<section style="width: 44%; padding-left: 8px;">...</section>
+```
+
+With `box-sizing: border-box`, `padding-right` is added to the element's total width. Two columns with 55% + 8px + 45% = >100%, causing the right column to wrap to next line.
+
+### Safe Two-Column Widths
+
+| Left | Right | Gap | Total | Safe? |
+|:---:|:---:|:---:|:---:|:---:|
+| 50% | 50% | 0px | 100% | ⚠️ Risky (no gap) |
+| 52% | 44% | 8px | 96% + 8px | ✅ Safe |
+| 48% | 48% | 4% | 100% | ⚠️ Risky (gap by whitespace) |
+| 100% | — | — | — | ✅ Single column (safest) |
+
+**Recommendation**: For reliable cross-platform compatibility, use single-column layouts. Two-column only when necessary, with total width ≤ 96%.
+
+### Inline-Block Three-Column (Safe Method)
+
+Three columns are possible, but less forgiving than two columns. Keep widths conservative.
+
+```html
+<section style="text-align: center; padding: 0 12px; box-sizing: border-box;">
+  <section style="display: inline-block; width: 30%; vertical-align: top; box-sizing: border-box;">
+    <!-- Left column -->
+  </section><!--
+  --><section style="display: inline-block; width: 32%; vertical-align: top; margin: 0 2%; box-sizing: border-box;">
+    <!-- Center column -->
+  </section><!--
+  --><section style="display: inline-block; width: 30%; vertical-align: top; box-sizing: border-box;">
+    <!-- Right column -->
+  </section>
+</section>
+```
+
+Safe three-column widths:
+
+| Left | Center | Right | Gap | Total | Safe? |
+|:---:|:---:|:---:|:---:|:---:|:---:|
+| 30% | 32% | 30% | 2% + 2% margin | 96% | ✅ Safe |
+| 31% | 31% | 31% | 0 | 93% | ✅ Safe, tighter visuals |
+| 33% | 33% | 33% | whitespace or margin | 99%+ | ⚠️ Risky |
+| 33.33% | 33.33% | 33.33% | any gap | >100% | ❌ Avoid |
