@@ -108,31 +108,43 @@ Use for quotes, testimonials, notes, or highlighted paragraphs.
 
 Implement with four small corner blocks and a center text area. Avoid overusing it.
 
+**Critical layout rule**: Do not use `width: 50%` two-column rows for left/right corner marks — this causes misalignment in WeChat mobile editor. Instead, place left and right corner marks on separate rows and pull the right mark upward with negative margin.
+
 Skeleton:
 
 ```html
 <section style="margin: 24px 20px; box-sizing: border-box;">
-  <section style="height: 14px; line-height: 0; text-align: left; box-sizing: border-box;">
-    <section style="display: inline-block; width: 50%; text-align: left; box-sizing: border-box;">
-      <section style="display: inline-block; width: 14px; height: 14px; border-top: 2px solid rgb(80,105,92); border-left: 2px solid rgb(80,105,92); box-sizing: border-box;"></section>
-    </section><!--
-    --><section style="display: inline-block; width: 50%; text-align: right; box-sizing: border-box;">
-      <section style="display: inline-block; width: 14px; height: 14px; border-top: 2px solid rgb(80,105,92); border-right: 2px solid rgb(80,105,92); box-sizing: border-box;"></section>
-    </section>
+  <!-- Top-left corner -->
+  <section style="line-height: 0; text-align: left; box-sizing: border-box;">
+    <section style="display: inline-block; width: 14px; height: 14px; border-top: 2px solid rgb(80,105,92); border-left: 2px solid rgb(80,105,92); box-sizing: border-box;"></section>
   </section>
-  <section style="padding: 12px 16px; box-sizing: border-box;">
+
+  <!-- Top-right corner (pulled up to align with top-left) -->
+  <section style="line-height: 0; text-align: right; margin-top: -14px; box-sizing: border-box;">
+    <section style="display: inline-block; width: 14px; height: 14px; border-top: 2px solid rgb(80,105,92); border-right: 2px solid rgb(80,105,92); box-sizing: border-box;"></section>
+  </section>
+
+  <!-- Center text -->
+  <section style="margin: 12px 16px; box-sizing: border-box;">
     <p style="margin: 0; font-size: 15px; line-height: 1.8; color: rgb(70,70,70); text-align: justify;">TEXT</p>
   </section>
-  <section style="height: 14px; line-height: 0; text-align: left; box-sizing: border-box;">
-    <section style="display: inline-block; width: 50%; text-align: left; box-sizing: border-box;">
-      <section style="display: inline-block; width: 14px; height: 14px; border-bottom: 2px solid rgb(80,105,92); border-left: 2px solid rgb(80,105,92); box-sizing: border-box;"></section>
-    </section><!--
-    --><section style="display: inline-block; width: 50%; text-align: right; box-sizing: border-box;">
-      <section style="display: inline-block; width: 14px; height: 14px; border-bottom: 2px solid rgb(80,105,92); border-right: 2px solid rgb(80,105,92); box-sizing: border-box;"></section>
-    </section>
+
+  <!-- Bottom-left corner -->
+  <section style="line-height: 0; text-align: left; box-sizing: border-box;">
+    <section style="display: inline-block; width: 14px; height: 14px; border-bottom: 2px solid rgb(80,105,92); border-left: 2px solid rgb(80,105,92); box-sizing: border-box;"></section>
+  </section>
+
+  <!-- Bottom-right corner (pulled up to align with bottom-left) -->
+  <section style="line-height: 0; text-align: right; margin-top: -14px; box-sizing: border-box;">
+    <section style="display: inline-block; width: 14px; height: 14px; border-bottom: 2px solid rgb(80,105,92); border-right: 2px solid rgb(80,105,92); box-sizing: border-box;"></section>
   </section>
 </section>
 ```
+
+Rules:
+- Each corner mark lives in its own row. Left marks use `text-align: left`; right marks use `text-align: right` + `margin-top: -14px` to pull them up to the same baseline as the left mark.
+- Center text uses `margin: 12px 16px` for whitespace instead of relying on outer padding.
+- Do not nest `display: inline-block` inside the corner-mark rows unnecessarily.
 
 ## Capability: Two-Image Stagger
 

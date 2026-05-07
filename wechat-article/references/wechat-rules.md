@@ -148,15 +148,17 @@ Child vertical alignment:
 
 Spacing rules:
 1. Use `<!-- -->` comments between inline-block children to remove whitespace gaps.
-2. Keep total width at or below 96% when there are two or three columns.
+2. **PC client**: total width ≤ 96%. **Mobile**: total width ≤ 92% (mobile WeChat counts inline-block whitespace differently and may add 1-2px extra).
 3. Prefer `padding-left` or inner wrappers for gaps. Avoid `padding-right` on a fixed-width left column when the row is close to 100%.
 4. For staggered layouts, use `padding-top` on selected columns instead of `position` or `transform`.
+5. **Do not nest `display: inline-block`** — outer columns can be inline-block, but inner image wrappers should use plain `section` without `display: inline-block` to prevent mobile from treating them as block-level breaks.
+6. **`box-sizing: border-box` is not fully reliable on mobile** — WeChat mobile editor sometimes adds padding outside the declared width. Leave extra margin (≤ 92% total) rather than relying on exact box-sizing math.
 
 ### Inline-Block Two-Column (Safe Method)
 
 ```html
 <section style="text-align: center; padding: 0 15px;">
-  <section style="display: inline-block; width: 52%; vertical-align: top; box-sizing: border-box;">
+  <section style="display: inline-block; width: 48%; vertical-align: top; box-sizing: border-box;">
     <!-- Left column -->
   </section><!--
   --><section style="display: inline-block; width: 44%; vertical-align: top; padding-left: 8px; box-sizing: border-box;">
@@ -167,7 +169,7 @@ Spacing rules:
 
 **Critical rules:**
 1. **Use `<!-- -->` comment** to eliminate whitespace between inline-block elements
-2. **Total width ≤ 96%** (leave 4% safety margin)
+2. **PC total width ≤ 96%**; **mobile total width ≤ 92%** (leave 8% safety margin for mobile)
 3. **Use `padding-left` on right column** for spacing (not `padding-right` on left column)
 4. **Never use `padding-right` + `width: 55%`** — it exceeds 100% with box-sizing
 
@@ -190,11 +192,12 @@ With `box-sizing: border-box`, `padding-right` is added to the element's total w
 | Left | Right | Gap | Total | Safe? |
 |:---:|:---:|:---:|:---:|:---:|
 | 50% | 50% | 0px | 100% | ⚠️ Risky (no gap) |
-| 52% | 44% | 8px | 96% + 8px | ✅ Safe |
+| 48% | 44% | 8px | 92% + 8px | ✅ Safe on both PC and mobile |
+| 52% | 44% | 8px | 96% + 8px | ⚠️ Safe on PC; may wrap on mobile |
 | 48% | 48% | 4% | 100% | ⚠️ Risky (gap by whitespace) |
 | 100% | — | — | — | ✅ Single column (safest) |
 
-**Recommendation**: For reliable cross-platform compatibility, use single-column layouts. Two-column only when necessary, with total width ≤ 96%.
+**Recommendation**: For reliable cross-platform compatibility, use single-column layouts. Two-column only when necessary, with total width ≤ 92% on mobile.
 
 ### Inline-Block Three-Column (Safe Method)
 
@@ -218,7 +221,7 @@ Safe three-column widths:
 
 | Left | Center | Right | Gap | Total | Safe? |
 |:---:|:---:|:---:|:---:|:---:|:---:|
-| 30% | 32% | 30% | 2% + 2% margin | 96% | ✅ Safe |
+| 30% | 30% | 30% | 0 | 90% | ✅ Safe on both PC and mobile |
 | 31% | 31% | 31% | 0 | 93% | ✅ Safe, tighter visuals |
 | 33% | 33% | 33% | whitespace or margin | 99%+ | ⚠️ Risky |
 | 33.33% | 33.33% | 33.33% | any gap | >100% | ❌ Avoid |
