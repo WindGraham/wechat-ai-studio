@@ -42,6 +42,16 @@ Use this checklist before returning paste-ready HTML. It is a practical self-che
 - Image groups use similar aspect ratios when possible.
 - Decorative images are small and do not compete with primary content.
 
+## Public Image URLs
+
+- Local image paths have been replaced before the final paste-ready HTML is returned.
+- The default zero-config provider is 360 image host via `wzapi` unless the user configured another provider.
+- Every uploaded image URL was checked with `curl -I`.
+- Every final image URL returns HTTP `200` and `Content-Type: image/*`.
+- No final image URL points to a warning page, tunnel reminder page, HTML page, redirect trap, or local file path.
+- Large images were compressed or resized as temporary copies before upload when required by the provider.
+- Anonymous image hosts were not used for sensitive/private images unless the user explicitly approved.
+
 ## Final Pass
 
 - HTML starts with one clear root `<section>` and has balanced tags.

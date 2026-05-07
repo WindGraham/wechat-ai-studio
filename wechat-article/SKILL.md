@@ -1,6 +1,6 @@
 ---
 name: wechat-article
-description: Generate WeChat Official Account (微信公众号) article HTML. Use when the user needs to create paste-ready HTML content for WeChat public account articles, WeChat rich-text editor compatible layouts, mobile-first article pages, or temporary public image URLs for local images before pasting into the WeChat editor. Covers technical rules (tag whitelist, CSS restrictions), visual design patterns (borders, frames, dividers, decorations), adaptable formatting guidance, reference screenshot style matching, and short-lived local image publishing via CLI tunnel workflows.
+description: Generate WeChat Official Account (微信公众号) article HTML. Use when the user needs to create paste-ready HTML content for WeChat public account articles, WeChat rich-text editor compatible layouts, mobile-first article pages, or public image URLs for local images before pasting into the WeChat editor. Covers technical rules (tag whitelist, CSS restrictions), visual design patterns (borders, frames, dividers, decorations), adaptable formatting guidance, reference screenshot style matching, and CLI image-publication workflows.
 ---
 
 # WeChat Push Article HTML Generator
@@ -22,7 +22,7 @@ Do not attempt account login, media upload, automatic publishing, browser automa
 5. Use `references/generation-checklist.md` before returning final HTML
 6. Use `assets/template.html` as starting point
 7. Replace content placeholders with actual text/images
-8. If the article uses local image files and the user wants paste-ready WeChat editor HTML, use the temporary public image workflow before final output.
+8. If the article uses local image files and the user wants paste-ready WeChat editor HTML, use the image publication workflow before final output.
 
 ## Knowledge Structure
 
@@ -105,58 +105,106 @@ Decision rule:
 - If the user provides only article text and asks for direct output, make reasonable defaults based on the content instead of blocking on minor style details.
 - Ask again only when a missing input affects factual correctness or cannot be safely guessed, such as required footer names, real image URLs, event time/place, contact details, or official organization identity.
 
-## Temporary Public Image URLs for WeChat Paste
+## Image Upload Workflow for WeChat Paste
 
-Use this workflow when the user has local image files in the HTML and wants to copy the generated HTML into the WeChat editor so WeChat can fetch the images from public URLs.
+Use this workflow when the user has local image files in the HTML and wants to copy the generated HTML into the WeChat editor. This workflow uploads local images to a public image hosting service, replaces local `img src` values with public HTTPS URLs, and outputs a paste-ready HTML file.
 
-Goal: create short-lived public HTTPS URLs for local images, replace local `img src` values in the HTML, and keep the local tunnel running until the user confirms the WeChat editor has loaded or transferred the images.
+Goal: turn local images into public HTTPS image URLs that the WeChat editor backend can fetch and transfer.
 
-Preferred approach: local read-only static server bound to `127.0.0.1` plus a Cloudflare Quick Tunnel (`trycloudflare.com`). Quick Tunnels do not require a Cloudflare account, domain, DNS setup, or browser login, but they do require the `cloudflared` CLI to be installed.
+Default provider: 360 image host via `wzapi`. It requires no account, no domain, no server, and no background process.
 
-### When to Use
+### Why Upload Instead of Local Exposure
 
-Use this for short editing sessions only:
-- The user wants to paste HTML into the WeChat editor.
-- The HTML contains local image paths such as `/home/.../image.jpg`, `file:///.../image.jpg`, or relative image paths.
-- The user only needs the public image URLs long enough for WeChat to fetch or transfer the images.
+- No CLI tool installation required beyond `curl`.
+- No background HTTP service needs to keep running.
+- No temporary networking setup, domain, or account registration is required.
+- Uploaded URLs are CDN image URLs such as `https://ps.ssl.qhimg.com/...`.
+- The generated HTML is portable after upload and replacement.
 
-Do not present this as a permanent image hosting solution. For long-term hosting, recommend a proper object store/CDN or WeChat material library.
+### Limits
+
+| Limit | Guidance |
+|:---|:---|
+| Single file size | Keep images under 1.5MB when possible; larger uploads may be slow or fail. |
+| Upload timeout | Use `curl --max-time 60`, especially for files over 1MB. |
+| Content filter | Some individual images may be rejected; retry once, then report failure. |
+| Persistence | Good enough for WeChat fetch-and-transfer; do not treat anonymous hosting as permanent storage. |
+| Sensitive images | Do not upload sensitive/private images unless the user explicitly approves anonymous third-party hosting. |
+
+### Prerequisites
+
+- `curl`.
+- Optional: Python Pillow for automatic image compression.
+- Optional fallback: ImageMagick (`magick`) for image compression.
 
 ### CLI Workflow
 
-1. Inspect the HTML and collect local image sources from `<img src="...">`.
-2. Resolve relative paths against the HTML file's directory.
-3. Create a temporary public directory containing only the images that need to be exposed. Do not expose the user's home directory, project root, source tree, credentials, or unrelated files.
-4. Start a local static file server from that temporary image directory:
+1. Inspect the HTML and collect local image sources from `<img src="...">` and `<img data-src="...">`.
+2. Resolve paths: convert relative paths to absolute paths using the HTML file's directory as base.
+3. Process each image:
 
-```bash
-python3 -m http.server 8000 --bind 127.0.0.1
-```
+   a. Check size. If an image is over 1.5MB, compress a temporary copy. Do not overwrite the original image.
 
-5. Start a Cloudflare Quick Tunnel pointing at the local server:
+   Preferred compression with Python Pillow:
 
-```bash
-cloudflared tunnel --url http://127.0.0.1:8000
-```
+   ```bash
+   python3 -c "from PIL import Image; img = Image.open('input.jpg'); img.save('output.jpg', quality=85, optimize=True)"
+   ```
 
-6. Read the generated `https://...trycloudflare.com` URL from `cloudflared` output.
-7. Replace each local image `src` in the HTML with the public tunnel URL plus the URL-encoded image filename.
-8. Write a separate output HTML file, for example `original.public.html`. Do not overwrite the source unless the user explicitly asks.
-9. Keep both the static server and tunnel process running while the user copies the HTML into WeChat and verifies that the images appear.
-10. After confirmation, stop the server and tunnel.
+   Fallback compression with ImageMagick:
+
+   ```bash
+   magick input.jpg -resize 90% -quality 85 output.jpg
+   ```
+
+   b. Upload to 360 image host via `wzapi`:
+
+   ```bash
+   curl -s --max-time 60 -F "file=@/path/to/image.jpg" https://wzapi.com/api/360tc
+   ```
+
+   c. Parse the response. Expected JSON:
+
+   ```json
+   {"errno": 0, "error": "", "data": {"url": "https://ps.ssl.qhimg.com/xxxxx.jpg"}}
+   ```
+
+   Extract `data.url`.
+
+   d. Verify URL:
+
+   ```bash
+   curl -sI "https://ps.ssl.qhimg.com/xxxxx.jpg"
+   ```
+
+   The URL is usable only if:
+   - HTTP status is `200`.
+   - `Content-Type` starts with `image/`.
+   - The response is not HTML, a warning page, a redirect trap, or an error page.
+
+   e. Retry logic: if upload fails, wait 5 seconds and retry once. If it still fails, record the image as failed.
+
+4. Replace paths in HTML: substitute each local `src` or `data-src` with the verified public URL.
+5. Output a separate file, for example `original.uploaded.html`. Do not overwrite the source unless the user explicitly asks.
+6. Report summary:
+   - Success count and uploaded URLs.
+   - Failed image paths and reasons.
+   - Output file path.
+
+### Fallback Providers
+
+If 360 upload fails for multiple images, use a configured provider only when the user has already provided credentials or configuration, such as a team image host, COS/OSS/CDN, or WeChat material library. Do not ask ordinary users to configure object storage just to complete a paste-ready HTML task.
 
 ### Safety Rules
 
-- Bind the local HTTP server to `127.0.0.1`, not `0.0.0.0`.
-- Serve only a temporary directory containing the intended image files.
-- Prefer copied images with sanitized filenames such as `image-01.jpg`; avoid exposing original directories with private names.
-- Keep the tunnel alive only for the current editing session.
-- Tell the user that if the tunnel is closed before WeChat fetches the images, the images may fail to load.
-- If `cloudflared` is missing, install it only with the user's approval when the environment requires installation or network access.
+- Keep original images untouched; work on copied or compressed temporary files.
+- Keep existing remote `https://...` image URLs unchanged unless the user asks to rehost them.
+- Do not upload sensitive or private images to anonymous third-party image hosts without explicit user approval.
+- Verify every uploaded URL with HTTP `200` and `Content-Type: image/*` before including it in HTML.
+- If an image cannot be uploaded after retry, either remove that image block from the generated HTML or leave the local path unchanged and clearly warn that it must be uploaded manually in the WeChat editor.
 
 ### URL Replacement Rules
 
-- Encode filenames for URLs, especially spaces and non-ASCII characters.
 - Preserve non-image parts of the HTML exactly.
 - Keep existing remote `https://...` image URLs unchanged unless the user asks to rehost them.
 - Use public URLs only in the final paste-ready HTML.
@@ -168,7 +216,7 @@ Example replacement:
 <img src="/home/user/article/images/cover.png">
 
 <!-- After -->
-<img src="https://example.trycloudflare.com/image-01.png">
+<img src="https://ps.ssl.qhimg.com/example.jpg">
 ```
 
 ## Output Contract
