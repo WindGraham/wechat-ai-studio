@@ -276,7 +276,24 @@ Background wallpaper + frame + image layers.
 - Use `padding-left` on right column for spacing (not `padding-right` on left)
 - Different `padding-top` values create vertical stagger
 
-#### 10. Asymmetric Shapes
+#### 10. Image or Card Overlap
+Use normal document flow plus negative margin for overlaps. Avoid `position: absolute`.
+
+```html
+<!-- Image over image -->
+<section style="text-align: center; padding: 0 15px; box-sizing: border-box;">
+  <section style="line-height: 0;"><img src="BASE_IMAGE_URL" style="width: 100%; max-width: 100%; display: block; margin: 0 auto;"></section>
+  <section style="text-align: right; margin-top: -50px; padding-right: 12px; box-sizing: border-box;">
+    <section style="display: inline-block; width: 44%; line-height: 0; border: 5px solid rgb(255,255,255); border-radius: 8px; overflow: hidden; box-sizing: border-box;">
+      <img src="OVERLAY_IMAGE_URL" style="width: 100%; max-width: 100%; display: block; margin: 0 auto;">
+    </section>
+  </section>
+</section>
+```
+
+For image-over-text-card layouts, add extra padding inside the text card where the overlay sits, then render the overlay block after the card with negative `margin-top` and `text-align: left/center/right`.
+
+#### 11. Asymmetric Shapes
 ```html
 <!-- Diamond -->
 <section style="display: inline-block; width: 10px; height: 10px; background-color: rgb(255,183,77); border-radius: 2px; transform: rotate(45deg); box-sizing: border-box;"></section>
@@ -287,7 +304,7 @@ Background wallpaper + frame + image layers.
 </section>
 ```
 
-#### 11. Three-Image Crown Layout
+#### 12. Three-Image Crown Layout
 Use this for one row of three images where the left and right images sit lower and the center image sits higher. Prefer `inline-block`; keep total width ≤ 96%.
 
 ```html
@@ -304,7 +321,7 @@ Use this for one row of three images where the left and right images sit lower a
 </section>
 ```
 
-#### 12. Text Background Cards
+#### 13. Text Background Cards
 ```html
 <!-- Card with colored borders -->
 <section style="background-color: rgb(255,255,255); padding: 20px; margin: 10px 15px; box-sizing: border-box; border-top: 3px solid rgb(255,183,77); border-bottom: 3px solid rgb(78,128,88);">
@@ -317,7 +334,7 @@ Use this for one row of three images where the left and right images sit lower a
 </section>
 ```
 
-#### 13. Decorative Divider with Stickers
+#### 14. Decorative Divider with Stickers
 ```html
 <section style="text-align: center; margin: 20px 0; box-sizing: border-box;">
   <section style="display: inline-block; width: 24px; height: 24px; vertical-align: middle; background-color: rgb(78,128,88); border-radius: 0 100% 0 100%; box-sizing: border-box; line-height: 24px; text-align: center;">

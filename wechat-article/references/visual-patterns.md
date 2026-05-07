@@ -49,7 +49,57 @@ Create depth by overlapping elements upward.
 
 **Key rule**: Use `height: 0` for pure decoration layers to prevent them from taking up document flow space.
 
-## Pattern 19: Staggered Image Grid (Interlaced Layout)
+## Pattern 19: Image Over Image
+
+Place one image visually on top of another by rendering it after the base image and pulling it upward with negative margin. Use `text-align` on the overlay wrapper to choose left, center, or right placement.
+
+```html
+<section style="text-align: center; padding: 0 15px; box-sizing: border-box;">
+  <section style="line-height: 0; box-sizing: border-box;">
+    <img src="BASE_IMAGE_URL" style="width: 100%; max-width: 100%; display: block; margin: 0 auto;">
+  </section>
+
+  <section style="text-align: right; margin-top: -50px; padding-right: 12px; box-sizing: border-box;">
+    <section style="display: inline-block; width: 44%; line-height: 0; border: 5px solid rgb(255,255,255); border-radius: 8px; overflow: hidden; box-sizing: border-box;">
+      <img src="OVERLAY_IMAGE_URL" style="width: 100%; max-width: 100%; display: block; margin: 0 auto;">
+    </section>
+  </section>
+</section>
+```
+
+Rules:
+- Use `margin-top: -NNpx` on the overlay wrapper, not `position: absolute`.
+- Use wrapper `text-align: left`, `center`, or `right` to place the overlay.
+- Use `width` on the overlay inner block to control image size.
+- Add a border when the overlay image needs separation from the base image.
+
+## Pattern 20: Corner Image Over Text Card
+
+Place a small image or decoration over a text card corner. The text card must reserve space with padding so text does not run under the image.
+
+```html
+<section style="margin: 25px 15px 0; box-sizing: border-box;">
+  <section style="background-color: rgb(255,255,255); padding: 36px 18px 18px; border-left: 4px solid rgb(78,128,88); box-sizing: border-box;">
+    <p style="white-space: normal; margin: 0; padding: 0; font-size: 16px; line-height: 1.8; color: rgb(62,62,62); text-align: justify;">
+      这里是文本框内容。文本框顶部或侧边需要留出额外内边距，避免被角上的图片遮挡。
+    </p>
+  </section>
+
+  <section style="text-align: right; margin-top: -92px; padding-right: 12px; box-sizing: border-box;">
+    <section style="display: inline-block; width: 86px; line-height: 0; border: 4px solid rgb(255,255,255); border-radius: 8px; overflow: hidden; box-sizing: border-box;">
+      <img src="CORNER_IMAGE_URL" style="width: 100%; max-width: 100%; display: block; margin: 0 auto;">
+    </section>
+  </section>
+</section>
+```
+
+Rules:
+- Use text card `padding-top` when the image overlaps the top edge.
+- Use text card `padding-right` or `padding-left` when the image overlaps a side.
+- Use overlay wrapper `text-align: right` for top-right, `left` for top-left, and `center` for top-center.
+- Keep the corner image small enough that the card still reads as a text block.
+
+## Pattern 21: Staggered Image Grid (Interlaced Layout)
 
 Multiple images arranged in staggered left-right positions with different vertical offsets.
 
@@ -91,7 +141,7 @@ Multiple images arranged in staggered left-right positions with different vertic
 3. Use `padding-left` on right column for gap (NOT `padding-right` on left column)
 4. Different `padding-top` values create vertical offset/stagger effect
 
-## Pattern 20: Three-Image Crown Layout
+## Pattern 22: Three-Image Crown Layout
 
 One row with three images where the left and right images sit lower and the center image sits higher. This is useful for activity photos, portrait groups, product details, and visual rhythm between text sections.
 
@@ -129,7 +179,7 @@ One row with three images where the left and right images sit lower and the cent
 - Make the center image slightly larger or framed to emphasize the high point.
 - If the images are too small for the content, switch to a two-column stagger or single-column image stack.
 
-## Pattern 21: Asymmetric Shapes (Beyond Rectangles)
+## Pattern 23: Asymmetric Shapes (Beyond Rectangles)
 
 ### Diamond (Rotated Square)
 ```html
@@ -151,7 +201,7 @@ One row with three images where the left and right images sit lower and the cent
 </section>
 ```
 
-## Pattern 22: Text Background Cards (Letter Paper Feel)
+## Pattern 24: Text Background Cards (Letter Paper Feel)
 
 ### Card with Colored Top/Bottom Borders
 ```html
@@ -167,7 +217,7 @@ One row with three images where the left and right images sit lower and the cent
 </section>
 ```
 
-## Pattern 23: Tilted Elements (Transform)
+## Pattern 25: Tilted Elements (Transform)
 
 Use `transform: rotate()` sparingly. WeChat editor support is partial.
 
@@ -182,7 +232,7 @@ Use `transform: rotate()` sparingly. WeChat editor support is partial.
 
 **Note**: Counter-rotate the inner element to keep the image straight while the frame is tilted. Small angles (1-3deg) work best.
 
-## Pattern 24: Decorative Divider with Stickers
+## Pattern 26: Decorative Divider with Stickers
 
 ### Diamond + Line + Diamond
 ```html
@@ -222,7 +272,7 @@ Use `transform: rotate()` sparingly. WeChat editor support is partial.
 </section>
 ```
 
-## Pattern 25: Whole-Page Background
+## Pattern 27: Whole-Page Background
 
 Some article designs use a unified background color for the entire page, with content blocks layered on top.
 

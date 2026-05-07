@@ -69,6 +69,37 @@ Always use **both** methods:
 
 **`display: flex` is NOT reliably supported in WeChat PC client.** Use `display: inline-block` instead.
 
+### Overlap Without Absolute Positioning
+
+For overlapping images, cards, titles, or decorations, keep elements in normal document flow and use negative margins. Do not use `position: absolute` or `position: fixed`.
+
+Core method:
+1. Render the base element first.
+2. Render the overlapping element after it.
+3. Move the overlapping element upward with `margin-top: -NNpx`.
+4. Use the wrapper's `text-align: left`, `center`, or `right` to choose where the overlapping element sits horizontally.
+5. If the overlap covers text, add enough `padding-top`, `padding-right`, or `padding-left` inside the text card so text does not sit under the overlapping image.
+
+```html
+<section style="text-align: center; padding: 0 15px; box-sizing: border-box;">
+  <section style="line-height: 0; box-sizing: border-box;">
+    <img src="BASE_IMAGE_URL" style="width: 100%; max-width: 100%; display: block; margin: 0 auto;">
+  </section>
+
+  <section style="text-align: right; margin-top: -48px; padding-right: 12px; box-sizing: border-box;">
+    <section style="display: inline-block; width: 42%; line-height: 0; border: 4px solid rgb(255,255,255); box-sizing: border-box;">
+      <img src="OVERLAY_IMAGE_URL" style="width: 100%; max-width: 100%; display: block; margin: 0 auto;">
+    </section>
+  </section>
+</section>
+```
+
+Text card overlap rules:
+- Put the text card before the overlapping image if the image should appear on top of the card.
+- Give the text card extra top/side padding where the image overlaps.
+- Use a small overlay image or decoration for corner overlaps; large overlaps can make the text hard to read.
+- Use a white border around overlapping images when they sit on busy backgrounds.
+
 ### Multi-Element Row Alignment
 
 When placing multiple elements in one row, use `inline-block` children inside a parent container. The parent's `text-align` controls the horizontal alignment of the row as a whole, while each child's `vertical-align` controls how the columns line up vertically.
