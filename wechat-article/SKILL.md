@@ -27,6 +27,17 @@ Do not attempt account login, WeChat material-library upload, automatic publishi
 10. Use `assets/template.html` as starting point
 11. Replace content placeholders with actual text/images
 
+## Skill Update Check
+
+When the user asks to update this skill, or asks to check for updates before a layout project:
+
+1. If this skill is inside a git clone of the source repository, run `git status --short --branch` and then `git pull` in that repository.
+2. If the active CLI Agent uses a separate skills directory, copy the updated `wechat-article` folder into that skills directory after pulling.
+3. If the skill was installed through a skill installer, rerun the installer command for the repository path.
+4. Tell the user to restart the CLI Agent when metadata or `SKILL.md` changed, because skill metadata may be cached.
+
+Do not push changes during an update check unless the user explicitly asks to publish local edits.
+
 ## Knowledge Structure
 
 Keep these six parts separate when generating or revising an article:

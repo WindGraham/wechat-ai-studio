@@ -53,6 +53,23 @@ cp -R wechat-article "${CODEX_HOME:-$HOME/.codex}/skills/"
 $skill-installer install https://github.com/WindGraham/wechat-article-skills/tree/main/wechat-article
 ```
 
+## 更新
+
+如果你是通过 git clone 使用这个仓库，进入仓库目录后拉取最新版本：
+
+```bash
+git pull
+cp -R wechat-article "${CODEX_HOME:-$HOME/.codex}/skills/"
+```
+
+如果你是通过 `$skill-installer` 安装，可以重新执行安装命令覆盖旧版本：
+
+```text
+$skill-installer install https://github.com/WindGraham/wechat-article-skills/tree/main/wechat-article
+```
+
+重启对应的 CLI Agent 后，更新后的 skill 元数据才会生效。也可以在每次正式排版前，让 Agent 先检查本仓库是否有更新。
+
 ## 使用方式
 
 ```text
