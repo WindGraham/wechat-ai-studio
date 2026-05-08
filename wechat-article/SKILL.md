@@ -36,9 +36,9 @@ Treat this skill as a mandatory checklist, not a suggestion. Do NOT skip steps t
 
    **Do NOT skip this step.** Even if the user says "you decide" in the first message, present the questions and wait for explicit answers. Once answered, briefly summarize your understanding and ask the user to confirm before proceeding.
 
-2b. **Ask SVG usage**: Explicitly ask whether the user wants SVG-based visual effects (animations, interactive components). If yes, remind the user that SVG content cannot be pasted directly via Manual Paste — it requires Auto-Publish (WeChat API) or browser extension injection. See `references/svg-compatibility.md`.
+2b. **Ask SVG usage**: Explicitly ask whether the user wants SVG-based visual effects (animations, interactive components). **If SVG is involved, Manual Paste (copy-paste) is strictly prohibited** — the content must be migrated via Auto-Publish (WeChat API) or browser extension injection. See `references/svg-compatibility.md`.
 
-3. **Ask publish workflow**: ALWAYS ask whether to use Auto-Publish (WeChat API) or Manual Paste. Do not assume either path. If SVG is requested, strongly recommend Auto-Publish.
+3. **Ask publish workflow**: ALWAYS ask whether to use Auto-Publish (WeChat API) or Manual Paste. Do not assume either path. **If SVG is involved, Manual Paste is NOT an option** — the user must choose Auto-Publish (WeChat API) or browser extension injection.
 
 4. **Ask layout guidance**: After style preferences are confirmed, ask the layout structure question:
    ```text
