@@ -67,7 +67,7 @@ WeChat mobile app width = 375px. WeChat PC client width > 375px. **Alignment mus
 | `margin-left/right` | `auto` | Force centering (more reliable than `margin: 0 auto`) |
 | `text-align` | `center` | Default all children to center |
 
-**Do NOT use** `margin: 0 auto` alone — it may fail in WeChat PC client.
+For root container centering, we recommend `margin-left: auto; margin-right: auto;` over `margin: 0 auto` for better reliability in the WeChat PC client.
 
 ### Text Paragraphs (Override Root Center)
 
@@ -190,7 +190,7 @@ Spacing rules:
 2. **Total rendered width must stay ≤ 92%** for reliable mobile safety. PC client tolerates up to 96%, but mobile WeChat counts inline-block whitespace differently and may add extra pixels, so design for 90%-92% total.
 3. **Use `padding-left` on columns for gaps.** `padding` is absorbed inside `width` when `box-sizing: border-box` is used, so it does not increase total rendered width. Avoid `margin` for column gaps — margin adds to the total and can push the row over the mobile limit.
 4. Avoid `padding-right` on a fixed-width left column when the row is close to 100%. Use `padding-left` on the right/adjacent column instead.
-5. For staggered layouts, use `padding-top` on selected columns instead of `position` or `transform`.
+5. For staggered layouts, we recommend `padding-top` on selected columns over `position` or `transform`.
 6. **Do not nest `display: inline-block`** — outer columns can be inline-block, but inner image wrappers should use plain `section` without `display: inline-block` to prevent mobile from treating them as block-level breaks.
 7. **`box-sizing: border-box` is not fully reliable on mobile** — WeChat mobile editor sometimes adds padding outside the declared width. Leave a safety margin (≤ 92% total) rather than relying on exact box-sizing math.
 

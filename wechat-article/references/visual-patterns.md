@@ -113,7 +113,7 @@ Multiple images arranged in staggered left-right positions with different vertic
 
 Structure formula: `row of inline-block columns -> selected columns get padding-top -> repeat with alternate widths`.
 
-**⚠️ WeChat PC client does NOT support `display: flex`. Use `display: inline-block` instead.**
+**We recommend `display: inline-block` over `display: flex` for WeChat PC client compatibility.**
 
 ```html
 <!-- Row 1: Left large, Right small (pushed down) -->

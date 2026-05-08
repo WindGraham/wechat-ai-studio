@@ -603,7 +603,7 @@ These work in mobile WeChat but may render differently or fail in PC client. Alw
 
 | Property | Notes |
 |:---|:---|
-| `transform: rotate()`, `rotateZ()`, `translate()`, `translate3d()`, `scale()` | 2D transforms are stable on mobile and mostly retain on PC. Safe for decorative elements (tilted frames, rotated shapes, micro-offsets). `translate3d()` and small `scale()` values are often just source-export offsets; convert them to margins/padding when possible. Do NOT use for critical text readability. |
+| `transform: rotate()`, `rotateZ()`, `translate()`, `translate3d()`, `scale()` | 2D transforms are stable on mobile and mostly retain on PC. Safe for decorative elements (tilted frames, rotated shapes, micro-offsets). `translate3d()` and small `scale()` values are often just source-export offsets; convert them to margins/padding when possible. We recommend reserving these for decorative elements rather than critical text readability. |
 | `transform: rotateX()`, `rotateY()`, `perspective()` | 3D transforms are unsupported or render as flat/blank in WeChat. `perspective(0px)` is mathematically invalid (zero distance = invisible). Avoid entirely. |
 | `text-shadow` | Mobile OK; PC support weaker. Fallback: none or bold color contrast. |
 | `-webkit-background-clip: text` | Gradient text effect. Mobile OK; PC may show transparent or solid color. Always set a solid `color` fallback. |
@@ -626,9 +626,9 @@ These work in mobile WeChat but may render differently or fail in PC client. Alw
 | `font-family` with custom fonts | External fonts not loaded; falls back to system default. |
 | `filter` (CSS filters) | Not supported in WeChat editor. |
 
-### Flex Two-Column Layout (Critical)
+### Two-Column Layout (Recommended: Inline-Block)
 
-WeChat editor handles flex differently from browsers. Prefer inline-block columns for compatibility. If flex is necessary, include:
+WeChat editor handles flex differently from browsers. We recommend inline-block columns for the best compatibility. If you must use flex, include:
 
 ```html
 <section style="display: flex; flex-flow: row;">
@@ -809,7 +809,7 @@ Background wallpaper + frame + image layers.
 </section>
 ```
 **Critical**: 
-- Do NOT use `display: flex` — not supported on WeChat PC
+- If you need column layouts, we recommend `display: inline-block` over `display: flex` for WeChat PC compatibility
 - Use `<!-- -->` comment to eliminate inline-block whitespace gap
 - Total width ≤ 96% (52% + 44% = 96%)
 - Use `padding-left` on right column for spacing (not `padding-right` on left)
