@@ -7,3 +7,4 @@ __pycache__/
 .pytest_cache/
 .wechat_draft_id
 layout-draft.json
+wechat_inject.py
