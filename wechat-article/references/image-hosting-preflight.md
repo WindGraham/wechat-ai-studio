@@ -103,3 +103,179 @@ curl -I http://your-server.com:port/images/test.jpg
 ## 通过标准
 
 只有图床测试完全通过后，才能开始 HTML 排版工作。
+
+## 图片失败处理流程
+
+当图片上传或处理失败时，必须向用户说明情况并提供选择：
+
+### 1. 失败检测
+
+```python
+# 上传后检查
+if "url" not in result:
+    print(f"❌ 图片上传失败: {result}")
+    # 记录失败信息
+    failed_images.append({
+        "path": image_path,
+        "error": result,
+        "type": "upload_failed"
+    })
+```
+
+### 2. 用户沟通模板
+
+```text
+⚠️ 图片处理异常
+
+以下图片上传失败：
+1. [图片1.jpg] - 原因：文件过大（2.3MB > 1MB限制）
+2. [图片2.png] - 原因：网络超时
+
+请选择处理方式：
+
+A. 替换图片
+   - 提供新的图片文件或URL
+   - 我将重新上传
+
+B. 删除图片占位
+   - 保留图片位置但显示占位符
+   - 您可在微信编辑器中手动替换
+
+C. 跳过该图片
+   - 从文章中移除该图片
+   - 调整周围文字排版
+
+D. 压缩重试
+   - 自动压缩图片至1MB以下
+   - 重新上传（可能降低画质）
+
+请输入选项（A/B/C/D）或描述您的需求：
+```
+
+### 3. 处理选项实现
+
+#### 选项 A：替换图片
+```python
+new_image_url = input("请提供新的图片路径或URL: ")
+# 重新上传新图片
+wechat_url = upload_content_image(access_token, new_image_url)
+if wechat_url:
+    html_content = html_content.replace(old_url, wechat_url)
+```
+
+#### 选项 B：保留占位
+```python
+# 保留 img 标签但添加占位样式
+placeholder_html = f'''
+<section style="text-align: center; margin: 15px 0; padding: 20px; 
+                background: #f5f5f5; border: 2px dashed #ccc;">
+  <p style="margin: 0; color: #999; font-size: 14px;">📷 图片占位</p>
+  <p style="margin: 5px 0 0; color: #bbb; font-size: 12px;">{original_filename}</p>
+</section>
+'''
+html_content = html_content.replace(img_tag, placeholder_html)
+```
+
+#### 选项 C：删除图片
+```python
+# 移除整个图片块（包括 figcaption）
+# 查找图片所在的 section 并移除
+import re
+# 移除 <img> 及其父级 section
+pattern = r'<section[^>]*>\s*<img[^>]*src="' + re.escape(old_url) + r'"[^>]*>.*?</section>'
+html_content = re.sub(pattern, '', html_content, flags=re.DOTALL)
+```
+
+#### 选项 D：压缩重试
+```python
+from PIL import Image
+import io
+
+# 压缩图片
+img = Image.open(image_path)
+# 转换为RGB（去除透明通道）
+if img.mode in ('RGBA', 'LA', 'P'):
+    img = img.convert('RGB')
+
+# 保存为压缩后的JPG
+output = io.BytesIO()
+img.save(output, format='JPEG', quality=70, optimize=True)
+compressed_path = "/tmp/compressed.jpg"
+with open(compressed_path, 'wb') as f:
+    f.write(output.getvalue())
+
+# 重新上传
+wechat_url = upload_content_image(access_token, compressed_path)
+```
+
+### 4. 批量失败处理
+
+如果多张图片失败：
+
+```text
+⚠️ 检测到 3 张图片上传失败
+
+失败清单：
+1. cover.jpg (2.5MB) - 超出大小限制
+2. chart.png - 格式不支持
+3. photo.jpg - 网络错误
+
+统一处理选项：
+
+[1] 全部替换 - 请提供新图片（可批量上传）
+[2] 全部占位 - 保留位置，稍后手动替换
+[3] 智能处理 - 大图自动压缩，其他保留占位
+[4] 逐张处理 - 每张图片单独决定
+
+建议：选择 [3] 智能处理，大图自动压缩，其他保留占位
+
+请输入选项（1/2/3/4）：
+```
+
+### 5. 最终确认
+
+无论选择哪种处理方式，完成后必须向用户确认：
+
+```text
+✅ 图片处理完成
+
+处理结果：
+- 成功上传：5 张
+- 压缩重传：2 张（画质轻微降低）
+- 保留占位：1 张（chart.png，可在微信编辑器替换）
+
+文章现在可以继续排版。
+
+是否继续？[Y/n]
+```
+
+### 6. 记录与追踪
+
+```python
+# 保存处理记录
+processing_log = {
+    "total_images": 10,
+    "success": 5,
+    "compressed": 2,
+    "placeholder": 1,
+    "failed": 2,
+    "details": [
+        {"file": "a.jpg", "status": "success", "url": "https://mmbiz.qpic.cn/..."},
+        {"file": "b.jpg", "status": "compressed", "original_size": "2.5MB", "new_size": "0.8MB"},
+        {"file": "c.png", "status": "placeholder", "reason": "format_not_supported"}
+    ]
+}
+
+# 保存到日志文件
+import json
+with open("image_processing_log.json", "w") as f:
+    json.dump(processing_log, f, ensure_ascii=False, indent=2)
+```
+
+## 用户选择权原则
+
+- **绝不擅自决定**：即使只有一张图片失败，也要告知用户
+- **提供明确选项**：A/B/C/D 清晰可选
+- **解释原因**：说明为什么失败（大小/格式/网络）
+- **建议但不强制**：给出推荐选项，但尊重用户选择
+- **确认后再继续**：处理完成后必须得到用户确认
