@@ -73,12 +73,22 @@
 
 | Source | Status | Notes |
 |:---|:---:|:---|
-| WeChat CDN (`mmbiz.qpic.cn`) | ✅ | **Only usable source in SVG** |
-| Third-party image hosts (e.g. `ps.ssl.qhimg.com`) | ❌ | Verified unavailable in SVG `<image>` even with `href` |
-| External public HTTPS URLs | ❌ | Verified unavailable in SVG `<image>` |
-| `<image>` tag | ✅ | Usable, but MUST use `href` attribute and WeChat CDN URL |
+| WeChat CDN (`mmbiz.qpic.cn`) | ✅ | **Required for SVG `<image>`** |
+| Third-party image hosts (e.g. `ps.ssl.qhimg.com`) | ❌ | Unavailable in SVG `<image>` even with `href` |
+| External public HTTPS URLs | ❌ | Unavailable in SVG `<image>` |
+| `<image>` tag | ✅ | Usable with `href`, but only with WeChat CDN URL |
 
-**Critical distinction**: Third-party image hosts (360, unsplash, picsum, etc.) work fine in ordinary HTML `<img>` tags, but are **filtered in SVG `<image>`**. For SVG-based layouts, all images must be uploaded to WeChat CDN via API (`/cgi-bin/media/uploadimg`) first.
+**Workflow distinction for ordinary HTML `<img>`:**
+
+| Workflow | Third-party host (360, etc.) | WeChat CDN |
+|:---|:---:|:---:|
+| Manual Paste (copy into editor) | ✅ Works | ✅ Works |
+| Auto-Publish (API `/cgi-bin/draft/add`) | ⚠️ May fail (server pre-fetch blocked) | ✅ Reliable |
+
+**For SVG `<image>` (all workflows):**
+- Third-party hosts are **always blocked**.
+- WeChat CDN is **always required**.
+- Upload via API: `POST /cgi-bin/media/uploadimg` → get `mmbiz.qpic.cn` URL → use in `href`.
 
 ---
 

@@ -998,7 +998,7 @@ When the user wants SVG animations or SVG-based visual effects in WeChat article
 
 ### Image Handling for SVG
 
-All images in SVG must use WeChat CDN URLs:
+SVG `<image>` **requires WeChat CDN URLs** in all workflows. Third-party hosts (360, unsplash, etc.) are blocked inside SVG regardless of manual paste or API publish.
 
 ```
 External Image → Download to Server → Call WeChat API (/cgi-bin/media/uploadimg) → Get WeChat CDN URL → Use in SVG
@@ -1012,6 +1012,10 @@ External Image → Download to Server → Call WeChat API (/cgi-bin/media/upload
        href="https://mmbiz.qpic.cn/mmbiz_jpg/..." 
        preserveAspectRatio="xMidYMid slice"/>
 ```
+
+**Note on HTML `<img>` vs SVG `<image>`:**
+- Manual Paste workflow: HTML `<img>` can use third-party hosts; SVG `<image>` must use WeChat CDN.
+- Auto-Publish workflow: Both HTML `<img>` and SVG `<image>` should use WeChat CDN for reliability.
 
 ### Full Documentation
 
