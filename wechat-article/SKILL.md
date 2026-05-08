@@ -13,11 +13,117 @@ Generate HTML that renders correctly in WeChat's rich-text editor and looks good
 
 Use this skill to produce paste-ready HTML fragments for WeChat Official Account articles. The output should be self-contained HTML with inline styles, not a full standalone web app.
 
-This skill also supports automatic draft publishing to WeChat Official Account when the user provides WeChat API credentials (AppID/AppSecret). See **Auto-Publish Workflow** below.
+This skill also supports automatic draft publishing to WeChat Official Account when the user provides WeChat API credentials (AppID/AppSecret). See `scripts/auto_publish.py` for the implementation.
+
+---
+
+## Execution Rule (Highest Priority)
+
+Treat this skill as a mandatory checklist, not a suggestion. Do NOT skip steps to speed up response. Follow the steps in order:
+
+### Phase 0: Preflight
+
+1. **Read required references**: Before generating ANY HTML, read `references/interaction-workflow.md` and `references/formatting-guide.md`.
+
+2. **Ask first-round style questions** (from `references/interaction-workflow.md`):
+   - Color direction / theme
+   - Refinement level
+   - Image style
+   - Opening style
+   - Body text habit (indent / alignment)
+
+   **Do NOT skip this step.** Even if the user says "you decide" in the first message, present the questions and wait for explicit answers. Once answered, briefly summarize your understanding and ask the user to confirm before proceeding.
+
+3. **Ask publish workflow**: ALWAYS ask whether to use Auto-Publish (WeChat API) or Manual Paste. Do not assume either path.
+
+4. **Ask layout guidance**: After style preferences are confirmed, ask the layout structure question:
+   ```text
+   Do you want to arrange the layout yourself? You can:
+   1. Open the visual drag-and-drop composer to place components
+   2. Upload a reference screenshot / template for me to match
+   3. Let me decide the layout based on the content
+   ```
+   - Option 1 → launch `wechat-article/tools/layout-composer.html`; follow `references/visual-layout-workflow.md`.
+   - Option 2 → follow **Reference Screenshot Workflow** below.
+   - Option 3 → proceed with AI-chosen layout; do not read `visual-layout-workflow.md`.
+
+5. **Test image hosting**: Before ANY layout work, verify the image hosting solution:
+   - Auto-Publish: test `access_token` + one image upload
+   - Manual Paste + local images: upload one test image to the default provider (360 via `wzapi`) and verify with `curl -I`
+   - External hosting provided by user: verify one URL is accessible
+
+### Phase 1: Layout & Generation
+
+6. **Preflight local images**: Upload local images to appropriate host; leave already-public HTTPS URLs unchanged. See Image Upload Workflow below.
+
+7. **Generate HTML**: Choose layout blocks that fit user preferences and content. Do not default to a long opening image unless the user asked for it. Apply WeChat constraints from `references/wechat-rules.md`. Use basic capabilities first; add refined layout blocks only when they improve the result. See `references/refined-layout-blocks.md`.
+
+8. **Background color handling** (per `references/background-color-guide.md`):
+   - Root container: no `background-color` (WeChat forces white)
+   - Each section carries its own background via wrapper `<section>`
+   - Use opaque `rgb()` — never `rgba()` for backgrounds or gradient end-stops
+   - For full-article coverage: tile colored wrapper sections edge-to-edge
+
+9. **Inline-block layout safety** (per `references/inline-block-safety.md`):
+   - Total width ≤ 92% (recommend ≤ 90%) for mobile
+   - Gap via `padding-left`, not `margin-right`
+   - **Symmetric padding rule**: all columns in a row must have equal `padding-left + padding-right` sums so content areas are identical. Gap = left column's `padding-right` + right column's `padding-left`.
+   - One row = one container; never stuff multiple rows into same parent
+   - Use `<!-- -->` between inline-block elements
+   - `vertical-align: top` for consistent alignment
+
+10. **Initialize git**: After first draft, `git init` in the article directory and commit.
+
+### Phase 2: Verification
+
+11. **Screenshot check**: Before presenting a draft as ready for review, capture a screenshot (viewport 430×1600) via `chromium --headless --screenshot`. If the current model lacks vision capability, skip visual screenshot analysis and tell the user to verify manually in browser.
+
+12. **3-round self-check** (per `references/self-check-workflow.md`):
+    - Round 1: Code Compliance (12 checks) — auto-check by AI
+    - Round 2: Visual Consistency (10 checks) — auto-check + screenshot
+    - Round 3: Content Integrity (8 checks) — auto-check + user confirm
+    - Fix issues and re-check until all pass. Do NOT deliver until critical checks pass.
+
+13. **Final image URL pass**: Rescan HTML; all `src` must be public HTTPS. Verify every URL with `curl -I`. No local paths, no file:// URLs.
+
+14. **Run `references/generation-checklist.md`** before returning final HTML.
+
+### Phase 3: Delivery
+
+15. **Auto-Publish**: Run `scripts/auto_publish.py` with user's AppID/AppSecret.
+16. **Manual Paste**: Instruct user: open HTML in browser → `Ctrl+A` → `Ctrl+C` → paste into mp.weixin.qq.com editor → `Ctrl+V` → verify mobile preview.
+
+---
+
+## Clarifying Style Requirements
+
+**MANDATORY: Ask the first-round style questions before generating any HTML, unless the user has already explicitly answered all of them in the current conversation.**
+
+Do not skip the questions even if the user says "you decide". The user must confirm or select from the choices.
+
+Ask one compact question with grouped choices (from `references/interaction-workflow.md`):
+
+```text
+Before I typeset this WeChat article, I need a few layout choices:
+1. Color direction: muted / warm / cool / bright / dark / use reference screenshot / provide theme color
+2. Refinement level: clean basic / polished / rich visual / highly decorative
+3. Image style: simple full-width / framed photos / staggered groups / text-image cards / follow reference screenshot
+4. Opening style: text-first / compact image + title / large visual opening / follow reference screenshot
+5. Body habit: first-line indent / no indent / left aligned / justified
+```
+
+Decision rule:
+- **Step 1 (Ask):** Present the questions. "You decide" before being asked is NOT permission to skip.
+- **Step 2 (Evaluate):** Follow concrete answers. If user says "you decide" AFTER being asked, choose reasonable defaults and state them.
+- **Step 3 (Proceed):** Only generate HTML after Step 2 is resolved.
+- Ask again only for factual items (names, URLs, dates, official identities).
+- **Exception: do not repeat questions the user already answered earlier in the same thread.**
+
+---
 
 ## Auto-Publish Workflow
 
-When the user wants to automatically publish the article to WeChat Official Account draft box (草稿箱), use this workflow.
+When the user wants automatic draft publishing to WeChat Official Account (草稿箱), use `scripts/auto_publish.py`.
 
 ### Prerequisites
 
@@ -36,188 +142,17 @@ When the user wants to automatically publish the article to WeChat Official Acco
 | `POST /cgi-bin/draft/update` | Update existing draft |
 | `POST /cgi-bin/draft/batchget` | List drafts |
 
-### Critical Implementation Notes
+### Key Implementation Notes
 
-1. **Unicode Encoding**: When sending JSON to WeChat API, always use `ensure_ascii=False`:
-   ```python
-   response = requests.post(
-       url,
-       data=json.dumps(data, ensure_ascii=False).encode('utf-8'),
-       headers={'Content-Type': 'application/json; charset=utf-8'}
-   )
-   ```
-   Without this, Chinese characters become `\uXXXX` sequences and display incorrectly in WeChat editor.
-
-2. **Image Upload**: All content images MUST be uploaded to WeChat CDN first:
-   - Download external images locally
-   - Upload via `/cgi-bin/media/uploadimg`
-   - Replace `src` URLs with returned WeChat CDN URLs (`mmbiz.qpic.cn`)
-   - WeChat blocks external image URLs
-
-3. **Thumbnail (thumb_media_id)**: REQUIRED field, not optional:
-   - Upload via `/cgi-bin/material/add_material?type=thumb`
-   - Image size: 200×200px recommended
-   - Must be included in draft creation/update
-
-4. **Draft ID Persistence**: Save successful draft Media ID to local file for subsequent updates:
-   ```python
-   # Save after creation
-   with open('draft_id.txt', 'w') as f:
-       f.write(media_id)
-   
-   # Read for update
-   with open('draft_id.txt', 'r') as f:
-       media_id = f.read().strip()
-   ```
-
-5. **Error Handling**:
-   - `40007 invalid media_id`: thumb_media_id missing or invalid
-   - `45004 description size out of limit`: digest field too long (max 120 chars)
-   - `40001 access_token expired`: refresh token
-
-### Python Script Template
-
-Save as `scripts/auto_publish.py` in skill directory:
-
-```python
-#!/usr/bin/env python3
-"""WeChat Official Account Auto-Publish Script"""
-
-import requests
-import json
-import re
-import os
-
-DRAFT_ID_FILE = ".wechat_draft_id"
-
-def get_access_token(appid, appsecret):
-    url = f"https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid={appid}&secret={appsecret}"
-    response = requests.get(url)
-    data = response.json()
-    return data.get("access_token")
-
-def upload_thumb_image(access_token):
-    """Upload thumbnail (required)"""
-    url = f"https://api.weixin.qq.com/cgi-bin/material/add_material?access_token={access_token}&type=thumb"
-    # Download and upload a 200x200 thumbnail
-    thumb_url = "https://picsum.photos/200/200"
-    response = requests.get(thumb_url)
-    with open("/tmp/thumb.jpg", "wb") as f:
-        f.write(response.content)
-    
-    with open("/tmp/thumb.jpg", "rb") as f:
-        files = {"media": f}
-        response = requests.post(url, files=files)
-        data = response.json()
-    
-    return data.get("media_id")
-
-def upload_content_image(access_token, image_url):
-    """Upload content image to WeChat CDN"""
-    response = requests.get(image_url)
-    if response.status_code != 200:
-        return None
-    
-    with open("/tmp/content_img.jpg", "wb") as f:
-        f.write(response.content)
-    
-    url = f"https://api.weixin.qq.com/cgi-bin/media/uploadimg?access_token={access_token}"
-    with open("/tmp/content_img.jpg", "rb") as f:
-        files = {"media": f}
-        response = requests.post(url, files=files)
-        data = response.json()
-    
-    return data.get("url")
-
-def process_html_images(access_token, html_content):
-    """Replace all image URLs with WeChat CDN URLs"""
-    img_pattern = r'<img[^>]+src="([^"]+)"'
-    urls = re.findall(img_pattern, html_content)
-    
-    for original_url in urls:
-        if original_url.startswith("http") and "mmbiz.qpic.cn" not in original_url:
-            wechat_url = upload_content_image(access_token, original_url)
-            if wechat_url:
-                html_content = html_content.replace(original_url, wechat_url)
-    
-    return html_content
-
-def create_or_update_draft(access_token, title, content, media_id=None):
-    """Create new draft or update existing"""
-    thumb_media_id = upload_thumb_image(access_token)
-    
-    if media_id:
-        # Update existing
-        url = f"https://api.weixin.qq.com/cgi-bin/draft/update?access_token={access_token}"
-        data = {
-            "media_id": media_id,
-            "index": 0,
-            "articles": {
-                "title": title,
-                "content": content,
-                "thumb_media_id": thumb_media_id,
-                "author": "AI助手",
-                "digest": "文章摘要",
-                "need_open_comment": 1,
-                "only_fans_can_comment": 0
-            }
-        }
-    else:
-        # Create new
-        url = f"https://api.weixin.qq.com/cgi-bin/draft/add?access_token={access_token}"
-        data = {
-            "articles": [{
-                "title": title,
-                "content": content,
-                "thumb_media_id": thumb_media_id,
-                "author": "AI助手",
-                "digest": "文章摘要",
-                "need_open_comment": 1,
-                "only_fans_can_comment": 0
-            }]
-        }
-    
-    response = requests.post(
-        url,
-        data=json.dumps(data, ensure_ascii=False).encode("utf-8"),
-        headers={"Content-Type": "application/json; charset=utf-8"}
-    )
-    result = response.json()
-    
-    if "media_id" in result:
-        # Save draft ID
-        with open(DRAFT_ID_FILE, "w") as f:
-            f.write(result["media_id"])
-        return result["media_id"]
-    elif result.get("errcode") == 0:
-        return media_id  # Update success
-    else:
-        print(f"Error: {result}")
-        return None
-
-def publish_article(appid, appsecret, title, html_content):
-    """Main entry point"""
-    token = get_access_token(appid, appsecret)
-    if not token:
-        return None
-    
-    # Process images
-    html_content = process_html_images(token, html_content)
-    
-    # Check for existing draft ID
-    media_id = None
-    if os.path.exists(DRAFT_ID_FILE):
-        with open(DRAFT_ID_FILE, "r") as f:
-            media_id = f.read().strip()
-    
-    # Create or update draft
-    return create_or_update_draft(token, title, html_content, media_id)
-```
+1. **Unicode**: Always `json.dumps(data, ensure_ascii=False).encode('utf-8')`.
+2. **Image upload**: Content images MUST go to WeChat CDN (`mmbiz.qpic.cn`). WeChat blocks external URLs.
+3. **Thumbnail**: REQUIRED (200×200px recommended, `thumb_media_id`).
+4. **Draft ID persistence**: Save to `.wechat_draft_id` for subsequent updates.
+5. **Error codes**: `40007` (invalid media_id), `45004` (digest too long), `40001` (token expired).
 
 ### Usage
 
 ```python
-# In skill execution or separate script
 from scripts.auto_publish import publish_article
 
 media_id = publish_article(
@@ -226,871 +161,243 @@ media_id = publish_article(
     title="文章标题",
     html_content=html_string
 )
-
-if media_id:
-    print(f"Draft published: {media_id}")
 ```
 
 ### Image Hosting Note
 
-If the user already uses an image hosting service (图床) with public HTTPS URLs that WeChat can access, skip the upload step and use those URLs directly. WeChat CDN upload is only needed for:
-- Local image files
-- External image URLs that WeChat blocks
-- Images requiring long-term stability
+If the user already has image hosting with public HTTPS URLs, skip WeChat CDN upload. WeChat CDN upload is only needed for local files, blocked external URLs, or long-term stability.
 
-## Execution Rule (Highest Priority)
-
-Treat this skill as a mandatory checklist, not a suggestion. Do NOT skip steps to speed up response or because the user's request sounds simple.
-
-Specifically:
-1. Before generating ANY HTML, you MUST read `references/interaction-workflow.md` and `references/formatting-guide.md`. **Even if the user provided a detailed brief, you MUST summarize your understanding of the requirements (content, style, tone, images, layout intent) and ask the user to confirm before proceeding. Do NOT start layout until the user explicitly confirms.**
-2. **ALWAYS ask whether the user wants to use the Auto-Publish Workflow (WeChat API) or the Manual Paste workflow.** Do NOT assume either path. If the user does not mention auto-publish, default to asking.
-3. **CRITICAL: Before any layout work, test the image hosting solution.** If using WeChat API, verify `access_token` works and one test image uploads successfully. If using external hosting, verify one test image URL is accessible. Do NOT proceed with HTML generation until image hosting is confirmed working.
-4. **CRITICAL: After generating HTML, run the 3-round self-check** per `references/self-check-workflow.md`:
-   - Round 1: Code Compliance (12 checks)
-   - Round 2: Visual Consistency (10 checks)
-   - Round 3: Content Integrity (8 checks)
-   - Do NOT deliver until all critical checks pass.
-5. Before generating the first draft, you MUST initialize local git versioning in the article working directory and commit the draft.
-6. Before presenting a draft as ready for review, you MUST run screenshot checks per `references/screenshot-check.md`.
-7. Before returning final HTML, you MUST use `references/generation-checklist.md`.
-8. Do NOT generate HTML directly without confirming style requirements first, even if the user says "make a push article" or similar.
-
-## Quick Start
-
-1. Read `references/wechat-rules.md` for hard code constraints
-2. Read `references/editor-features.md` for basic capabilities vs. special layout capabilities
-3. **Must-read** `references/formatting-guide.md` for editorial habits (e.g., image grouping rules) and typography defaults
-4. **Must-read** `references/interaction-workflow.md` before starting a new layout project or revising an existing one with the user
-5. Read `references/image-url-workflow.md` whenever local images appear; public HTTPS image URLs can stay unchanged
-6. Read `references/refined-layout-blocks.md` when the user asks for richer, more polished, magazine-like, visual, or reference-matched layout
-7. Read `references/screenshot-check.md` before reporting a layout draft as ready for review
-8. Read `references/visual-patterns.md` only when a more designed or reference-matched layout needs lower-level HTML patterns
-9. Read `references/background-color-guide.md` when the user wants colored backgrounds, dark themes, or full-article background coverage
-10. Read `references/inline-block-safety.md` when using two-column, three-column, or multi-card layouts
-11. Use `references/generation-checklist.md` before returning final HTML
-12. Use `references/self-check-workflow.md` for mandatory 3-round self-check before delivery
-13. Use `assets/template.html` as starting point
-14. Replace content placeholders with actual text/images
-
-**Conditional references — only read when the specific scenario applies:**
-- `references/background-color-guide.md` — colored backgrounds, dark themes, full-article background coverage
-- `references/visual-layout-workflow.md` — only when the user actively chooses the visual drag-and-drop composer (Option 1 in the layout guidance question). Do not read this file if the user lets AI decide or uploads a reference screenshot.
-- `references/svg-compatibility.md` — when the user says yes to SVG motion decorations during style questioning. The agent SHOULD proactively ask whether the user wants SVG decorative touches (a batch of safe, verified templates are available: rotating badges, drawing dividers, breathing borders, floating dots, fade transitions, sliding reveals). The agent MUST explain the delivery constraint before asking: SVG content requires API auto-publish or the bundled browser extension (`tools/wechat-inject-extension/`). Standard manual paste (browser Ctrl+A→Ctrl+C→paste into WeChat) strips SVG tags. If the user does not have API access, the agent should guide them to install the extension (see SVG Extension Install workflow below). If the user declines both, skip SVG.
-
-## Skill Update Check
-
-**Source repository:** `git@github.com:WindGraham/wechat-ai-publisher.git` (GitHub)
-
-When the user asks to update this skill, or asks to check for updates before a layout project:
-
-1. If this skill is inside a git clone of the source repository, run `git status --short --branch` and then `git pull` in that repository.
-2. If the active CLI Agent uses a separate skills directory, copy the updated `wechat-article` folder into that skills directory after pulling.
-3. If the skill was installed through a skill installer, rerun the installer command for the repository path.
-4. Tell the user to restart the CLI Agent when metadata or `SKILL.md` changed, because skill metadata may be cached.
-
-Do not push changes during an update check unless the user explicitly asks to publish local edits.
-
-## Knowledge Structure
-
-Keep these six parts separate when generating or revising an article:
-
-1. Hard code rules: constraints imposed by the WeChat rich-text editor. These are not optional. Examples: inline styles only, safe tags, mobile root width, no scripts, no free absolute positioning.
-2. Collaboration state: user preferences, current draft file, local image URL status, screenshot review status, and local git commits.
-3. Basic capabilities: simple components that can be used freely in most articles. Examples: titles, paragraphs, captions, borders, single images, simple cards, dividers, two-column rows.
-4. Refined layout capability blocks: richer but reusable patterns such as framed image groups, corner cards, compact section labels, light overlap, and decorative dividers. These are abilities to choose from, not a fixed article structure.
-5. Special layout capabilities: more designed patterns for richer visual rhythm. Examples: layered overlap, framed image groups, staggered grids, four-corner frames, circle-character titles, side-image text cards.
-6. Editorial habits: defaults that should follow common WeChat reading conventions but can be changed by user preference. Examples: body text size, line height, letter spacing, paragraph indent, justified alignment, image cropping and grouping.
-
-## Workflow
-
-1. **Preflight image hosting test**: Before ANY layout work, test the user's image hosting solution:
-   - If using **WeChat API** (Auto-Publish): Test `access_token` retrieval and one image upload to verify API connectivity
-   - If using **external image hosting** (图床): Test upload one image and verify the returned URL is accessible via HTTPS
-   - If using **local images**: Confirm the user has a hosting plan or use the built-in upload workflow
-   - **Do NOT proceed with layout until image hosting is confirmed working**
-2. Preflight local images before layout: upload/verify local images if needed; leave already-public HTTPS image URLs unchanged.
-3. Ask the first-round style questions from `references/interaction-workflow.md` unless the user already gave equivalent preferences.
-4. **Ask whether the user wants guidance on layout structure.** After style preferences are confirmed, ask:
-   ```text
-   Do you want to arrange the layout yourself? You can:
-   1. Open the visual drag-and-drop composer to place components
-   2. Upload a reference screenshot / template for me to match
-   3. Let me decide the layout based on the content
-   ```
-   - If the user chooses **Option 1 (composer)**: Launch `wechat-article/tools/layout-composer.html`. The user drags 5 basic rectangle types onto a 375px canvas; AI reads `layout-draft.json` and translates spatial relationships into WeChat-safe HTML. See `references/visual-layout-workflow.md` for the full workflow, fit strategy, and source code.
-   - If the user chooses **Option 2 (reference screenshot)**: Follow the **Reference Screenshot Workflow** below.
-   - If the user chooses **Option 3 (AI decides)** or gives no preference: Proceed with normal layout generation without reading `visual-layout-workflow.md`.
-5. Identify the article type and image roles, but do not impose a fixed article structure. Choose reusable layout capability blocks that fit the user's preferences and content.
-6. Do not default to a long opening image. Use a large visual opening only when the user asks for it, the reference style requires it, or the content/images clearly benefit from it.
-7. Apply WeChat constraints from `references/wechat-rules.md`.
-8. Choose basic capabilities first; add refined or special layout blocks only when they improve visual rhythm, image presentation, or reference style matching.
-9. After the first draft, initialize local git versioning in the article working directory if appropriate, commit the draft, and commit every later user-requested update.
-10. Use screenshot checks before presenting a draft as ready for review.
-11. When the user approves the layout, run the final image URL pass and keep one final HTML file for WeChat paste.
-12. **CRITICAL: Run 3-round self-check before delivery** per `references/self-check-workflow.md`:
-    - **Round 1**: Code Compliance Check (12 items) - auto-check by AI
-    - **Round 2**: Visual Consistency Check (10 items) - auto-check + screenshot
-    - **Round 3**: Content Integrity Check (8 items) - auto-check + user confirm
-    - Fix issues and re-check until all pass
-13. **Background Color Handling** - per `references/background-color-guide.md`:
-    - WeChat editor forces white background on root
-    - Use **wrapper sections** for colored blocks (not root container)
-    - Use **opaque `rgb()`** colors (not `rgba()` transparency)
-    - For full-article background: tile colored wrapper sections edge-to-edge
-    - For dark themes: each section must explicitly set dark background + light text
-    - Never rely on root `background-color` or transparent overlays
-14. **Inline-Block Layout Safety** - per `references/inline-block-safety.md`:
-    - **Total width ≤ 92%** (recommend ≤ 90%) for mobile safety
-    - **Gap must use `padding-left`** (not `margin-right`) with `box-sizing: border-box`
-    - **One row = one container**: never stuff multiple rows into same parent relying on natural wrapping
-    - Use `<!-- -->` comments between inline-block elements to remove whitespace
-    - Use `vertical-align: top` for consistent alignment
-15. **Deliver based on the user's chosen workflow:**
-    - **Auto-Publish**: Run `scripts/auto_publish.py` with the user's AppID/AppSecret to create or update the WeChat draft directly.
-    - **Manual Paste**: Instruct the user to open the final HTML file in a browser, press `Ctrl+A` to select all content, then `Ctrl+C` to copy, and paste into the WeChat Official Account editor (mp.weixin.qq.com) with `Ctrl+V`. Remind the user to verify the mobile preview before saving.
+---
 
 ## Reference Screenshot Workflow
 
-Use this workflow when the user provides a screenshot, reference image, or says they want "this style", "similar to this", "match this layout", or "generate a WeChat article in the style of this image".
+When the user provides a reference screenshot or asks to match a style:
 
-1. Analyze the reference visually before writing HTML:
-   - Overall structure: header, title area, intro card, body sections, image groups, footer.
-   - Color palette: dominant background, theme color, accent color, text colors.
-   - Typography hierarchy: title size, subtitle style, body size, caption size, weight, alignment.
-   - Spacing rhythm: outer padding, card margins, paragraph spacing, section breaks.
-   - Visual devices: borders, rounded corners, dividers, labels, icons, dots, frames, shadows, decorative shapes.
-   - Image treatment: full-width, framed, rounded, staggered, overlapped, grid, captioned, or image-heavy.
-2. Translate the style into WeChat-safe HTML:
-   - Use `section` containers and inline styles only.
-   - Use the required 375px mobile-first root container.
-   - Use `inline-block` rows and negative margins instead of absolute positioning.
-   - Replace unsupported effects with compatible approximations.
-3. Preserve content separately from style:
-   - Keep user-provided wording and facts unchanged unless rewriting is requested.
-   - Use neutral placeholders for missing image URLs.
-   - Do not invent authors, organizations, QR codes, dates, contacts, or publication metadata.
-4. If exact replication is not possible in WeChat, preserve the visual intent first:
-   - Approximate shadows with borders or layered background blocks.
-   - Approximate complex positioning with normal-flow layers and negative margins.
-   - Approximate complex shapes with border radius, small inline-block decorations, or image placeholders.
-   - Drop animation, interactivity, filters, fixed/absolute positioning, and unsupported tags.
-5. Return either:
-   - One clean paste-ready HTML fragment when the task is clear.
-   - A short style summary followed by the HTML when the user asks for explanation or when important visual compromises were made.
+1. **Analyze**: structure, color palette, typography hierarchy, spacing rhythm, visual devices, image treatment.
+2. **Translate**: Use inline styles, 375px root, `inline-block` rows, negative margins — no absolute positioning.
+3. **Preserve content**: Keep user wording unchanged unless rewriting is requested. Don't invent metadata.
+4. **Approximate what can't be exact**: borders for shadows, normal flow for complex positioning, `border-radius` for shapes. Drop animations, filters, and unsupported tags.
 
-## Clarifying Style Requirements
+---
 
-**MANDATORY: The agent MUST ask the first-round style questions before generating any HTML, unless the user has already explicitly answered all of them in the current conversation.**
+## Image Upload Workflow
 
-Do not skip the questions even if the user says "you decide", "based on the content", "随你", "按内容定", or similar. The user must confirm or select from the choices; the agent should not unilaterally decide.
-
-Ask only for high-impact missing information. Prefer one compact question with grouped choices instead of a long questionnaire.
-
-High-impact inputs:
-- Article content: title, body text, section headings, required source notes.
-- Article purpose and tone: formal, warm, lively, academic, promotional, event-oriented, newsletter-like, or minimalist.
-- Color direction: brand color, preferred theme color, light/dark background, or "choose based on content".
-- Image strategy: no images, placeholders, user-provided image URLs, image-heavy layout, single hero image, inline images, grid, staggered, or overlap.
-- Layout density: clean text-first, card-based, magazine-like, lively decorative, or compact announcement.
-- SVG motion decorations: spinning badges, drawing dividers, breathing borders, floating dots, fade transitions, sliding reveals. IMPORTANT: SVG delivery requires API auto-publish or WeChat browser extension; standard browser copy-paste will NOT work for SVG. The agent MUST ask the user about this trade-off before proceeding.
-- Footer fields: author, editor, source, organization, date, QR code/logo URL, or omit footer.
-
-Required follow-up question format (must be asked every time unless already answered):
-
-```text
-Before I generate the WeChat HTML, I need a few style choices:
-1. Tone: formal / warm / lively / minimalist / decide based on content
-2. Theme color: provide a color / use brand color / decide based on content
-3. Images: none / placeholders / use provided URLs / image-heavy
-4. Layout: text-first / card-based / magazine-like / layered-overlap / decide based on content
-5. SVG motion decorations? A batch of verified-safe SVG templates is available (rotating badges, drawing dividers, breathing borders, floating dots, fade/slide transitions). IMPORTANT: SVG requires API auto-publish or WeChat browser extension to deliver; standard browser copy-paste will strip SVG tags. / No SVG (plain HTML, compatible with all delivery methods)
-```
-
-Decision rule:
-- **Step 1 (Ask):** The agent MUST ask the style questions first. The user's initial silence, brevity, or lack of style direction does NOT constitute permission to decide unilaterally.
-- **Step 2 (Evaluate response):**
-  - If the user answers with concrete preferences, follow them.
-  - If the user says "you decide", "based on the content", "随你", "按内容定", or similar **AFTER being asked**, the agent may choose a style that fits the article type. Briefly state the chosen defaults before generating HTML.
-  - If the user says "you decide", "based on the content", "随你", "按内容定", or similar **BEFORE being asked** (e.g., in the very first message), the agent MUST still present the questions and wait for explicit answers. Do not treat pre-emptive "随意" as a waiver of the asking requirement.
-- **Step 3 (Proceed only after Step 2 is resolved):** Do not generate HTML until the user has either given concrete preferences OR explicitly confirmed "decide for me" in response to the asked questions.
-- Ask again only when a missing input affects factual correctness or cannot be safely guessed, such as required footer names, real image URLs, event time/place, contact details, or official organization identity.
-- **Exception: If the user has already answered the equivalent questions earlier in the same conversation thread, do not repeat them.**
-
-## Image Upload Workflow for WeChat Paste
-
-Use this workflow when the user has local image files in the HTML and wants to copy the generated HTML into the WeChat editor. This workflow uploads local images to a public image hosting service, replaces local `img src` values with public HTTPS URLs, and outputs a paste-ready HTML file.
-
-Goal: turn local images into public HTTPS image URLs that the WeChat editor backend can fetch and transfer.
-
-Default provider: 360 image host via `wzapi`. It requires no account, no domain, no server, and no background process.
-
-### Why Upload Instead of Local Exposure
-
-- No CLI tool installation required beyond `curl`.
-- No background HTTP service needs to keep running.
-- No temporary networking setup, domain, or account registration is required.
-- Uploaded URLs are CDN image URLs such as `https://ps.ssl.qhimg.com/...`.
-- The generated HTML is portable after upload and replacement.
+Turn local images into public HTTPS URLs for WeChat paste. Default provider: 360 image host via `wzapi` (no account required).
 
 ### Limits
 
 | Limit | Guidance |
 |:---|:---|
-| Single file size | Keep images under 1.5MB when possible; larger uploads may be slow or fail. |
-| Upload timeout | Use `curl --max-time 60`, especially for files over 1MB. |
-| Content filter | Some individual images may be rejected; retry once, then report failure. |
-| Persistence | Good enough for WeChat fetch-and-transfer; do not treat anonymous hosting as permanent storage. |
-| Sensitive images | Do not upload sensitive/private images unless the user explicitly approves anonymous third-party hosting. |
-
-### Prerequisites
-
-- `curl`.
-- Optional: Python Pillow for automatic image compression.
-- Optional fallback: ImageMagick (`magick`) for image compression.
+| File size | Keep under 1.5MB; larger may fail |
+| Upload timeout | `curl --max-time 60` |
+| Content filter | Some images may be rejected; retry once |
+| Persistence | Good for WeChat fetch-and-transfer; not permanent storage |
+| Sensitive images | Don't upload without explicit user approval |
 
 ### CLI Workflow
 
-1. Inspect the HTML and collect local image sources from `<img src="...">` and `<img data-src="...">`.
-2. Resolve paths: convert relative paths to absolute paths using the HTML file's directory as base.
-3. Process each image:
+1. Collect local `src` paths from HTML.
+2. For images >1.5MB, compress a temp copy (Pillow: `quality=85, optimize=True`).
+3. Upload: `curl -s --max-time 60 -F "file=@/path/to/image.jpg" https://wzapi.com/api/360tc`
+4. Parse `{"errno": 0, "data": {"url": "https://ps.ssl.qhimg.com/..."}}` → extract `data.url`.
+5. Verify: `curl -sI "<url>"` → HTTP 200 + `Content-Type: image/*`.
+6. Replace local paths in HTML with verified public URLs.
+7. Retry once on failure; report failed images to user.
 
-   a. Check size. If an image is over 1.5MB, compress a temporary copy. Do not overwrite the original image.
-
-   Preferred compression with Python Pillow:
-
-   ```bash
-   python3 -c "from PIL import Image; img = Image.open('input.jpg'); img.save('output.jpg', quality=85, optimize=True)"
-   ```
-
-   Fallback compression with ImageMagick:
-
-   ```bash
-   magick input.jpg -resize 90% -quality 85 output.jpg
-   ```
-
-   b. Upload to 360 image host via `wzapi`:
-
-   ```bash
-   curl -s --max-time 60 -F "file=@/path/to/image.jpg" https://wzapi.com/api/360tc
-   ```
-
-   c. Parse the response. Expected JSON:
-
-   ```json
-   {"errno": 0, "error": "", "data": {"url": "https://ps.ssl.qhimg.com/xxxxx.jpg"}}
-   ```
-
-   Extract `data.url`.
-
-   d. Verify URL:
-
-   ```bash
-   curl -sI "https://ps.ssl.qhimg.com/xxxxx.jpg"
-   ```
-
-   The URL is usable only if:
-   - HTTP status is `200`.
-   - `Content-Type` starts with `image/`.
-   - The response is not HTML, a warning page, a redirect trap, or an error page.
-
-   e. Retry logic: if upload fails, wait 5 seconds and retry once. If it still fails, record the image as failed.
-
-4. Replace paths in HTML: substitute each local `src` or `data-src` with the verified public URL.
-5. During an active layout project, update the current working HTML file so local git tracks one file across revisions. Only write a separate uploaded copy if the user asks for one.
-6. Report summary:
-   - Success count and uploaded URLs.
-   - Failed image paths and reasons.
-   - Output file path.
-
-### Fallback Providers
-
-If 360 upload fails for multiple images, use a configured provider only when the user has already provided credentials or configuration, such as a team image host, COS/OSS/CDN, or WeChat material library. Do not ask ordinary users to configure object storage just to complete a paste-ready HTML task.
-
-### Safety Rules
-
-- Keep original images untouched; work on copied or compressed temporary files.
-- Keep existing remote `https://...` image URLs unchanged unless the user asks to rehost them.
-- Do not upload sensitive or private images to anonymous third-party image hosts without explicit user approval.
-- Verify every uploaded URL with HTTP `200` and `Content-Type: image/*` before including it in HTML.
-- If an image cannot be uploaded after retry, either remove that image block from the generated HTML or leave the local path unchanged and clearly warn that it must be uploaded manually in the WeChat editor.
-
-### URL Replacement Rules
-
-- Preserve non-image parts of the HTML exactly.
-- Keep existing remote `https://...` image URLs unchanged unless the user asks to rehost them.
-- Use public URLs only in the final paste-ready HTML.
-
-Example replacement:
-
-```html
-<!-- Before -->
-<img src="/home/user/article/images/cover.png">
-
-<!-- After -->
-<img src="https://ps.ssl.qhimg.com/example.jpg">
-```
+---
 
 ## Manual Paste Workflow
 
-If the user chooses **NOT** to use Auto-Publish, follow these exact steps after generating the final paste-ready HTML with public image URLs:
+After generating final paste-ready HTML:
 
-1. **Open the file**: Tell the user to open the final HTML file in a web browser (double-click or drag into a browser tab).
-2. **Select all**: Instruct the user to press **`Ctrl+A`** (or **`Cmd+A`** on macOS) to select all rendered content in the browser.
-3. **Copy**: Instruct the user to press **`Ctrl+C`** (or **`Cmd+C`** on macOS) to copy the selected content.
-4. **Paste into WeChat Editor**: Instruct the user to open the WeChat Official Account editor (`mp.weixin.qq.com`), click inside the editor body, and press **`Ctrl+V`** (or **`Cmd+V`** on macOS) to paste.
-5. **Verify**: Remind the user to check the mobile preview in the WeChat editor before saving or publishing.
+1. Open the HTML file in a browser.
+2. `Ctrl+A` (select all).
+3. `Ctrl+C` (copy).
+4. Open mp.weixin.qq.com editor, click body area, `Ctrl+V` (paste).
+5. Verify mobile preview before saving.
 
-Do NOT skip these instructions. The user must be explicitly guided through `Ctrl+A` → `Ctrl+C` → `Ctrl+V` every time Manual Paste is used.
+---
 
 ## Output Contract
 
-The final HTML should:
+- Root `<section>` with `width: 100%; max-width: 375px; margin-left: auto; margin-right: auto;`.
+- Inline styles only.
+- `<section>` for containers; `<p>`, `<span>`, `<strong>`, `<em>`, `<br>` for text; `<img>` for images.
+- All images: `width: 100%; max-width: 100%; display: block; margin: 0 auto;` (unless intentionally narrower).
+- No invented contact details, organization names, authors, QR codes, or publication metadata.
+- Preserve user-provided wording and facts.
 
-- Start with a root `<section>` using `width: 100%; max-width: 375px; margin-left: auto; margin-right: auto;`.
-- Use inline styles only.
-- Use `<section>` for layout containers.
-- Use `<p>`, `<span>`, `<strong>`, `<em>`, `<br>`, and `<img>` for content.
-- Keep all image tags at `width: 100%; max-width: 100%; display: block; margin: 0 auto;` unless a narrower image is intentional.
-- Use neutral placeholders for unknown images, names, credits, source notes, or brand fields.
-- Avoid inventing private contact details, organization names, authors, QR codes, or publication metadata.
-- Preserve user-provided wording and factual content unless the user asks for rewriting.
+---
 
 ## Core Principles
 
-### Mobile-First (Default)
-**All HTML files must include `max-width: 375px; margin: 0 auto;` on the root container.**
-
-This ensures:
-- Browser preview looks like mobile (not stretched to full screen width)
-- Content is centered with gray margins on desktop
-- Matches WeChat editor's actual rendering width
+### Mobile-First
 
 Root container pattern:
-```html
-<section style="max-width: 375px; margin: 0 auto; background-color: rgb(255,255,255);">
-  <!-- all content -->
-</section>
-```
 
-- Target width: 375px (iPhone standard)
-- All elements use percentage widths or `width: 100%`
-- Background color should be white (not transparent)
-
-### Inline Styles Only
-- NO `<style>` tags
-- NO `class` attributes
-- ALL styles in `style=""` attributes
-
-### Tag Whitelist
-- **Containers**: `<section>` (NOT `<div>`)
-- **Text**: `<p>`, `<span>`, `<strong>`, `<em>`, `<br>`
-- **Images**: `<img>` (must have `width: 100%; max-width: 100%`)
-- **FORBIDDEN**: `<script>`, `<style>`, `<iframe>`, `<h1-h6>`, `<table>`, `<ul>/<ol>`
-
-### CSS Property Safety Levels
-
-Properties are grouped by safety based on extensive testing in the WeChat editor.
-
-#### Safe — Use freely
-These properties are stable in both mobile and PC WeChat clients:
-
-- **Layout**: `display` (`inline-block`, `block`), `width`, `height`, `max-width`, `min-width`, `margin`, `padding`, `vertical-align`, `overflow`, `box-sizing`
-- **Text**: `font-size`, `color`, `line-height`, `text-align`, `text-indent`, `letter-spacing`, `white-space`, `font-style`, `font-weight`, `word-break`
-- **Decoration**: `background-color`, `background-image` (public HTTPS URLs only), `background-position`, `background-repeat`, `background-size`, `background-attachment`, `border-*`, `border-radius`, `opacity`, `box-shadow`
-- **Container**: `section`, `p`, `span`, `strong`, `em`, `br`, `img`
-
-#### Caution — Use with care
-These work in mobile WeChat but may render differently or fail in PC client. Always provide a safe fallback:
-
-| Property | Notes |
-|:---|:---|
-| `transform: rotate()`, `rotateZ()`, `translate()`, `scale()` | 2D transforms are stable on mobile and mostly retain on PC. Safe for decorative elements (tilted frames, rotated shapes, micro-offsets). We recommend reserving these for decorative elements rather than critical text readability. |
-| `transform: rotateX()`, `rotateY()`, `perspective()` | 3D transforms are unsupported or render as flat/blank in WeChat. `perspective(0px)` is mathematically invalid (zero distance = invisible). Avoid entirely. |
-| `text-shadow` | Mobile OK; PC support weaker. Fallback: none or bold color contrast. |
-| `-webkit-background-clip: text` | Gradient text effect. Mobile OK; PC may show transparent or solid color. Always set a solid `color` fallback. |
-| `z-index` | Only effective with non-static positioning. In normal flow, use document order + negative margin instead. |
-| `float` | Can break inline-block/flex flow. Prefer inline-block columns. |
-| `text-decoration` (and split properties) | Use shorthand `text-decoration: line-through/underline color thickness` for better compatibility. |
-| Negative `margin` (e.g., `margin-top: -40px`) | Safe for overlap effects. Keep magnitude under ~120px to avoid editor clipping. |
-
-#### Flex — Use only with explicit fallback
-`display: flex` works on mobile WeChat but may break on WeChat PC client. **Default to `inline-block` for all column layouts.** Only use flex when:
-1. The user explicitly requests flex behavior
-2. You include `flex: 0 0 auto` on every flex child
-3. You provide an inline-block fallback structure
-
-#### Avoid — Do not use
-
-| Property | Reason |
-|:---|:---|
-| `position: absolute` / `position: fixed` | Editor forces to `static`; layout will break. |
-| `animation` / `@keyframes` / `transition` | Filtered by WeChat editor. |
-| `display: grid` / `grid-template-*` | Poor PC client support; use inline-block instead. |
-| `<svg>`, `<foreignObject>`, `<animateTransform>`, `<animateMotion>` | Source-export artifacts and animation wrappers do not belong in final paste-ready HTML. Rebuild as normal HTML/CSS or rasterize if needed. |
-| `pointer-events` / `user-select` / `-webkit-tap-highlight-color` | No meaningful effect in WeChat articles; may be filtered. |
-| `transform-style: preserve-3d` / `perspective` | 3D transforms unsupported in WeChat. `perspective(0px)` produces no visible effect. |
-| `direction: rtl` | Can cause unexpected line breaking with Chinese text. |
-| `font-family` with custom fonts | External fonts not loaded; falls back to system default. |
-| `filter` (CSS filters) | Not supported in WeChat editor. |
-
-### Two-Column Layout (Recommended: Inline-Block)
-
-**Default to `display: inline-block` for all column layouts.** WeChat editor handles flex differently from browsers, and flex may break on WeChat PC client.
-
-Only use flex when:
-1. The user explicitly requests flex behavior
-2. You include `flex: 0 0 auto` on every flex child
-3. You provide an inline-block fallback structure
-
-If you must use flex, include:
-
-```html
-<section style="display: flex; flex-flow: row;">
-  <section style="display: inline-block; width: 50%; 
-                  vertical-align: top;
-                  align-self: flex-start;
-                  flex: 0 0 auto;        ← CRITICAL!
-                  height: auto;
-                  box-sizing: border-box;">
-    <!-- content -->
-  </section>
-  <section style="display: inline-block; width: 50%; 
-                  vertical-align: top;
-                  align-self: flex-start;
-                  flex: 0 0 auto;        ← CRITICAL!
-                  height: auto;
-                  box-sizing: border-box;">
-    <!-- content -->
-  </section>
-</section>
-```
-
-Missing `flex: 0 0 auto` can cause images to expand to original size in WeChat editor.
-
-## Design Patterns
-
-### Basic Patterns
-
-#### 1. Header Block
-```html
-<section style="text-align: center; padding: 30px 10px; background-color: rgb(0,61,106);">
-  <p style="margin: 0; font-size: 14px; color: rgb(200,200,200);">栏目名称 | 文章说明</p>
-  <p style="margin: 15px 0 0; font-size: 28px; color: rgb(255,255,255);">
-    <strong>文章标题</strong>
-  </p>
-  <section style="width: 50px; height: 2px; background: rgb(255,209,131); margin: 20px auto 0;"></section>
-</section>
-```
-
-#### 2. Left-Border Quote
-```html
-<section style="border-left: 7px solid rgb(0,61,106); padding: 0 0 0 20px; margin: 20px 10px;">
-  <p style="margin: 0; font-size: 16px; color: rgb(0,61,106);"><strong>编者按</strong></p>
-  <p style="margin: 10px 0 0; text-indent: 2em;">引言内容...</p>
-</section>
-```
-
-#### 3. Image with Frame
-```html
-<section style="text-align: center; margin: 15px 0; padding: 0 10px;">
-  <section style="display: inline-block; width: 100%; line-height: 0; 
-                  border: 8px solid rgb(0,61,106); box-sizing: border-box;">
-    <img src="URL" style="vertical-align: middle; max-width: 100%; width: 100%; display: block;">
-  </section>
-  <p style="margin: 8px 0 0; font-size: 14px; color: rgb(100,100,100); text-align: center;">
-    图1 | 图片注释
-  </p>
-</section>
-```
-
-#### 4. Divider Lines
-```html
-<!-- Dashed -->
-<section style="border-top: 1px dashed rgb(200,200,200); margin: 20px 10px;"></section>
-
-<!-- Solid -->
-<section style="border-bottom: 1px solid rgb(0,61,106); margin: 20px 10px;"></section>
-```
-
-#### 5. Circular Decoration
-```html
-<section style="text-align: center; margin: 25px 0;">
-  <section style="display: inline-block; width: 40px; height: 40px; 
-                  background-color: rgb(0,61,106); border-radius: 100%;
-                  line-height: 40px; text-align: center;">
-    <span style="color: rgb(255,255,255); font-size: 18px;">✦</span>
-  </section>
-</section>
-```
-
-#### 6. Footer
-```html
-<!-- Two blank lines -->
-<section style="padding: 0 10px;"><p style="margin: 0;"><br></p></section>
-<section style="padding: 0 10px;"><p style="margin: 0;"><br></p></section>
-
-<!-- Credits -->
-<section style="text-align: right; padding: 0 10px;">
-  <p style="margin: 0; font-size: 14px; color: rgb(128,128,128);">文案 | 姓名</p>
-  <p style="margin: 5px 0 0; font-size: 14px; color: rgb(128,128,128);">排版 | 姓名</p>
-</section>
-
-<!-- Brand logo -->
-<section style="text-align: center; margin-top: 25px; padding: 0 10px;">
-  <section style="display: inline-block; width: 60px; height: 60px;
-                  background-color: rgb(0,61,106); border-radius: 100%;
-                  line-height: 60px; text-align: center;">
-    <span style="color: rgb(255,255,255); font-size: 14px;">品牌</span>
-  </section>
-</section>
-```
-
-### Alignment Rules (Critical)
-
-WeChat PC client width > 375px. Must work on both mobile and PC.
-
-#### Root Container
 ```html
 <section style="width: 100%; max-width: 375px; margin-left: auto; margin-right: auto; text-align: center;">
   <!-- all content -->
 </section>
 ```
 
-**Key**: Always use `margin-left: auto; margin-right: auto` (never `margin: 0 auto`) for reliable centering in WeChat PC client.
+- Use `margin-left: auto; margin-right: auto` (not `margin: 0 auto`) for reliable PC centering.
+- Root container does NOT set `background-color` — WeChat forces white. Use wrapper sections for colored backgrounds (see `references/background-color-guide.md`).
 
-#### Text Paragraphs
-```html
-<p style="text-align: left; text-indent: 2em;">正文...</p>
-```
+### Inline Styles Only
 
-Root container uses `text-align: center`. Paragraphs must explicitly set `text-align: left`.
+No `<style>` tags, no `class` attributes, no external CSS. All styles in `style=""`.
 
-#### Images (Dual Centering)
-Always use both methods:
-```html
-<section style="text-align: center;">
-  <img src="URL" style="width: 100%; display: block; margin: 0 auto;">
-</section>
-```
-- Parent `text-align: center` — primary centering
-- Image `margin: 0 auto` — backup when parent fails
+### Tag Whitelist
 
-### Advanced Patterns
+- **Containers**: `<section>`
+- **Text**: `<p>`, `<span>`, `<strong>`, `<em>`, `<br>`
+- **Images**: `<img>` (must have `width: 100%; max-width: 100%`)
+- **FORBIDDEN**: `<script>`, `<style>`, `<iframe>`, `<h1-h6>`, `<table>`, `<ul>/<ol>`
 
-#### 7. Layered Stack (Multi-layer Overlap)
-Background wallpaper + frame + image layers.
-```html
-<section style="display: inline-block; width: 90%; background-color: rgb(255,183,77); padding: 15px; box-sizing: border-box;">
-  <section style="display: inline-block; width: 100%; line-height: 0; border-radius: 8px; overflow: hidden; box-sizing: border-box;">
-    <img src="URL" style="vertical-align: middle; max-width: 100%; width: 100%; display: block;">
-  </section>
-</section>
-```
+### CSS Property Safety Levels
 
-#### 8. Negative Margin Overlap
-```html
-<!-- Large: Title over hero image -->
-<section style="background-color: rgb(0,61,106); padding: 30px 20px; margin: -40px 15px 0; box-sizing: border-box;">
-  <p style="margin: 0; font-size: 24px; color: rgb(255,255,255);"><strong>Title</strong></p>
-</section>
+#### Safe — Use freely
 
-<!-- Medium: Decor over image bottom -->
-<section style="line-height: 0; margin: -24px 0px 0px; box-sizing: border-box; text-align: center;">
-  <section style="display: inline-block; width: 50px; height: 50px; background-color: rgb(0,61,106); border-radius: 100%; line-height: 50px; text-align: center;">
-    <span style="color: rgb(255,255,255); font-size: 20px;">✦</span>
-  </section>
-</section>
+**Layout**: `display` (`flex`, `inline-block`, `block`), `flex-flow`, `justify-content`, `align-self`, `flex`, `width`, `height`, `max-width`, `min-width`, `margin`, `padding`, `vertical-align`, `overflow`, `box-sizing`
+**Text**: `font-size`, `color`, `line-height`, `text-align`, `text-indent`, `letter-spacing`, `white-space`, `font-style`, `font-weight`, `word-break`
+**Decoration**: `background-color`, `background-image` (public HTTPS URLs), `background-position`, `background-repeat`, `background-size`, `background-attachment`, `border-*`, `border-radius`, `opacity`, `box-shadow`
 
-<!-- Micro: Dot decoration -->
-<section style="text-align: center; margin: -10px 0px 0px; box-sizing: border-box;">
-  <section style="display: inline-block; width: 14px; height: 14px; border-radius: 100%; background-color: rgb(0,61,106); box-sizing: border-box;"></section>
-</section>
-```
+#### Caution — Use with care
 
-#### 9. Staggered Image Grid (Safe for PC)
-```html
-<section style="text-align: center; padding: 0 15px;">
-  <section style="display: inline-block; width: 52%; vertical-align: top; box-sizing: border-box;">
-    <section style="display: inline-block; width: 100%; line-height: 0; border-radius: 15px; overflow: hidden; box-sizing: border-box;">
-      <img src="URL" style="vertical-align: middle; max-width: 100%; width: 100%; display: block; margin: 0 auto;">
-    </section>
-  </section><!--
-  --><section style="display: inline-block; width: 44%; vertical-align: top; padding-top: 25px; padding-left: 8px; box-sizing: border-box;">
-    <section style="display: inline-block; width: 100%; line-height: 0; border-radius: 10px; overflow: hidden; box-sizing: border-box;">
-      <img src="URL" style="vertical-align: middle; max-width: 100%; width: 100%; display: block; margin: 0 auto;">
-    </section>
-  </section>
-</section>
-```
-**Critical**: 
-- If you need column layouts, we recommend `display: inline-block` over `display: flex` for WeChat PC compatibility
-- Use `<!-- -->` comment to eliminate inline-block whitespace gap
-- Total width ≤ 96% (52% + 44% = 96%)
-- Use `padding-left` on right column for spacing (not `padding-right` on left)
-- Different `padding-top` values create vertical stagger
+| Property | Notes |
+|:---|:---|
+| `transform: rotate()`, `rotateZ()`, `translate()`, `translate3d()`, `scale()` | Safe for decorative elements. For critical text, convert to margins/padding. |
+| `transform: rotateX()`, `rotateY()`, `perspective()` | 3D transforms unsupported; avoid entirely. |
+| `text-shadow` | Mobile OK; PC weaker. Provide fallback. |
+| `-webkit-background-clip: text` | Mobile OK; PC may degrade. Always set solid `color` fallback. |
+| `z-index` | Only with non-static positioning. Use document order + negative margin instead. |
+| `float` | Can break inline-block flow. Prefer inline-block. |
+| `text-decoration` | Use shorthand `text-decoration: line-through/underline color thickness`. |
+| Negative `margin` | Safe for overlap; keep under ~120px. |
+| SVG (`<svg>`, `<animate>`, `<animateTransform>`, `<animateMotion>`) | Conditionally supported. Use only when the user explicitly requests SVG effects, and follow `references/svg-compatibility.md`. No filters, no gradients, no CSS animation inside SVG. |
 
-#### 10. Image or Card Overlap
-Use normal document flow plus negative margin for overlaps. Avoid `position: absolute`.
+#### Avoid — Do not use
 
-```html
-<!-- Image over image -->
-<section style="text-align: center; padding: 0 15px; box-sizing: border-box;">
-  <section style="line-height: 0;"><img src="BASE_IMAGE_URL" style="width: 100%; max-width: 100%; display: block; margin: 0 auto;"></section>
-  <section style="text-align: right; margin-top: -50px; padding-right: 12px; box-sizing: border-box;">
-    <section style="display: inline-block; width: 44%; line-height: 0; border: 5px solid rgb(255,255,255); border-radius: 8px; overflow: hidden; box-sizing: border-box;">
-      <img src="OVERLAY_IMAGE_URL" style="width: 100%; max-width: 100%; display: block; margin: 0 auto;">
-    </section>
-  </section>
-</section>
-```
+| Property | Reason |
+|:---|:---|
+| `position: absolute` / `position: fixed` | Editor forces to `static`. |
+| `animation` / `@keyframes` / `transition` | Filtered by WeChat. |
+| `display: grid` / `grid-template-*` | Poor PC support; use inline-block. |
+| `pointer-events` / `user-select` / `-webkit-tap-highlight-color` | No meaningful effect. |
+| `transform-style: preserve-3d` / `perspective` | 3D unsupported. |
+| `direction: rtl` | Breaks Chinese line breaking. |
+| `font-family` with custom fonts | Falls back to system default. |
+| `filter` | Not supported. |
 
-For image-over-text-card layouts, add extra padding inside the text card where the overlay sits, then render the overlay block after the card with negative `margin-top` and `text-align: left/center/right`.
+### Alignment Rules
 
-#### 11. Asymmetric Shapes
-```html
-<!-- Diamond -->
-<section style="display: inline-block; width: 10px; height: 10px; background-color: rgb(255,183,77); border-radius: 2px; transform: rotate(45deg); box-sizing: border-box;"></section>
+- Root: `text-align: center` for centering inline-block children.
+- Body paragraphs: explicitly override with `text-align: justify` or `text-align: left`, plus `text-indent: 2em` for Chinese prose.
+- Images: both `text-align: center` on parent AND `display: block; margin: 0 auto` on `<img>`.
+- Prefer `inline-block` rows over `flex` for cross-platform reliability.
 
-<!-- Leaf shape -->
-<section style="display: inline-block; width: 24px; height: 24px; background-color: rgb(78,128,88); border-radius: 0 100% 0 100%; box-sizing: border-box; line-height: 24px; text-align: center;">
-  <span style="color: rgb(255,255,255); font-size: 12px;">🌿</span>
-</section>
-```
+---
 
-#### 12. Three-Image Crown Layout
-Use this for one row of three images where the left and right images sit lower and the center image sits higher. Prefer `inline-block`; keep total width ≤ 96%.
+## Layout Capability References
 
-```html
-<section style="text-align: center; padding: 0 12px; box-sizing: border-box;">
-  <section style="display: inline-block; width: 30%; vertical-align: top; padding-top: 24px; box-sizing: border-box;">
-    <img src="URL_LEFT" style="max-width: 100%; width: 100%; display: block; margin: 0 auto;">
-  </section><!--
-  --><section style="display: inline-block; width: 32%; vertical-align: top; margin: 0 2%; box-sizing: border-box;">
-    <img src="URL_CENTER" style="max-width: 100%; width: 100%; display: block; margin: 0 auto;">
-  </section><!--
-  --><section style="display: inline-block; width: 30%; vertical-align: top; padding-top: 24px; box-sizing: border-box;">
-    <img src="URL_RIGHT" style="max-width: 100%; width: 100%; display: block; margin: 0 auto;">
-  </section>
-</section>
-```
+Instead of duplicating patterns here, use the reference files organized by capability level:
 
-#### 13. Text Background Cards
-```html
-<!-- Card with colored borders -->
-<section style="background-color: rgb(255,255,255); padding: 20px; margin: 10px 15px; box-sizing: border-box; border-top: 3px solid rgb(255,183,77); border-bottom: 3px solid rgb(78,128,88);">
-  <p style="margin: 0; text-indent: 2em;">正文内容...</p>
-</section>
+| Need | Reference File | When to Read |
+|:---|:---|:---|
+| Hard compatibility rules | `references/wechat-rules.md` | Always |
+| Basic capabilities (headings, cards, dividers) | `references/editor-features.md` | Always |
+| Refined layout blocks (framed images, corner cards, layered stacks) | `references/refined-layout-blocks.md` | User wants polished/rich layout |
+| Lower-level visual patterns | `references/visual-patterns.md` | Highly custom or reference-matched layout |
+| Background color / dark theme handling | `references/background-color-guide.md` | Colored backgrounds, dark themes |
+| Inline-block layout safety | `references/inline-block-safety.md` | Multi-column layouts |
+| SVG compatibility | `references/svg-compatibility.md` | User explicitly requests SVG effects |
+| Visual layout composer | `references/visual-layout-workflow.md` | User chooses drag-and-drop composer |
 
-<!-- Card with shadow and left border -->
-<section style="background-color: rgb(255,255,255); padding: 20px; margin: 15px; box-sizing: border-box; border-left: 4px solid rgb(78,128,88); border: 1px solid rgb(220,220,220);">
-  <p style="margin: 0; text-indent: 2em;">正文内容...</p>
-</section>
-```
-
-#### 14. Decorative Divider with Stickers
-```html
-<section style="text-align: center; margin: 20px 0; box-sizing: border-box;">
-  <section style="display: inline-block; width: 24px; height: 24px; vertical-align: middle; background-color: rgb(78,128,88); border-radius: 0 100% 0 100%; box-sizing: border-box; line-height: 24px; text-align: center;">
-    <span style="color: rgb(255,255,255); font-size: 12px;">🌿</span>
-  </section>
-  <section style="display: inline-block; width: 80px; height: 2px; vertical-align: middle; background-color: rgb(78,128,88); margin: 0 10px; box-sizing: border-box;"></section>
-  <section style="display: inline-block; width: 24px; height: 24px; vertical-align: middle; background-color: rgb(255,183,77); border-radius: 100% 0 100% 0; box-sizing: border-box; line-height: 24px; text-align: center;">
-    <span style="color: rgb(255,255,255); font-size: 12px;">🍁</span>
-  </section>
-</section>
-```
+---
 
 ## Formatting Defaults
 
-These values are safe defaults, not mandatory standards. Adapt them to the user's brand, column, audience, and source material.
+Adaptable defaults (override with user preferences):
 
 | Element | Default Size | Default Color | Alignment | Other |
 |:---|:---:|:---|:---|:---|
 | Body text | 16px | rgb(62,62,62) | justify | line-height: 1.8, text-indent: 2em |
 | Image caption | 14px | rgb(100,100,100) | center | — |
-| Footer text | 14px | rgb(128,128,128) | right | Optional credits or brand notes |
+| Footer text | 14px | rgb(128,128,128) | right | — |
 | Section title | 20px | theme color | left | — |
 | Header subtitle | 14px | rgb(200,200,200) | center | letter-spacing: 2px |
 | Header title | 28px | rgb(255,255,255) | center | — |
 
-## Content Structure
+For detailed editorial habits (image grouping, caption conventions, footer patterns), see `references/formatting-guide.md`.
 
-```
-标题区（背景色块 + 居中）
-  ↓
-编者按（左边框引用）
-  ↓
-虚线分割
-  ↓
-正文段落1（按用户偏好设置字号、缩进和行距）
-  ↓
-图片（带相框 + 注释）
-  ↓
-正文段落2
-  ↓
-金句引用块（背景色 + 居中）
-  ↓
-实线分割
-  ↓
-图文双栏（优先 inline-block，必要时谨慎使用 flex）
-  ↓
-正文段落3
-  ↓
-图片（圆角相框）
-  ↓
-圆形装饰分隔
-  ↓
-...更多段落...
-  ↓
-结语（大色块 + 反白文字）
-  ↓
-补充信息区（可选）
-  ↓
-空行×2
-  ↓
-落款或来源说明（可选）
-  ↓
-尾图（品牌标识）
-```
+---
 
 ## Testing
 
-### Browser Preview (Approximate)
-```html
-<section style="max-width: 375px; margin: 0 auto; background: white;">
-  <!-- article content -->
-</section>
-```
+- **Browser preview**: Open HTML file, view at 375px width.
+- **WeChat editor (ground truth)**: Copy → Paste into mp.weixin.qq.com editor → verify rendering.
 
-### Chrome DevTools
-Press F12 → Toggle device toolbar → Select iPhone (375×667)
-
-### WeChat Editor (Ground Truth)
-Copy HTML → Paste into mp.weixin.qq.com editor → Verify rendering
+---
 
 ## Image Requirements
-- Use `width: 100%; max-width: 100%;` on ALL images
-- Container must have `line-height: 0` to remove gap
-- Image URLs must be from your own domain (WeChat blocks external hotlinking)
-- Recommended: Upload to WeChat material library first, then use WeChat CDN URLs
+
+- All images: `width: 100%; max-width: 100%; display: block; margin: 0 auto;`.
+- Container: `line-height: 0` to remove gap below image.
+- Image URLs must be public HTTPS. For Manual Paste, third-party hosts (360 etc.) are fine. For Auto-Publish, prefer WeChat CDN (`mmbiz.qpic.cn`). See `references/image-url-workflow.md` for details.
+
+---
 
 ## SVG Support
 
-> **Status**: ✅ Verified through 9 rounds of actual publishing (2026-05-08). A batch of safe SVG motion templates is available (rotating badges, drawing dividers, breathing borders, floating dots, fade transitions, sliding reveals). The agent SHOULD proactively ask the user whether they want SVG decorations. **Critical delivery constraint**: SVG content requires API auto-publish or WeChat browser extension; standard browser copy-paste (open HTML → Ctrl+A → Ctrl+C → paste into WeChat editor) will strip SVG tags and break rendering. If the user only has manual paste access, skip SVG.
-> >
-> See `references/svg-compatibility.md` for the complete compatibility matrix and 7 verified practical templates.
+> **Status**: ✅ Verified through 9 rounds of actual publishing (2026-05-08). Use only when the user explicitly requests SVG-based visual effects.
 
-When the user says yes to SVG motion decorations during the style questioning:
-
-### Critical Rules (Must Follow)
+### Critical Rules
 
 | # | Rule | Reason |
 |:---|:---|:---|
-| 1 | **Images must use WeChat CDN** (`mmbiz.qpic.cn`) | External URLs, Base64, Data URI are filtered |
-| 2 | **Animations must use SMIL** | CSS animations (`@keyframes`, `animation`, `transition`) are completely unsupported |
-| 3 | **Styles must use inline attributes** | `style` attributes and `<style>` tags are filtered out |
-| 4 | **No interaction events** | `onclick`, `onmouseover`, `ontouchstart` are unsupported |
-| 5 | **2D transforms only** | `rotate()`, `translate()`, `scale()`, `skewX()` are safe; 3D transforms (`rotateX`, `rotateY`, `perspective`, `matrix()`) are unsupported |
-| 6 | **No `class`/`id` attributes** | Removed by WeChat editor |
-| 7 | **No `<script>` tags** | Completely prohibited in WeChat articles |
-| 8 | **Auto-play only** | Use `repeatCount="indefinite"` for loops, `begin` for delays |
-| 9 | **No filters** | `<filter>`, `<feGaussianBlur>`, etc. are filtered |
-| 10 | **No gradients** | `<linearGradient>`, `<radialGradient>`, `<stop>` are filtered |
-| 11 | **No clipping** | `clipPath`, `clip-path` are filtered |
-| 12 | **Use `href` not `xlink:href`** | `xlink:href` is filtered; `href` (SVG2) works |
+| 1 | Images must use WeChat CDN (`mmbiz.qpic.cn`) | External/Base64/Data URI filtered |
+| 2 | Animations must use SMIL | CSS animations unsupported |
+| 3 | Styles must use inline attributes | `style` attributes and `<style>` filtered |
+| 4 | No interaction events | `onclick`, `onmouseover` unsupported |
+| 5 | 2D transforms only | `rotate()`, `translate()`, `scale()`, `skewX()` OK |
+| 6 | No `class`/`id` | Removed by editor |
+| 7 | No `<script>` | Prohibited |
+| 8 | Auto-play only | `repeatCount="indefinite"` for loops |
+| 9 | No filters | `<filter>`, `<feGaussianBlur>` filtered |
+| 10 | No gradients | `<linearGradient>`, `<radialGradient>` filtered |
+| 11 | No clipping | `clipPath` filtered |
+| 12 | Use `href` not `xlink:href` | `xlink:href` filtered |
 
-### Verified Working SMIL Animation Tags
+### Verified Working
 
-- `<animate>` - Attribute animation (opacity, r, fill, stroke-width, etc.) ✅
-- `<animateTransform>` - Transform animation (translate/scale/rotate/skewX) ✅
-- `<animateMotion>` - Path motion ✅
-- `<set>` - Set animation ✅
+- SMIL tags: `<animate>`, `<animateTransform>`, `<animateMotion>`, `<set>`
+- 2D transforms: `translate()`, `scale()`, `rotate()`, `skewX()` / `skewY()`
 
-### Verified Working 2D Transforms
+Full compatibility matrix in `references/svg-compatibility.md`.
 
-`translate()`, `scale()`, `rotate()`, `skewX()` / `skewY()`
+---
 
-### Image Handling for SVG
+## Quick Start
 
-SVG `<image>` **requires WeChat CDN URLs** in all workflows. Third-party hosts (360, unsplash, etc.) are blocked inside SVG regardless of manual paste or API publish.
+1. Read `references/wechat-rules.md` — hard code constraints
+2. Read `references/editor-features.md` — basic vs. special capabilities
+3. Read `references/formatting-guide.md` — editorial habits and typography defaults
+4. Read `references/interaction-workflow.md` — collaboration and iteration workflow
+5. Read `references/image-url-workflow.md` — whenever local images are involved
+6. Read `references/refined-layout-blocks.md` — when user wants polished/rich layout
+7. Read `references/screenshot-check.md` — before presenting draft as ready
+8. Read `references/background-color-guide.md` — when using colored backgrounds or dark themes
+9. Read `references/inline-block-safety.md` — when using multi-column layouts
+10. Read `references/self-check-workflow.md` — mandatory 3-round self-check before delivery
+11. Read `references/generation-checklist.md` — before returning final HTML
+12. Read `references/svg-compatibility.md` — only when user explicitly requests SVG effects
+13. Read `references/visual-layout-workflow.md` — only when user chooses drag-and-drop composer
 
-```
-External Image → Download to Server → Call WeChat API (/cgi-bin/media/uploadimg) → Get WeChat CDN URL → Use in SVG
-```
+---
 
-**API**: `POST https://api.weixin.qq.com/cgi-bin/media/uploadimg?access_token=TOKEN`
+## Skill Update Check
 
-**Example**:
-```svg
-<image x="0" y="0" width="335" height="200" 
-       href="https://mmbiz.qpic.cn/mmbiz_jpg/..." 
-       preserveAspectRatio="xMidYMid slice"/>
-```
+**Source repository:** `git@github.com:WindGraham/wechat-ai-publisher.git` (GitHub)
 
-**Delivery limitation**: SVG content requires API auto-publish or WeChat browser extension to deliver correctly. Standard manual paste (browser Ctrl+A→Ctrl+C→paste into WeChat editor) strips SVG tags. If the user is on manual paste only, skip SVG.
-
-**Note on HTML `<img>` vs SVG `<image>`:**
-- Manual Paste workflow: Only HTML `<img>` works. SVG `<image>` is stripped during paste.
-
-**Note on SVG animation preview**: SMIL animations do not play in the WeChat PC editor preview. This is expected — animations work on mobile devices when the article is actually viewed.
-
-### Full Documentation
-
-See `references/svg-compatibility.md` for complete compatibility matrix, test records, and practical component templates.
-
-### SVG Extension Install Workflow
-
-When the user wants SVG motion decorations but does not have API auto-publish access, guide them to install the bundled browser extension.
-
-The extension source is at `tools/wechat-inject-extension/` relative to this skill directory.
-
-**Step 0: Copy extension to a user-friendly location (agent MUST do this first)**
-
-The extension must be copied out of the project directory to survive updates. The agent should:
-
-1. Detect the user's OS from the environment.
-2. Copy `tools/wechat-inject-extension/` to the user's Desktop:
-
-   | OS | Target path |
-   |:---|:---|
-   | Windows | `%USERPROFILE%\Desktop\wechat-inject-extension` |
-   | macOS | `~/Downloads/wechat-inject-extension` |
-   | Linux | `~/Downloads/wechat-inject-extension` |
-
-   ```bash
-   # macOS / Linux
-   cp -r tools/wechat-inject-extension ~/Downloads/
-   ```
-
-   ```powershell
-   # Windows
-   Copy-Item -Recurse tools\wechat-inject-extension $env:USERPROFILE\Desktop\
-   ```
-
-3. If `~/Downloads` does not exist, fall back to `~/.` (home directory).
-
-**Installation instructions (tell the user):**
-
-1. Open Chrome/Edge and go to `chrome://extensions/` (or `edge://extensions/`)
-2. Turn on **Developer mode** (top-right toggle)
-3. Click **Load unpacked** (加载已解压的扩展程序)
-4. Navigate to Desktop (Windows) or Downloads (macOS/Linux) and select the `wechat-inject-extension` folder
-5. IMPORTANT: In the extension card, enable **"Allow access to file URLs"** (允许访问文件网址) — needed for local HTML files
-6. The extension icon should appear in the toolbar
-
-**Usage instructions (tell the user):**
-
-1. Open the WeChat Official Account editor (`mp.weixin.qq.com`) and enter a new/existing article edit page — keep this tab open
-2. Open the generated HTML file in the browser (a separate tab)
-3. On the HTML page tab, click the extension icon in the toolbar
-4. Click **Capture page content** (捕获页面内容) — the popup reads the current page's HTML
-5. Click **Find WeChat editors** (查找微信编辑器) — the popup discovers open editor tabs
-6. Select the target editor from the list, then click **Inject** (注入)
-7. Switch to the WeChat editor tab to verify content, then save immediately
-
-**Key points the agent must communicate:**
-- The extension injects HTML directly into the editor DOM, bypassing WeChat's paste sanitizer — SVG tags, SMIL animations, and `foreignObject` are preserved
-- After injection, **do not continue editing the article content** in the WeChat editor — ProseMirror-based editors may re-serialize the DOM and trigger filters. Edit metadata (title/author) only, then save immediately.
-- The extension works with all three editor versions: official JSAPI, ProseMirror Shadow DOM, and UEditor iframe.
-
+When updating this skill: `git status --branch` → `git pull` → copy updated `wechat-article/` folder into the active skills directory. Restart the CLI Agent if `SKILL.md` changed (metadata may be cached).

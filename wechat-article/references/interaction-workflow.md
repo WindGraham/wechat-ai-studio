@@ -10,8 +10,6 @@ The user provides content and images. The agent collaborates with the user to ch
 
 **MANDATORY: Ask one compact question before the first layout. Do not generate any HTML until the user has responded.**
 
-The agent must present these questions even if the user says "you decide", "based on content", "随你", or "按内容定". The user must confirm or select from the choices; the agent must not proceed unilaterally.
-
 ```text
 Before I typeset this WeChat article, I need a few layout choices:
 1. Color direction: muted / warm / cool / bright / dark / use reference screenshot / provide theme color
@@ -27,6 +25,21 @@ Only after the user has answered (or explicitly skipped by choosing from the opt
 - If the user's **first** message already includes "you decide", "随你", or "based on content", the agent MUST still present the questions. Pre-emptive delegation does not bypass the asking requirement.
 - If the user **still** insists on "you decide" / "随你" / "based on content" **after seeing the questions**, only then may the agent choose reasonable defaults and briefly state them before generating HTML.
 - The agent must NEVER assume "default to auto-decide" when the user simply has not been asked yet.
+
+## Second-Round Question: Layout Guidance
+
+**MANDATORY: After style preferences are confirmed, ask whether the user wants layout guidance.**
+
+```text
+Do you want to arrange the layout yourself? You can:
+1. Open the visual drag-and-drop composer to place components
+2. Upload a reference screenshot / template for me to match
+3. Let me decide the layout based on the content
+```
+
+- Option 1 (composer) → launch `wechat-article/tools/layout-composer.html`; see `references/visual-layout-workflow.md`.
+- Option 2 (reference screenshot) → follow the Reference Screenshot Workflow in SKILL.md.
+- Option 3 (AI decides) or no preference → proceed with AI-chosen layout.
 
 ## Opening Image Rule
 

@@ -125,3 +125,41 @@ Optional brand image
 ```
 
 Always prefer user-provided style requirements over these defaults.
+
+## Example Article Structure
+
+The following is a common structure reference, not a mandatory template. Adapt to the article type and user preferences:
+
+```
+标题区（背景色块 + 居中）
+  ↓
+编者按（左边框引用）
+  ↓
+虚线分割
+  ↓
+正文段落1
+  ↓
+图片（带相框 + 注释）
+  ↓
+正文段落2
+  ↓
+金句引用块（背景色 + 居中）
+  ↓
+实线分割
+  ↓
+图文双栏（inline-block）
+  ↓
+正文段落3
+  ↓
+图片（圆角相框）
+  ↓
+圆形装饰分隔
+  ↓
+结语（大色块 + 反白文字）
+  ↓
+空行×2
+  ↓
+落款或来源说明（可选）
+  ↓
+尾图（品牌标识）
+```
