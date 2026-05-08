@@ -264,9 +264,11 @@ Specifically:
 6. Read `references/refined-layout-blocks.md` when the user asks for richer, more polished, magazine-like, visual, or reference-matched layout
 7. Read `references/screenshot-check.md` before reporting a layout draft as ready for review
 8. Read `references/visual-patterns.md` only when a more designed or reference-matched layout needs lower-level HTML patterns
-9. Use `references/generation-checklist.md` before returning final HTML
-10. Use `assets/template.html` as starting point
-11. Replace content placeholders with actual text/images
+9. Read `references/background-color-guide.md` when the user wants colored backgrounds, dark themes, or full-article background coverage
+10. Use `references/generation-checklist.md` before returning final HTML
+11. Use `references/self-check-workflow.md` for mandatory 3-round self-check before delivery
+12. Use `assets/template.html` as starting point
+13. Replace content placeholders with actual text/images
 
 ## Skill Update Check
 
@@ -311,7 +313,14 @@ Keep these six parts separate when generating or revising an article:
     - **Round 2**: Visual Consistency Check (10 items) - auto-check + screenshot
     - **Round 3**: Content Integrity Check (8 items) - auto-check + user confirm
     - Fix issues and re-check until all pass
-12. **Deliver based on the user's chosen workflow:**
+12. **Background Color Handling** - per `references/background-color-guide.md`:
+    - WeChat editor forces white background on root
+    - Use **wrapper sections** for colored blocks (not root container)
+    - Use **opaque `rgb()`** colors (not `rgba()` transparency)
+    - For full-article background: tile colored wrapper sections edge-to-edge
+    - For dark themes: each section must explicitly set dark background + light text
+    - Never rely on root `background-color` or transparent overlays
+13. **Deliver based on the user's chosen workflow:**
     - **Auto-Publish**: Run `scripts/auto_publish.py` with the user's AppID/AppSecret to create or update the WeChat draft directly.
     - **Manual Paste**: Instruct the user to open the final HTML file in a browser, press `Ctrl+A` to select all content, then `Ctrl+C` to copy, and paste into the WeChat Official Account editor (mp.weixin.qq.com) with `Ctrl+V`. Remind the user to verify the mobile preview before saving.
 
