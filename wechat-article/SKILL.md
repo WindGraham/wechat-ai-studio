@@ -276,7 +276,7 @@ Specifically:
 **Conditional references — only read when the specific scenario applies:**
 - `references/background-color-guide.md` — colored backgrounds, dark themes, full-article background coverage
 - `references/visual-layout-workflow.md` — only when the user actively chooses the visual drag-and-drop composer (Option 1 in the layout guidance question). Do not read this file if the user lets AI decide or uploads a reference screenshot.
-- `references/svg-compatibility.md` — only when the user explicitly requests experimental SVG animations or SVG-based visual effects
+- `references/svg-compatibility.md` — when the user says yes to SVG motion decorations during style questioning. The agent SHOULD proactively ask whether the user wants SVG decorative touches (a batch of safe, verified templates are available: rotating badges, drawing dividers, breathing borders, floating dots, fade transitions, sliding reveals). The agent MUST explain the delivery constraint before asking: SVG content requires API auto-publish or the bundled browser extension (`tools/wechat-inject-extension/`). Standard manual paste (browser Ctrl+A→Ctrl+C→paste into WeChat) strips SVG tags. If the user does not have API access, the agent should guide them to install the extension (see SVG Extension Install workflow below). If the user declines both, skip SVG.
 
 ## Skill Update Check
 
@@ -393,6 +393,7 @@ High-impact inputs:
 - Color direction: brand color, preferred theme color, light/dark background, or "choose based on content".
 - Image strategy: no images, placeholders, user-provided image URLs, image-heavy layout, single hero image, inline images, grid, staggered, or overlap.
 - Layout density: clean text-first, card-based, magazine-like, lively decorative, or compact announcement.
+- SVG motion decorations: spinning badges, drawing dividers, breathing borders, floating dots, fade transitions, sliding reveals. IMPORTANT: SVG delivery requires API auto-publish or WeChat browser extension; standard browser copy-paste will NOT work for SVG. The agent MUST ask the user about this trade-off before proceeding.
 - Footer fields: author, editor, source, organization, date, QR code/logo URL, or omit footer.
 
 Required follow-up question format (must be asked every time unless already answered):
@@ -403,6 +404,7 @@ Before I generate the WeChat HTML, I need a few style choices:
 2. Theme color: provide a color / use brand color / decide based on content
 3. Images: none / placeholders / use provided URLs / image-heavy
 4. Layout: text-first / card-based / magazine-like / layered-overlap / decide based on content
+5. SVG motion decorations? A batch of verified-safe SVG templates is available (rotating badges, drawing dividers, breathing borders, floating dots, fade/slide transitions). IMPORTANT: SVG requires API auto-publish or WeChat browser extension to deliver; standard browser copy-paste will strip SVG tags. / No SVG (plain HTML, compatible with all delivery methods)
 ```
 
 Decision rule:
@@ -975,11 +977,11 @@ Copy HTML → Paste into mp.weixin.qq.com editor → Verify rendering
 
 ## SVG Support
 
-> **Status**: ✅ Verified through 9 rounds of actual publishing (2026-05-08). Use when the user explicitly requests SVG-based visual effects.
->
-> See `references/svg-compatibility.md` for the complete compatibility matrix.
+> **Status**: ✅ Verified through 9 rounds of actual publishing (2026-05-08). A batch of safe SVG motion templates is available (rotating badges, drawing dividers, breathing borders, floating dots, fade transitions, sliding reveals). The agent SHOULD proactively ask the user whether they want SVG decorations. **Critical delivery constraint**: SVG content requires API auto-publish or WeChat browser extension; standard browser copy-paste (open HTML → Ctrl+A → Ctrl+C → paste into WeChat editor) will strip SVG tags and break rendering. If the user only has manual paste access, skip SVG.
+> >
+> See `references/svg-compatibility.md` for the complete compatibility matrix and 7 verified practical templates.
 
-When the user wants SVG animations or SVG-based visual effects in WeChat articles:
+When the user says yes to SVG motion decorations during the style questioning:
 
 ### Critical Rules (Must Follow)
 
@@ -1026,13 +1028,69 @@ External Image → Download to Server → Call WeChat API (/cgi-bin/media/upload
        preserveAspectRatio="xMidYMid slice"/>
 ```
 
+**Delivery limitation**: SVG content requires API auto-publish or WeChat browser extension to deliver correctly. Standard manual paste (browser Ctrl+A→Ctrl+C→paste into WeChat editor) strips SVG tags. If the user is on manual paste only, skip SVG.
+
 **Note on HTML `<img>` vs SVG `<image>`:**
-- Manual Paste workflow: Both HTML `<img>` and SVG `<image>` can use third-party hosts (browser loads directly).
-- Auto-Publish workflow: HTML `<img>` prefers WeChat CDN; SVG `<image>` requires WeChat CDN.
+- Manual Paste workflow: Only HTML `<img>` works. SVG `<image>` is stripped during paste.
 
 **Note on SVG animation preview**: SMIL animations do not play in the WeChat PC editor preview. This is expected — animations work on mobile devices when the article is actually viewed.
 
 ### Full Documentation
 
 See `references/svg-compatibility.md` for complete compatibility matrix, test records, and practical component templates.
+
+### SVG Extension Install Workflow
+
+When the user wants SVG motion decorations but does not have API auto-publish access, guide them to install the bundled browser extension.
+
+The extension source is at `tools/wechat-inject-extension/` relative to this skill directory.
+
+**Step 0: Copy extension to a user-friendly location (agent MUST do this first)**
+
+The extension must be copied out of the project directory to survive updates. The agent should:
+
+1. Detect the user's OS from the environment.
+2. Copy `tools/wechat-inject-extension/` to the user's Desktop:
+
+   | OS | Target path |
+   |:---|:---|
+   | Windows | `%USERPROFILE%\Desktop\wechat-inject-extension` |
+   | macOS | `~/Downloads/wechat-inject-extension` |
+   | Linux | `~/Downloads/wechat-inject-extension` |
+
+   ```bash
+   # macOS / Linux
+   cp -r tools/wechat-inject-extension ~/Downloads/
+   ```
+
+   ```powershell
+   # Windows
+   Copy-Item -Recurse tools\wechat-inject-extension $env:USERPROFILE\Desktop\
+   ```
+
+3. If `~/Downloads` does not exist, fall back to `~/.` (home directory).
+
+**Installation instructions (tell the user):**
+
+1. Open Chrome/Edge and go to `chrome://extensions/` (or `edge://extensions/`)
+2. Turn on **Developer mode** (top-right toggle)
+3. Click **Load unpacked** (加载已解压的扩展程序)
+4. Navigate to Desktop (Windows) or Downloads (macOS/Linux) and select the `wechat-inject-extension` folder
+5. IMPORTANT: In the extension card, enable **"Allow access to file URLs"** (允许访问文件网址) — needed for local HTML files
+6. The extension icon should appear in the toolbar
+
+**Usage instructions (tell the user):**
+
+1. Open the WeChat Official Account editor (`mp.weixin.qq.com`) and enter a new/existing article edit page — keep this tab open
+2. Open the generated HTML file in the browser (a separate tab)
+3. On the HTML page tab, click the extension icon in the toolbar
+4. Click **Capture page content** (捕获页面内容) — the popup reads the current page's HTML
+5. Click **Find WeChat editors** (查找微信编辑器) — the popup discovers open editor tabs
+6. Select the target editor from the list, then click **Inject** (注入)
+7. Switch to the WeChat editor tab to verify content, then save immediately
+
+**Key points the agent must communicate:**
+- The extension injects HTML directly into the editor DOM, bypassing WeChat's paste sanitizer — SVG tags, SMIL animations, and `foreignObject` are preserved
+- After injection, **do not continue editing the article content** in the WeChat editor — ProseMirror-based editors may re-serialize the DOM and trigger filters. Edit metadata (title/author) only, then save immediately.
+- The extension works with all three editor versions: official JSAPI, ProseMirror Shadow DOM, and UEditor iframe.
 
