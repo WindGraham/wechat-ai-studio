@@ -55,29 +55,27 @@ Use temporary compressed copies for large images. Do not overwrite the user's or
 
 When the user will **manually copy-paste** HTML into the WeChat editor:
 
-- **Third-party image hosts (360, etc.) are fully usable.** The browser loads images directly; WeChat server pre-fetch is not involved.
+- **Third-party image hosts (360, etc.) are fully usable for both HTML `<img>` and SVG `<image>`.** The browser loads images directly; WeChat server pre-fetch is not involved.
 - Upload local images to the third-party host as usual.
-- HTML `<img>` tags can use any public HTTPS URL.
-- **Exception**: SVG `<image>` still requires WeChat CDN (see below).
+- HTML `<img>` and SVG `<image>` tags can both use any public HTTPS URL.
 
 ### Auto-Publish Workflow
 
 When the user provides **AppID/AppSecret** and wants API-based draft creation:
 
-- **Prefer WeChat CDN for all images.** WeChat server pre-fetches images during draft creation; third-party hosts may be blocked by anti-crawl or fail silently.
+- **HTML `<img>`**: Third-party hosts may work, but WeChat CDN is more reliable (server pre-fetch can fail on third-party hosts).
+- **SVG `<image>`**: WeChat CDN is **required**. Third-party URLs are blocked during API draft creation.
 - Upload content images via `/cgi-bin/media/uploadimg` to get `mmbiz.qpic.cn` URLs.
-- Replace all `<img src>` with WeChat CDN URLs before API call.
-- WeChat CDN is **required** for SVG `<image>` tags.
+- For SVG articles, replace all `<image href>` with WeChat CDN URLs before API call.
 
 ## SVG Image Special Rule
 
-If the article uses **SVG `<image>` tags**, third-party image hosts (including 360) are **not usable** in any workflow. SVG `<image>` only accepts WeChat CDN URLs (`mmbiz.qpic.cn`).
+| Workflow | SVG `<image>` Image Source |
+|:---|:---|
+| Manual Paste | Any public HTTPS URL works (including third-party hosts) |
+| API publish | WeChat CDN (`mmbiz.qpic.cn`) only — third-party blocked |
 
-In this case:
-1. Upload images to the third-party host for HTML `<img>` preview/draft (Manual Paste only).
-2. Before finalizing, additionally upload all SVG-bound images to WeChat CDN via the API (`POST /cgi-bin/media/uploadimg`).
-3. Replace the third-party URLs inside `<image href="...">` with the returned WeChat CDN URLs.
-4. HTML `<img>` tags can keep third-party URLs for Manual Paste; Auto-Publish should use WeChat CDN for everything.
+**Note on SVG animation preview**: SMIL animations (`<animate>`, `<animateTransform>`, `<animateMotion>`) do **not** play in the WeChat PC editor preview. This is normal. Animations typically work when the article is viewed on a mobile device.
 
 ## Failure Handling
 

@@ -1014,8 +1014,10 @@ External Image → Download to Server → Call WeChat API (/cgi-bin/media/upload
 ```
 
 **Note on HTML `<img>` vs SVG `<image>`:**
-- Manual Paste workflow: HTML `<img>` can use third-party hosts; SVG `<image>` must use WeChat CDN.
-- Auto-Publish workflow: Both HTML `<img>` and SVG `<image>` should use WeChat CDN for reliability.
+- Manual Paste workflow: Both HTML `<img>` and SVG `<image>` can use third-party hosts (browser loads directly).
+- Auto-Publish workflow: HTML `<img>` prefers WeChat CDN; SVG `<image>` requires WeChat CDN.
+
+**Note on SVG animation preview**: SMIL animations do not play in the WeChat PC editor preview. This is expected — animations work on mobile devices when the article is actually viewed.
 
 ### Full Documentation
 

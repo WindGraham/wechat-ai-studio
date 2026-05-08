@@ -73,22 +73,19 @@
 
 | Source | Status | Notes |
 |:---|:---:|:---|
-| WeChat CDN (`mmbiz.qpic.cn`) | ✅ | **Required for SVG `<image>`** |
-| Third-party image hosts (e.g. `ps.ssl.qhimg.com`) | ❌ | Unavailable in SVG `<image>` even with `href` |
-| External public HTTPS URLs | ❌ | Unavailable in SVG `<image>` |
-| `<image>` tag | ✅ | Usable with `href`, but only with WeChat CDN URL |
+| WeChat CDN (`mmbiz.qpic.cn`) | ✅ | Required for API publish; recommended for all SVG |
+| Third-party image hosts (e.g. `ps.ssl.qhimg.com`) | ✅ | **Manual Paste only** — works in SVG `<image>` |
+| Third-party image hosts | ❌ | **API publish** — blocked by server pre-fetch |
+| `<image>` tag | ✅ | Usable with `href` |
 
-**Workflow distinction for ordinary HTML `<img>`:**
+**Workflow distinction:**
 
-| Workflow | Third-party host (360, etc.) | WeChat CDN |
+| Workflow | HTML `<img>` | SVG `<image>` |
 |:---|:---:|:---:|
-| Manual Paste (copy into editor) | ✅ Works | ✅ Works |
-| Auto-Publish (API `/cgi-bin/draft/add`) | ⚠️ May fail (server pre-fetch blocked) | ✅ Reliable |
+| Manual Paste | ✅ Any public HTTPS | ✅ Any public HTTPS (including 360) |
+| API publish | ⚠️ Prefer WeChat CDN | ✅ WeChat CDN only (third-party blocked) |
 
-**For SVG `<image>` (all workflows):**
-- Third-party hosts are **always blocked**.
-- WeChat CDN is **always required**.
-- Upload via API: `POST /cgi-bin/media/uploadimg` → get `mmbiz.qpic.cn` URL → use in `href`.
+**Important**: SVG SMIL animations do not play in the WeChat **PC editor preview**, regardless of workflow or image source. This is an editor limitation, not a failure. Animations typically play on **mobile devices** when the article is actually viewed.
 
 ---
 
