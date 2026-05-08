@@ -24,6 +24,7 @@
 - 通过生成清单检查微信兼容性、版式稳定性和事实信息
 - 在排版开始前预检本地图片上传，排版确认后再次生成最终在线图片 URL 版本
 - 提供完整的起始模板 `assets/template.html`
+- **自动发布**：支持通过微信公众号 API 自动创建/更新草稿箱文章（详见 `references/auto-publish.md`）
 
 ## 适用场景
 
@@ -35,7 +36,7 @@
 - 参考截图风格，生成相近的公众号排版
 - 在开发转换器、主题系统或发布流程前，先掌握公众号 HTML 的底层规则
 
-这个 skill 专注于 HTML 生成和兼容规则。账号登录、微信素材库上传、草稿保存、自动发布、浏览器自动化和严格确定性的 Markdown 解析，需要由其他工具或工作流完成。
+这个 skill 专注于 HTML 生成、兼容规则和自动发布。账号登录、浏览器自动化和严格确定性的 Markdown 解析，需要由其他工具或工作流完成。
 
 ## 安装
 
@@ -123,7 +124,10 @@ wechat-article/
   SKILL.md
   agents/openai.yaml
   assets/template.html
+  scripts/
+    auto_publish.py          # 自动发布脚本
   references/
+    auto-publish.md          # 自动发布文档
     editor-features.md
     formatting-guide.md
     generation-checklist.md
