@@ -307,8 +307,8 @@ Instead of duplicating patterns here, use the reference files organized by capab
 |:---|:---|:---|
 | Hard compatibility rules | `references/wechat-rules.md` | Always |
 | Basic capabilities (headings, cards, dividers) | `references/editor-features.md` | Always |
-| Refined layout blocks (framed images, corner cards, layered stacks) | `references/refined-layout-blocks.md` | User wants polished/rich layout |
-| Lower-level visual patterns | `references/visual-patterns.md` | Highly custom or reference-matched layout |
+| Refined layout blocks (structural patterns) | `references/refined-layout-blocks.md` | User wants polished/rich layout |
+| Decorative patterns (dividers, shapes, transforms) | `references/decorative-patterns.md` | Adding visual flourishes |
 | Background color / dark theme handling | `references/background-color-guide.md` | Colored backgrounds, dark themes |
 | Inline-block layout safety | `references/inline-block-safety.md` | Multi-column layouts |
 | SVG compatibility | `references/svg-compatibility.md` | User explicitly requests SVG effects |
@@ -385,11 +385,12 @@ Full compatibility matrix in `references/svg-compatibility.md`.
 3. Read `references/formatting-guide.md` — editorial habits and typography defaults
 4. Read `references/interaction-workflow.md` — collaboration and iteration workflow
 5. Read `references/image-url-workflow.md` — whenever local images are involved
-6. Read `references/refined-layout-blocks.md` — when user wants polished/rich layout
+6. Read `references/refined-layout-blocks.md` — structural patterns (headers, cards, image grids)
+7. Read `references/decorative-patterns.md` — decorative patterns (dividers, shapes, transforms)
 7. Read `references/screenshot-check.md` — before presenting draft as ready
-8. Read `references/background-color-guide.md` — when using colored backgrounds or dark themes
-9. Read `references/inline-block-safety.md` — when using multi-column layouts
-10. Read `references/self-check-workflow.md` — mandatory 3-round self-check before delivery
+10. Read `references/background-color-guide.md` — colored backgrounds or dark themes
+11. Read `references/inline-block-safety.md` — multi-column layouts
+12. Read `references/self-check-workflow.md` — mandatory 3-round self-check before delivery
 11. Read `references/generation-checklist.md` — before returning final HTML
 12. Read `references/svg-compatibility.md` — only when user explicitly requests SVG effects
 13. Read `references/visual-layout-workflow.md` — only when user chooses drag-and-drop composer
