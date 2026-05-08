@@ -266,12 +266,15 @@ Specifically:
 8. Read `references/visual-patterns.md` only when a more designed or reference-matched layout needs lower-level HTML patterns
 9. Read `references/background-color-guide.md` when the user wants colored backgrounds, dark themes, or full-article background coverage
 10. Read `references/inline-block-safety.md` when using two-column, three-column, or multi-card layouts
-11. Use `references/generation-checklist.md` before returning final HTML
-12. Use `references/self-check-workflow.md` for mandatory 3-round self-check before delivery
-13. Use `assets/template.html` as starting point
-14. Replace content placeholders with actual text/images
+11. Read `references/visual-layout-workflow.md` when the user wants complex layered, overlapped, or "half-cover" boundary layouts; launch `wechat-article/tools/layout-composer.html` to capture spatial intent
+12. Use `references/generation-checklist.md` before returning final HTML
+13. Use `references/self-check-workflow.md` for mandatory 3-round self-check before delivery
+14. Use `assets/template.html` as starting point
+15. Replace content placeholders with actual text/images
 
 ## Skill Update Check
+
+**Source repository:** `git@github.com:WindGraham/wechat-ai-publisher.git` (GitHub)
 
 When the user asks to update this skill, or asks to check for updates before a layout project:
 
@@ -302,7 +305,8 @@ Keep these six parts separate when generating or revising an article:
    - **Do NOT proceed with layout until image hosting is confirmed working**
 2. Preflight local images before layout: upload/verify local images if needed; leave already-public HTTPS image URLs unchanged.
 3. Ask the first-round style questions from `references/interaction-workflow.md` unless the user already gave equivalent preferences.
-4. Identify the article type and image roles, but do not impose a fixed article structure. Choose reusable layout capability blocks that fit the user's preferences and content.
+4. **Optional: Visual Layout Composer** — If the user has complex spatial layout intent (layered overlap, diagonal image placement, staggered grids, or "half-cover" boundary effects), offer to open `wechat-article/tools/layout-composer.html`. The user drags 5 basic rectangle types onto a 375px canvas; AI reads `layout-draft.json` and translates spatial relationships into WeChat-safe HTML. See `references/visual-layout-workflow.md` for the full workflow, fit strategy, and source code.
+5. Identify the article type and image roles, but do not impose a fixed article structure. Choose reusable layout capability blocks that fit the user's preferences and content.
 5. Do not default to a long opening image. Use a large visual opening only when the user asks for it, the reference style requires it, or the content/images clearly benefit from it.
 6. Apply WeChat constraints from `references/wechat-rules.md`.
 7. Choose basic capabilities first; add refined or special layout blocks only when they improve visual rhythm, image presentation, or reference style matching.

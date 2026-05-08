@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WeChat Layout Composer</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: #1a1a2e;
+    color: #eee;
+    height: 100vh;
+    display: flex;
+    overflow: hidden;
+  }
+
+  /* 左侧面板 */
+  .sidebar {
+    width: 220px;
+    background: #16213e;
+    border-right: 1px solid #0f3460;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    gap: 12px;
+    flex-shrink: 0;
+  }
+  .sidebar h2 {
+    font-size: 14px;
+    color: #e94560;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  .component-source {
+    background: #0f3460;
+    border: 2px dashed #533483;
+    border-radius: 8px;
+    padding: 16px;
+    text-align: center;
+    cursor: grab;
+    transition: all 0.2s;
+    font-size: 12px;
+    color: #ccc;
+  }
+  .component-source:hover {
+    background: #1a1a40;
+    border-color: #e94560;
+    color: #fff;
+  }
+  .component-source:active { cursor: grabbing; }
+
+  .shape-hero   { width: 100%; height: 50px; background: #e94560; border-radius: 6px; margin: 0 auto 8px; }
+  .shape-card   { width: 80%; height: 40px; background: #0f3460; border-radius: 6px; margin: 0 auto 8px; border: 2px solid #533483; }
+  .shape-image  { width: 60%; height: 40px; background: #533483; border-radius: 4px; margin: 0 auto 8px; }
+  .shape-small  { width: 40%; height: 30px; background: #16213e; border-radius: 4px; margin: 0 auto 8px; border: 1px solid #e94560; }
+  .shape-line   { width: 70%; height: 6px; background: #533483; border-radius: 3px; margin: 12px auto; }
+
+  .btn {
+    background: #e94560;
+    color: #fff;
+    border: none;
+    padding: 10px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+    transition: background 0.2s;
+  }
+  .btn:hover { background: #ff6b81; }
+  .btn-secondary {
+    background: #0f3460;
+  }
+  .btn-secondary:hover { background: #16213e; }
+
+  .hint {
+    font-size: 11px;
+    color: #888;
+    line-height: 1.6;
+    margin-top: 10px;
+  }
+
+  /* 中间画布区 */
+  .canvas-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    overflow: auto;
+  }
+
+  .phone-frame {
+    width: 415px;
+    background: #000;
+    border-radius: 40px;
+    padding: 15px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+    flex-shrink: 0;
+  }
+  .phone-screen {
+    width: 375px;
+    min-height: 500px;
+    background: #fff;
+    border-radius: 30px;
+    position: relative;
+    overflow: visible;
+    background-image: radial-gradient(#e8e8e8 1px, transparent 1px);
+    background-size: 20px 20px;
+  }
+
+  /* 画布内的组件 */
+  .layout-component {
+    position: absolute;
+    cursor: move;
+    border: 2px solid transparent;
+    transition: box-shadow 0.15s;
+    user-select: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    color: rgba(255,255,255,0.8);
+    overflow: hidden;
+  }
+  /* 悬停时显示可交互边框 */
+  .layout-component:hover {
+    box-shadow: inset 0 0 0 2px rgba(233,69,96,0.4);
+  }
+  .layout-component.selected {
+    box-shadow: inset 0 0 0 3px rgba(233,69,96,0.7);
+    z-index: 1000 !important;
+  }
+
+  /* 删除按钮 */
+  .delete-btn {
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    width: 20px;
+    height: 20px;
+    background: #ff4444;
+    color: #fff;
+    border-radius: 50%;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    cursor: pointer;
+    z-index: 1001;
+  }
+  .layout-component.selected .delete-btn { display: flex; }
+
+  /* 方向指示（仅在选中时显示） */
+  .resize-indicator {
+    position: absolute;
+    background: rgba(233,69,96,0.0);
+    pointer-events: none;
+    transition: background 0.1s;
+  }
+  .layout-component:hover .resize-indicator,
+  .layout-component.selected .resize-indicator {
+    background: rgba(233,69,96,0.15);
+  }
+  .ri-n  { top: 0; left: 30px; right: 30px; height: 30px; cursor: ns-resize; }
+  .ri-s  { bottom: 0; left: 30px; right: 30px; height: 30px; cursor: ns-resize; }
+  .ri-w  { left: 0; top: 30px; bottom: 30px; width: 30px; cursor: ew-resize; }
+  .ri-e  { right: 0; top: 30px; bottom: 30px; width: 30px; cursor: ew-resize; }
+  .ri-nw { top: 0; left: 0; width: 30px; height: 30px; cursor: nwse-resize; }
+  .ri-ne { top: 0; right: 0; width: 30px; height: 30px; cursor: nesw-resize; }
+  .ri-sw { bottom: 0; left: 0; width: 30px; height: 30px; cursor: nesw-resize; }
+  .ri-se { bottom: 0; right: 0; width: 30px; height: 30px; cursor: nwse-resize; }
+
+  .bg-hero   { background: rgba(233, 69, 96, 0.85); }
+  .bg-card   { background: rgba(83, 52, 131, 0.85); }
+  .bg-image  { background: rgba(15, 52, 96, 0.85); }
+  .bg-small  { background: rgba(22, 33, 62, 0.85); }
+  .bg-line   { background: rgba(100, 100, 100, 0.6); }
+
+  .label-overlay {
+    pointer-events: none;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+  }
+
+  .status-bar {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 28px;
+    background: rgba(0,0,0,0.05);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    color: #999;
+    z-index: 5;
+    pointer-events: none;
+  }
+
+  .export-panel {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: #16213e;
+    border: 1px solid #0f3460;
+    border-radius: 12px;
+    padding: 16px;
+    max-width: 420px;
+    max-height: 300px;
+    overflow: auto;
+    font-family: "SF Mono", Monaco, monospace;
+    font-size: 11px;
+    display: none;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+    z-index: 9999;
+  }
+  .export-panel.active { display: block; }
+  .export-panel pre { color: #a6e22e; white-space: pre-wrap; word-break: break-all; }
+  .export-panel .close-btn {
+    position: absolute;
+    top: 8px;
+    right: 12px;
+    cursor: pointer;
+    color: #e94560;
+    font-size: 14px;
+  }
+</style>
+</head>
+<body>
+
+<div class="sidebar">
+  <h2>拖拽组件</h2>
+
+  <div class="component-source" draggable="true" data-type="hero" data-w="345" data-h="160">
+    <div class="shape-hero"></div>
+    大图/标题区
+  </div>
+
+  <div class="component-source" draggable="true" data-type="card" data-w="345" data-h="240">
+    <div class="shape-card"></div>
+    内容卡片
+  </div>
+
+  <div class="component-source" draggable="true" data-type="image" data-w="345" data-h="200">
+    <div class="shape-image"></div>
+    图片块
+  </div>
+
+  <div class="component-source" draggable="true" data-type="small" data-w="160" data-h="100">
+    <div class="shape-small"></div>
+    小组件
+  </div>
+
+  <div class="component-source" draggable="true" data-type="line" data-w="200" data-h="6">
+    <div class="shape-line"></div>
+    分割线
+  </div>
+
+  <div class="hint">
+    💡 拖组件到画布<br>
+    💡 点击中心 = 移动<br>
+    💡 点击边框/角 = 缩放<br>
+    💡 角部识别 30px<br>
+    💡 Delete 删除<br>
+    💡 组件表示空间占位
+  </div>
+
+  <button class="btn" onclick="exportLayout()">📋 导出 JSON</button>
+  <button class="btn" onclick="saveToProject()">💾 保存到项目</button>
+  <button class="btn btn-secondary" onclick="clearCanvas()">🗑 清空画布</button>
+</div>
+
+<div class="canvas-area">
+  <div class="phone-frame">
+    <div class="phone-screen" id="canvas">
+      <div class="status-bar">375px · WeChat Article Canvas</div>
+    </div>
+  </div>
+</div>
+
+<div class="export-panel" id="exportPanel">
+  <span class="close-btn" onclick="document.getElementById('exportPanel').classList.remove('active')">✕</span>
+  <pre id="exportContent"></pre>
+</div>
+
+<script>
+const canvas = document.getElementById('canvas');
+let selectedEl = null;
+let dragTarget = null;
+let resizeTarget = null;
+let resizeDir = '';
+let dragOffsetX = 0, dragOffsetY = 0;
+let resizeStartX = 0, resizeStartY = 0, resizeStartW = 0, resizeStartH = 0, resizeStartL = 0, resizeStartT = 0;
+let componentCounter = 0;
+const CORNER_SIZE = 30;
+const EDGE_SIZE = 15;
+const CANVAS_WIDTH = 375;
+
+// ========== 自动扩展画布高度 ==========
+function ensureCanvasHeight() {
+  const maxY = getMaxY();
+  const needed = Math.max(500, maxY + 100);
+  if (needed > canvas.clientHeight) {
+    canvas.style.minHeight = needed + 'px';
+  }
+}
+
+// ========== 从侧边栏拖入新组件 ==========
+document.querySelectorAll('.component-source').forEach(src => {
+  src.addEventListener('dragstart', e => {
+    e.dataTransfer.setData('type', src.dataset.type);
+    e.dataTransfer.setData('w', src.dataset.w);
+    e.dataTransfer.setData('h', src.dataset.h);
+  });
+});
+
+canvas.addEventListener('dragover', e => {
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'copy';
+});
+
+canvas.addEventListener('drop', e => {
+  e.preventDefault();
+  const type = e.dataTransfer.getData('type');
+  const w = parseInt(e.dataTransfer.getData('w'));
+  const h = parseInt(e.dataTransfer.getData('h'));
+  if (!type) return;
+
+  const rect = canvas.getBoundingClientRect();
+  const x = e.clientX - rect.left - w/2;
+  const y = e.clientY - rect.top - h/2;
+
+  createComponent(type, x, y, w, h);
+});
+
+// ========== 创建组件 ==========
+function createComponent(type, x, y, w, h) {
+  const el = document.createElement('div');
+  el.className = `layout-component bg-${type}`;
+  el.dataset.type = type;
+  el.dataset.id = `c${++componentCounter}`;
+  el.style.left = `${Math.max(0, Math.min(CANVAS_WIDTH - w, x))}px`;
+  el.style.top = `${Math.max(28, y)}px`;
+  el.style.width = `${w}px`;
+  el.style.height = `${h}px`;
+  el.style.zIndex = componentCounter;
+
+  const label = document.createElement('span');
+  label.className = 'label-overlay';
+  label.textContent = typeLabel(type);
+  el.appendChild(label);
+
+  // 8方向缩放指示区域（仅视觉，不拦截事件）
+  const dirs = ['n','s','w','e','nw','ne','sw','se'];
+  dirs.forEach(d => {
+    const ind = document.createElement('div');
+    ind.className = `resize-indicator ri-${d}`;
+    el.appendChild(ind);
+  });
+
+  // 删除按钮
+  const del = document.createElement('div');
+  del.className = 'delete-btn';
+  del.innerHTML = '×';
+  del.onclick = e => { e.stopPropagation(); el.remove(); selectedEl = null; ensureCanvasHeight(); };
+  el.appendChild(del);
+
+  canvas.appendChild(el);
+  selectComponent(el);
+  ensureCanvasHeight();
+}
+
+function typeLabel(t) {
+  return { hero: '标题/大图', card: '卡片', image: '图片', small: '小组件', line: '分割线' }[t] || t;
+}
+
+function selectComponent(el) {
+  if (selectedEl) selectedEl.classList.remove('selected');
+  selectedEl = el;
+  if (el) el.classList.add('selected');
+}
+
+// ========== 判断鼠标在组件上的操作类型 ==========
+function getMouseAction(el, mx, my) {
+  const rect = el.getBoundingClientRect();
+  const dx = mx - rect.left;
+  const dy = my - rect.top;
+  const w = rect.width;
+  const h = rect.height;
+
+  // 角部优先（大识别范围）
+  if (dx < CORNER_SIZE && dy < CORNER_SIZE) return { action: 'resize', dir: 'nw' };
+  if (dx > w - CORNER_SIZE && dy < CORNER_SIZE) return { action: 'resize', dir: 'ne' };
+  if (dx < CORNER_SIZE && dy > h - CORNER_SIZE) return { action: 'resize', dir: 'sw' };
+  if (dx > w - CORNER_SIZE && dy > h - CORNER_SIZE) return { action: 'resize', dir: 'se' };
+
+  // 边框
+  if (dy < EDGE_SIZE) return { action: 'resize', dir: 'n' };
+  if (dy > h - EDGE_SIZE) return { action: 'resize', dir: 's' };
+  if (dx < EDGE_SIZE) return { action: 'resize', dir: 'w' };
+  if (dx > w - EDGE_SIZE) return { action: 'resize', dir: 'e' };
+
+  // 中心 = 移动
+  return { action: 'move' };
+}
+
+// ========== mousedown 统一入口 ==========
+canvas.addEventListener('mousedown', e => {
+  const comp = e.target.closest('.layout-component');
+  if (!comp) {
+    selectComponent(null);
+    return;
+  }
+
+  e.stopPropagation();
+  selectComponent(comp);
+
+  const actionInfo = getMouseAction(comp, e.clientX, e.clientY);
+
+  if (actionInfo.action === 'resize') {
+    resizeTarget = comp;
+    resizeDir = actionInfo.dir;
+    resizeStartX = e.clientX;
+    resizeStartY = e.clientY;
+    resizeStartW = parseInt(comp.style.width);
+    resizeStartH = parseInt(comp.style.height);
+    resizeStartL = parseInt(comp.style.left);
+    resizeStartT = parseInt(comp.style.top);
+  } else {
+    dragTarget = comp;
+    dragOffsetX = e.clientX - comp.offsetLeft;
+    dragOffsetY = e.clientY - comp.offsetTop;
+  }
+});
+
+// ========== 全局鼠标移动 ==========
+document.addEventListener('mousemove', e => {
+  if (dragTarget) {
+    const rect = canvas.getBoundingClientRect();
+    let nx = e.clientX - dragOffsetX;
+    let ny = e.clientY - dragOffsetY;
+    const w = parseInt(dragTarget.style.width);
+    const h = parseInt(dragTarget.style.height);
+    nx = Math.max(0, Math.min(CANVAS_WIDTH - w, nx));
+    ny = Math.max(28, ny);
+    dragTarget.style.left = `${nx}px`;
+    dragTarget.style.top = `${ny}px`;
+    ensureCanvasHeight();
+  }
+
+  if (resizeTarget) {
+    const dx = e.clientX - resizeStartX;
+    const dy = e.clientY - resizeStartY;
+    let newW = resizeStartW;
+    let newH = resizeStartH;
+    let newL = resizeStartL;
+    let newT = resizeStartT;
+
+    const dir = resizeDir;
+    if (dir.includes('e')) {
+      newW = Math.max(30, Math.min(CANVAS_WIDTH - resizeStartL, resizeStartW + dx));
+    }
+    if (dir.includes('w')) {
+      const candidateW = resizeStartW - dx;
+      if (candidateW >= 30 && resizeStartL + dx >= 0) {
+        newW = candidateW;
+        newL = resizeStartL + dx;
+      }
+    }
+    if (dir.includes('s')) {
+      newH = Math.max(20, resizeStartH + dy);
+    }
+    if (dir.includes('n')) {
+      const candidateH = resizeStartH - dy;
+      if (candidateH >= 20 && resizeStartT + dy >= 28) {
+        newH = candidateH;
+        newT = resizeStartT + dy;
+      }
+    }
+
+    resizeTarget.style.width = `${newW}px`;
+    resizeTarget.style.height = `${newH}px`;
+    resizeTarget.style.left = `${newL}px`;
+    resizeTarget.style.top = `${newT}px`;
+    ensureCanvasHeight();
+  }
+});
+
+document.addEventListener('mouseup', () => {
+  dragTarget = null;
+  resizeTarget = null;
+  resizeDir = '';
+});
+
+// ========== 键盘删除 ==========
+document.addEventListener('keydown', e => {
+  if ((e.key === 'Delete' || e.key === 'Backspace') && selectedEl) {
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+    selectedEl.remove();
+    selectedEl = null;
+    ensureCanvasHeight();
+  }
+});
+
+// ========== 导出布局（计算有内容区域）==========
+function collectLayout() {
+  const components = [];
+  canvas.querySelectorAll('.layout-component').forEach(el => {
+    components.push({
+      id: el.dataset.id,
+      type: el.dataset.type,
+      bounds: {
+        x: parseInt(el.style.left),
+        y: parseInt(el.style.top),
+        width: parseInt(el.style.width),
+        height: parseInt(el.style.height)
+      },
+      center: {
+        x: parseInt(el.style.left) + parseInt(el.style.width)/2,
+        y: parseInt(el.style.top) + parseInt(el.style.height)/2
+      },
+      area: parseInt(el.style.width) * parseInt(el.style.height),
+      zIndex: parseInt(el.style.zIndex || 0)
+    });
+  });
+  components.sort((a, b) => a.bounds.y - b.bounds.y);
+
+  // 只保存有内容的区域高度
+  const contentBottom = getMaxY();
+  const canvasHeight = Math.max(500, contentBottom + 50);
+
+  return {
+    canvas: { width: CANVAS_WIDTH, height: canvasHeight },
+    componentCount: components.length,
+    components: components,
+    spatialHints: generateSpatialHints(components)
+  };
+}
+
+function getMaxY() {
+  let max = 0;
+  canvas.querySelectorAll('.layout-component').forEach(el => {
+    max = Math.max(max, parseInt(el.style.top) + parseInt(el.style.height));
+  });
+  return max;
+}
+
+function exportLayout() {
+  const layout = collectLayout();
+  const panel = document.getElementById('exportPanel');
+  document.getElementById('exportContent').textContent = JSON.stringify(layout, null, 2);
+  panel.classList.add('active');
+}
+
+function saveToProject() {
+  const layout = collectLayout();
+  fetch('http://localhost:8081/save-layout', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(layout)
+  })
+  .then(r => r.json())
+  .then(data => {
+    alert('✅ 布局已保存！\nAI 现在可以直接读取 layout-draft.json');
+  })
+  .catch(err => {
+    alert('❌ 保存失败，请确认接收服务器已启动 (python3 save-layout-server.py)\n' + err);
+  });
+}
+
+// ========== 生成空间关系提示 ==========
+function generateSpatialHints(components) {
+  const hints = [];
+  for (let i = 0; i < components.length; i++) {
+    for (let j = i + 1; j < components.length; j++) {
+      const a = components[i], b = components[j];
+      const horizontalOverlap = !(a.bounds.x + a.bounds.width < b.bounds.x || b.bounds.x + b.bounds.width < a.bounds.x);
+      const verticalGap = b.bounds.y - (a.bounds.y + a.bounds.height);
+
+      if (horizontalOverlap && verticalGap >= -20 && verticalGap < 30) {
+        hints.push({
+          type: 'adjacent',
+          from: a.id,
+          to: b.id,
+          gap: verticalGap,
+          note: `${a.id} 与 ${b.id} 上下紧密相邻（gap=${verticalGap}px），视为文档流中的连续区块`
+        });
+      }
+      if (Math.abs(a.center.y - b.center.y) < 40 && (a.bounds.width + b.bounds.width) <= 365) {
+        hints.push({
+          type: 'side-by-side',
+          left: a.bounds.x < b.bounds.x ? a.id : b.id,
+          right: a.bounds.x < b.bounds.x ? b.id : a.id,
+          note: `左右并排布局，推断为双栏`
+        });
+      }
+      if (horizontalOverlap && verticalGap < -10) {
+        hints.push({
+          type: 'overlap',
+          top: a.bounds.y < b.bounds.y ? a.id : b.id,
+          bottom: a.bounds.y < b.bounds.y ? b.id : a.id,
+          overlapPixels: Math.abs(verticalGap),
+          note: `重叠 ${Math.abs(verticalGap)}px，推断为负边距叠加效果`
+        });
+      }
+    }
+  }
+  return hints;
+}
+
+function clearCanvas() {
+  if (!confirm('确定清空画布？')) return;
+  canvas.querySelectorAll('.layout-component').forEach(el => el.remove());
+  selectedEl = null;
+  componentCounter = 0;
+  canvas.style.minHeight = '500px';
+}
+</script>
+
+</body>
+</html>
