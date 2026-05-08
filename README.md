@@ -22,43 +22,26 @@
 
 ---
 
-## 🎬 三步上手
+## 🎬 快速开始
+
+一张图看完安装到使用：
 
 <p align="center">
-  <img src="assets/terminal-block.png" width="680" alt="Terminal Demo">
-</p>
-
-```bash
-# 1. 克隆仓库并添加为 skill
-git clone https://github.com/WindGraham/wechat-article-skills.git
-cp -R wechat-article-skills/wechat-article ~/.claude/skills/
-
-# 2. 重启你的 CLI Agent
-
-# 3. 一句话开始排版
-"调用微信排版的 skill，按照本文件夹的素材写一期推送"
-```
-
-<p align="center">
-  <img src="assets/terminal-demo.gif" width="680" alt="Terminal Typing Demo">
+  <img src="assets/quickstart-terminal.png" width="780" alt="Quick Start Terminal">
 </p>
 
 ---
 
 ## 🎨 效果展示
 
-三种截然不同的风格，全部由 AI 生成：
+随便让 AI 用这个 skill 生成了三篇：
 
 <p align="center">
-  <img src="assets/example-zhuogui.png" width="280" alt="暗黑中国风 — 如何捉鬼">
+  <img src="assets/example-zhuogui.png" width="280" alt="如何捉鬼">
   &nbsp;&nbsp;
-  <img src="assets/example-jiuhua.png" width="280" alt="文艺散文风 — 九华山游记">
+  <img src="assets/example-jiuhua.png" width="280" alt="九华山游记">
   &nbsp;&nbsp;
-  <img src="assets/example-weekly.png" width="280" alt="新闻简报风 — Weekly News">
-</p>
-
-<p align="center">
-  <sub>暗黑中国风 · 文艺散文风 · 新闻简报风</sub>
+  <img src="assets/example-weekly.png" width="280" alt="Weekly News">
 </p>
 
 ---
@@ -80,7 +63,7 @@ cp -R wechat-article-skills/wechat-article ~/.claude/skills/
 
 ---
 
-## 🚀 快速开始
+## 🚀 使用方式详解
 
 ### 方式一：手动粘贴（Manual Paste）
 
