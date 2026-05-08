@@ -15,7 +15,6 @@
 <p align="center">
   <a href="#-快速开始">快速开始</a> •
   <a href="#-核心功能">核心功能</a> •
-  <a href="#-安装">安装</a> •
   <a href="#-使用示例">使用示例</a>
 </p>
 
@@ -24,7 +23,11 @@
 ## 🎬 快速开始
 
 <p align="center">
-  <img src="assets/quickstart-terminal.png" width="780" alt="Quick Start">
+  <img src="assets/terminal-demo.gif" width="780" alt="Terminal Demo">
+</p>
+
+<p align="center">
+  <img src="assets/extension-inject.png" width="360" alt="WeChat Extension Inject">
 </p>
 
 ---
@@ -56,22 +59,6 @@
 | 自动发布 | ✅ API 直连草稿箱 | ❌ 需手动粘贴 |
 | 移动端适配 | ✅ 375px 根容器，真机级还原 | ⚠️ 需自行调整 |
 | 使用成本 | ✅ 开源免费 | ❌ 付费订阅或按量计费 |
-
----
-
-## 🛠️ 安装
-
-```bash
-# 克隆仓库
-git clone https://github.com/WindGraham/wechat-article-skills.git
-
-# 添加到 skills 目录（以 Codex 为例）
-cp -R wechat-article-skills/wechat-article ~/.codex/skills/
-
-# 重启 CLI Agent
-```
-
-> ⚠️ 重启后 skill 元数据才会加载。
 
 ---
 
