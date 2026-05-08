@@ -448,7 +448,7 @@ Translation rules:
 - `position: static; z-index: ...` wrappers -> ordinary section order; render the lower layer first, then the upper layer.
 - `foreignObject` / complex nested SVG with filters or gradients -> source-only structures. Rebuild as plain sections, borders, circles, corner marks, or static images.
 - Basic SVG shapes and SMIL animation (`<animate>`, `<animateTransform>`, `<animateMotion>`) -> usable when the user explicitly requests them and they comply with `references/svg-compatibility.md`.
-- `box-shadow` -> border, double border, offset color block, or a very subtle shadow only when tested.
+- `box-shadow` -> safe to use directly. When the source uses overly complex shadows, simplify to a single solid shadow or fall back to border / offset color block.
 - Gradient text/backgrounds -> solid theme colors unless the user specifically asks for the gradient and accepts possible degradation.
 
 ### Source Export Tricks Worth Preserving

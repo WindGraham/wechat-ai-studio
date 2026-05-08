@@ -47,7 +47,7 @@
 | 边框卡片 | ✅ | `border` + `padding` |
 | 左侧色条卡片 | ✅ | `border-left` |
 | 上下边框卡片 | ✅ | `border-top` + `border-bottom` |
-| 阴影卡片 | ✅ | `box-shadow` 移动端支持良好；PC 端可能丢失，提供边框 fallback |
+| 阴影卡片 | ✅ | `box-shadow` 移动端与 PC 端均支持 |
 | 圆角卡片 | ✅ | `border-radius` |
 | 图文并排卡片 | ✅ | inline-block 双栏 |
 
@@ -62,7 +62,7 @@
 | 边框图片 | ✅ | 外层 section 加 `border` |
 | 双线/相框图片 | ✅ | 外层 section 加 `border-style: double` 或双层边框 |
 | 不对称圆角 | ✅ | `border-top-left-radius` + `border-bottom-right-radius` |
-| 图片阴影 | ✅ | `box-shadow` 移动端支持；PC 端可用白色边框 + 负 margin 模拟 |
+| 图片阴影 | ✅ | `box-shadow` 移动端与 PC 端均支持 |
 | 双图并排 | ✅ | inline-block 双栏（见 Alignment Rules） |
 | 图片滤镜 | ❌ | `filter` 不支持 |
 | 图片裁剪形状 | ⚠️ | 仅支持 `border-radius` 矩形裁剪，复杂形状不支持 |

@@ -593,7 +593,7 @@ These properties are stable in both mobile and PC WeChat clients:
 
 - **Layout**: `display` (`flex`, `inline-block`, `block`), `flex-flow`, `justify-content`, `align-self`, `flex`, `width`, `height`, `max-width`, `min-width`, `margin`, `padding`, `vertical-align`, `overflow`, `box-sizing`
 - **Text**: `font-size`, `color`, `line-height`, `text-align`, `text-indent`, `letter-spacing`, `white-space`, `font-style`, `font-weight`, `word-break`
-- **Decoration**: `background-color`, `background-image` (public HTTPS URLs only), `background-position`, `background-repeat`, `background-size`, `background-attachment`, `border-*`, `border-radius`, `opacity`
+- **Decoration**: `background-color`, `background-image` (public HTTPS URLs only), `background-position`, `background-repeat`, `background-size`, `background-attachment`, `border-*`, `border-radius`, `opacity`, `box-shadow`
 - **Container**: `section`, `p`, `span`, `strong`, `em`, `br`, `img`
 
 #### Caution — Use with care
@@ -603,7 +603,6 @@ These work in mobile WeChat but may render differently or fail in PC client. Alw
 |:---|:---|
 | `transform: rotate()`, `rotateZ()`, `translate()`, `translate3d()`, `scale()` | 2D transforms are stable on mobile and mostly retain on PC. Safe for decorative elements (tilted frames, rotated shapes, micro-offsets). `translate3d()` and small `scale()` values are often just source-export offsets; convert them to margins/padding when possible. Do NOT use for critical text readability. |
 | `transform: rotateX()`, `rotateY()`, `perspective()` | 3D transforms are unsupported or render as flat/blank in WeChat. `perspective(0px)` is mathematically invalid (zero distance = invisible). Avoid entirely. |
-| `box-shadow` | Mobile OK; PC may lose shadow. Fallback: solid border or layered background blocks. |
 | `text-shadow` | Mobile OK; PC support weaker. Fallback: none or bold color contrast. |
 | `-webkit-background-clip: text` | Gradient text effect. Mobile OK; PC may show transparent or solid color. Always set a solid `color` fallback. |
 | `z-index` | Only effective with non-static positioning. In normal flow, use document order + negative margin instead. |

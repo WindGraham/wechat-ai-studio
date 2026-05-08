@@ -414,8 +414,9 @@ Fallback rule: the `color` property (here `rgb(0,61,106)`) is the solid color sh
 Use for emphasis blocks, quotes, or feature cards that need to feel slightly elevated.
 
 Requirements:
-- **Do not use `box-shadow` or `rgba()` transparency.** PC client may drop shadows entirely, and `rgba` blends with WeChat's forced-white background producing muddy gray. Use a solid `border` or layered background-color blocks instead.
-- If depth is needed, simulate it with nested sections and slightly offset background colors.
+- **`box-shadow` is safe to use** on both mobile and PC WeChat. Verified: size, color, `rgba()`, `inset`, multiple shadows, and spread radius all render correctly.
+- **Avoid `rgba()` for background colors or gradient end-stops** when the intent is a solid dark surface. Semi-transparent backgrounds blend with WeChat's forced-white background and produce muddy gray. Use opaque `rgb()` instead.
+- If depth is needed without shadows, simulate it with nested sections and slightly offset background colors.
 
 ```html
 <section style="background-color: rgb(255,255,255); padding: 20px; margin: 15px; box-sizing: border-box; border-left: 4px solid rgb(78,128,88); border: 1px solid rgb(220,220,220);">
@@ -428,8 +429,9 @@ Requirements:
 Use for cover frames, hero banners, or prominent intro cards that need visible depth through layered shadows or nested color blocks.
 
 Requirements:
-- **Do not use `box-shadow` or `rgba()` transparency.** Use nested background-color blocks to create depth instead.
-- The layout must read clearly without any shadow effects.
+- **`box-shadow` is safe to use** on both mobile and PC WeChat.
+- **Avoid `rgba()` for background colors or gradient end-stops** when the intent is a solid dark surface; use opaque `rgb()` instead.
+- The layout must read clearly without any shadow effects (shadows are decorative, not structural).
 
 ### Option A: Nested Background Blocks (Safe)
 
@@ -450,7 +452,7 @@ Rules:
 
 ### Option B: Nested Background Blocks (More Compatible)
 
-Simulate depth with nested sections and slightly offset background colors. This works even when PC client drops `box-shadow`.
+Simulate depth with nested sections and slightly offset background colors. This is a reliable fallback when you prefer not to use `box-shadow`.
 
 ```html
 <!-- Outer layer (shadow color) -->
