@@ -57,27 +57,27 @@ Treat this skill as a mandatory checklist, not a suggestion. Do NOT skip steps t
    - External hosting provided by user: verify one URL is accessible
    - **If SVG is used**: test SVG `<image>` source URLs separately — 360图床 fails in API-published SVG but works in Manual Paste; WeChat CDN (`mmbiz.qpic.cn`) works in both. See `references/image-url-workflow.md`.
 
+6. **Initialize git in WORK directory**: Before generating HTML, `git init` in the AI's working directory (the actual project folder where the article is being built — NOT inside the skill directory). This ensures version control from the very first draft. Copy any needed scripts from `wechat-article/scripts/` to the working directory before running them. Never modify files inside the skill directory.
+
 ### Phase 1: Layout & Generation
 
-6. **Preflight local images**: Upload local images to appropriate host; leave already-public HTTPS URLs unchanged. See Image Upload Workflow below.
+7. **Preflight local images**: Upload local images to appropriate host; leave already-public HTTPS URLs unchanged. See Image Upload Workflow below.
 
-7. **Generate HTML**: Choose layout blocks that fit user preferences and content. Do not default to a long opening image unless the user asked for it. Apply WeChat constraints from `references/wechat-rules.md`. Use basic capabilities first; add refined layout blocks only when they improve the result. See `references/refined-layout-blocks.md`.
+8. **Generate HTML**: Choose layout blocks that fit user preferences and content. Do not default to a long opening image unless the user asked for it. Apply WeChat constraints from `references/wechat-rules.md`. Use basic capabilities first; add refined layout blocks only when they improve the result. See `references/refined-layout-blocks.md`.
 
-8. **Background color handling** (per `references/background-color-guide.md`):
+9. **Background color handling** (per `references/background-color-guide.md`):
    - Root container: no `background-color` (WeChat forces white)
    - Each section carries its own background via wrapper `<section>`
    - Use opaque `rgb()` — never `rgba()` for backgrounds or gradient end-stops
    - For full-article coverage: tile colored wrapper sections edge-to-edge
 
-9. **Inline-block layout safety** (per `references/inline-block-safety.md`):
-   - Total width ≤ 92% (recommend ≤ 90%) for mobile
-   - Gap via `padding-left`, not `margin-right`
-   - **Symmetric padding rule**: all columns in a row must have equal `padding-left + padding-right` sums so content areas are identical. Gap = left column's `padding-right` + right column's `padding-left`.
-   - One row = one container; never stuff multiple rows into same parent
-   - Use `<!-- -->` between inline-block elements
-   - `vertical-align: top` for consistent alignment
-
-10. **Initialize git in WORK directory**: After first draft, `git init` in the AI's working directory (the actual project folder where the article is being built — NOT inside the skill directory). Copy any needed scripts from `wechat-article/scripts/` to the working directory before running them. Never modify files inside the skill directory.
+10. **Inline-block layout safety** (per `references/inline-block-safety.md`):
+    - Total width ≤ 92% (recommend ≤ 90%) for mobile
+    - Gap via `padding-left`, not `margin-right`
+    - **Symmetric padding rule**: all columns in a row must have equal `padding-left + padding-right` sums so content areas are identical. Gap = left column's `padding-right` + right column's `padding-left`.
+    - One row = one container; never stuff multiple rows into same parent
+    - Use `<!-- -->` between inline-block elements
+    - `vertical-align: top` for consistent alignment
 
 ### Phase 2: Verification
 
