@@ -37,6 +37,16 @@ The default zero-config provider is the existing 360 image host workflow via `wz
 
 Use temporary compressed copies for large images. Do not overwrite the user's original images.
 
+## SVG Image Special Rule
+
+If the article uses **SVG `<image>` tags**, third-party image hosts (including 360) are **not usable**. SVG `<image>` only accepts WeChat CDN URLs (`mmbiz.qpic.cn`).
+
+In this case:
+1. Upload images to the third-party host as usual for HTML `<img>` preview/draft.
+2. Before finalizing, additionally upload all SVG-bound images to WeChat CDN via the API (`POST /cgi-bin/media/uploadimg`).
+3. Replace the third-party URLs inside `<image href="...">` with the returned WeChat CDN URLs.
+4. HTML `<img>` tags can keep the third-party URLs; only SVG `<image>` needs WeChat CDN.
+
 ## Failure Handling
 
 If upload or verification fails:

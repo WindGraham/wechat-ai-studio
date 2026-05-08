@@ -1,234 +1,234 @@
-# 编辑器功能 → HTML 实现对照表
+# Editor Features → HTML Implementation Reference
 
-> 基于对主流图文编辑器功能集的逆向分析，整理每个功能在微信富文本编辑器中的可实现性。
+> Based on reverse-analysis of mainstream article editor feature sets, documenting what can be reliably implemented in the WeChat rich-text editor.
 
-## 能力分级
+## Capability Levels
 
-| 图标 | 含义 |
+| Icon | Meaning |
 |:---:|:---|
-| ✅ | 完全可用，纯 HTML/CSS 实现 |
-| ⚠️ | 部分可用，有局限或降级方案 |
-| ❌ | 不可用，微信编辑器不支持 |
+| ✅ | Fully usable, pure HTML/CSS implementation |
+| ⚠️ | Partially usable, with limitations or fallback required |
+| ❌ | Not usable, WeChat editor does not support |
 
-## 能力层级
+## Capability Tiers
 
-| 层级 | 含义 | 使用原则 |
+| Tier | Meaning | Usage Principle |
 |:---|:---|:---|
-| 基础能力 | 常规公众号文章里可直接使用的稳定排版能力 | 默认优先使用，适合大多数文章 |
-| 特殊排版能力 | 更复杂、更有设计感的组合样式 | 只有在参考图、栏目风格、活动氛围、图片素材需要时使用 |
-| 不支持能力 | 微信富文本编辑器无法可靠接收或发布的效果 | 不要直接生成，改用降级方案 |
+| Basic capabilities | Stable layout abilities for regular Official Account articles | Use by default, suitable for most articles |
+| Advanced layout capabilities | More complex, visually designed composite styles | Only use when reference images, column style, event atmosphere, or image assets demand it |
+| Unsupported capabilities | Effects the WeChat rich-text editor cannot reliably receive or publish | Do not generate directly; use fallback alternatives |
 
 ---
 
-## 一、基础能力：标题与文字
+## I. Basic Capabilities: Headings & Text
 
-| 功能 | 状态 | HTML/CSS 实现 |
+| Feature | Status | HTML/CSS Implementation |
 |:---|:---:|:---|
-| 基础标题 | ✅ | `<p style="font-size:20px"><strong>标题</strong></p>` |
-| 极简标题 | ✅ | 去除装饰，纯文字 |
-| 框线标题 | ✅ | `border: 2px solid rgb(0,61,106)` |
-| 底色标题 | ✅ | `background-color` + `padding` |
-| 符号标题 | ✅ | 前缀装饰元素（圆点、线条、emoji） |
-| 主副标题 | ✅ | 上下两个 `<p>`，不同字号 |
-| 编号标题 | ✅ | 大号数字 + 标题文字组合 |
-| 竖排标题 | ⚠️ | `writing-mode: vertical-rl` 微信支持度未知，建议避免 |
-| 渐变标题 | ✅ | `-webkit-background-clip: text` + `linear-gradient`；PC 端可能降级为纯色，需设置 `color` fallback |
-| 动态标题 | ❌ | `animation` 被微信过滤 |
-| 文字纹理 | ❌ | 复杂纹理无法实现 |
-| 文字阴影 | ⚠️ | `text-shadow` 部分支持，效果有限 |
+| Basic heading | ✅ | `<p style="font-size:20px"><strong>Heading</strong></p>` |
+| Minimal heading | ✅ | Remove decoration, plain text only |
+| Bordered heading | ✅ | `border: 2px solid rgb(0,61,106)` |
+| Background heading | ✅ | `background-color` + `padding` |
+| Symbol heading | ✅ | Prefix decorative element (dot, line, emoji) |
+| Heading + subheading | ✅ | Two `<p>` tags with different font sizes |
+| Numbered heading | ✅ | Large number + heading text combination |
+| Vertical heading | ⚠️ | `writing-mode: vertical-rl`; WeChat support unknown, avoid if possible |
+| Gradient heading | ✅ | `-webkit-background-clip: text` + `linear-gradient`; PC may degrade to solid color, always set `color` fallback |
+| Animated heading | ❌ | `animation` is filtered by WeChat |
+| Text texture | ❌ | Complex textures not achievable |
+| Text shadow | ⚠️ | `text-shadow` partially supported, limited effect |
 
 ---
 
-## 二、基础能力：图文卡片
+## II. Basic Capabilities: Image-Text Cards
 
-| 功能 | 状态 | HTML/CSS 实现 |
+| Feature | Status | HTML/CSS Implementation |
 |:---|:---:|:---|
-| 单色卡片 | ✅ | `background-color` + `padding` + `border-radius` |
-| 边框卡片 | ✅ | `border` + `padding` |
-| 左侧色条卡片 | ✅ | `border-left` |
-| 上下边框卡片 | ✅ | `border-top` + `border-bottom` |
-| 阴影卡片 | ✅ | `box-shadow` 移动端与 PC 端均支持 |
-| 圆角卡片 | ✅ | `border-radius` |
-| 图文并排卡片 | ✅ | inline-block 双栏 |
+| Solid color card | ✅ | `background-color` + `padding` + `border-radius` |
+| Bordered card | ✅ | `border` + `padding` |
+| Left accent card | ✅ | `border-left` |
+| Top-bottom border card | ✅ | `border-top` + `border-bottom` |
+| Shadow card | ✅ | `box-shadow` supported on both mobile and PC |
+| Rounded card | ✅ | `border-radius` |
+| Side-by-side card | ✅ | inline-block two-column |
 
 ---
 
-## 三、基础能力：图片排版
+## III. Basic Capabilities: Image Layout
 
-| 功能 | 状态 | HTML/CSS 实现 |
+| Feature | Status | HTML/CSS Implementation |
 |:---|:---:|:---|
-| 全宽图片 | ✅ | `width: 100%` |
-| 圆角图片 | ✅ | `border-radius` |
-| 边框图片 | ✅ | 外层 section 加 `border` |
-| 双线/相框图片 | ✅ | 外层 section 加 `border-style: double` 或双层边框 |
-| 不对称圆角 | ✅ | `border-top-left-radius` + `border-bottom-right-radius` |
-| 图片阴影 | ✅ | `box-shadow` 移动端与 PC 端均支持 |
-| 双图并排 | ✅ | inline-block 双栏（见 Alignment Rules） |
-| 图片滤镜 | ❌ | `filter` 不支持 |
-| 图片裁剪形状 | ⚠️ | 仅支持 `border-radius` 矩形裁剪，复杂形状不支持 |
+| Full-width image | ✅ | `width: 100%` |
+| Rounded image | ✅ | `border-radius` |
+| Bordered image | ✅ | Outer section with `border` |
+| Double-line / frame image | ✅ | Outer section with `border-style: double` or double-layer border |
+| Asymmetric radius | ✅ | `border-top-left-radius` + `border-bottom-right-radius` |
+| Image shadow | ✅ | `box-shadow` supported on both mobile and PC |
+| Two images side-by-side | ✅ | inline-block two-column (see Alignment Rules) |
+| Image filter | ❌ | `filter` not supported |
+| Image clipping shape | ⚠️ | Only `border-radius` rectangular clipping supported; complex shapes not supported |
 
 ---
 
-## 四、基础能力：布局系统
+## IV. Basic Capabilities: Layout System
 
-| 功能 | 状态 | HTML/CSS 实现 |
+| Feature | Status | HTML/CSS Implementation |
 |:---|:---:|:---|
-| 单列布局 | ✅ | 标准块级堆叠 |
-| 双栏布局 | ✅ | inline-block 双栏 |
-| 三栏布局 | ✅ | inline-block 三栏（每栏 ~31%） |
-| 图文左右 | ✅ | inline-block 双栏 |
-| 图文上下 | ✅ | 块级堆叠 |
-| 嵌套框 | ✅ | 外层背景色 + 内层白色卡片 |
-| 表格 | ❌ | `<table>` 被微信过滤 |
-| 滑动区域 | ❌ | `overflow: scroll` 不支持交互滑动 |
-| 自由定位 | ❌ | `position: absolute/fixed` 被强制为 static |
+| Single column | ✅ | Standard block stacking |
+| Two-column | ✅ | inline-block two-column |
+| Three-column | ✅ | inline-block three-column (~31% each) |
+| Image left text right | ✅ | inline-block two-column |
+| Image top text bottom | ✅ | Block stacking |
+| Nested frames | ✅ | Outer background color + inner white card |
+| Table | ❌ | `<table>` is filtered by WeChat |
+| Scrollable area | ❌ | `overflow: scroll` does not support interactive scrolling |
+| Free positioning | ❌ | `position: absolute/fixed` forced to static |
 
 ---
 
-## 五、基础能力：分割线与装饰
+## V. Basic Capabilities: Dividers & Decorations
 
-| 功能 | 状态 | HTML/CSS 实现 |
+| Feature | Status | HTML/CSS Implementation |
 |:---|:---:|:---|
-| 实线分割 | ✅ | `border-bottom: 1px solid` |
-| 虚线分割 | ✅ | `border-top: 1px dashed` |
-| 粗线分割 | ✅ | `height: 3px; background-color` |
-| 圆点装饰 | ✅ | `width: 8px; height: 8px; border-radius: 100%` |
-| 菱形装饰 | ✅ | `transform: rotate(45deg)` + 小尺寸 |
-| 贴纸装饰 | ✅ | 圆形/异形背景 + emoji/文字 |
-| 组合分隔符 | ✅ | 圆点 + 短线 + 圆点组合 |
+| Solid divider | ✅ | `border-bottom: 1px solid` |
+| Dashed divider | ✅ | `border-top: 1px dashed` |
+| Thick divider | ✅ | `height: 3px; background-color` |
+| Dot decoration | ✅ | `width: 8px; height: 8px; border-radius: 100%` |
+| Diamond decoration | ✅ | `transform: rotate(45deg)` + small size |
+| Sticker decoration | ✅ | Circle / irregular background + emoji/text |
+| Composite separator | ✅ | Dot + short line + dot combination |
 
 ---
 
-## 六、特殊排版能力：组合样式
+## VI. Advanced Layout Capabilities: Composite Styles
 
-这些能力不是硬性必用项。它们适合参考图复刻、栏目包装、活动海报感文章、图片较多的推送，普通正文优先使用基础能力。
+These are not mandatory. They are suitable for reference-image replication, column packaging, event-poster-style articles, or image-heavy pushes. For regular body text, prioritize basic capabilities.
 
-| 功能 | 状态 | HTML/CSS 实现 |
+| Feature | Status | HTML/CSS Implementation |
 |:---|:---:|:---|
-| 图片标题叠加 | ✅ | 先放图片，再用负 margin 上拉标题块 |
-| 层叠布局 | ✅ | 普通文档流 + 负 margin，避免 absolute |
-| 多图交错 | ✅ | inline-block 多栏 + 不同 `padding-top` |
-| 左图右文诗笺 | ✅ | inline-block 双栏 + 边框/纹理背景 |
-| 四角框/证书框 | ✅ | 普通边框 + 四个 L 形角标 section |
-| 圆字标题 | ✅ | 每个字放入固定尺寸圆形 `inline-block` |
-| 图片标题 | ✅ | 背景图 + 文字居中；必要时降级为图片下方标题 |
-| 纹理纸背景 | ✅ | 浅色 repeat 背景图 + 纯色 fallback |
-| 角标图片压卡片 | ✅ | 小图后置 + 负 margin；文本卡预留内边距 |
-| 三图皇冠/错落组 | ✅ | 三个 inline-block 列 + 中间突出或两侧下沉 |
-| 双角引用框 | ✅ | 左上/右下角标 + 中间正文 |
-| 标签点线分隔 | ✅ | 短标签 + dotted/dashed 线 + 小圆点或小图 |
-| 页签标题卡 | ✅ | 圆角上标签 + 边框内容卡 |
+| Image-title overlay | ✅ | Place image first, then pull up title block with negative margin |
+| Layered layout | ✅ | Normal document flow + negative margin; avoid absolute |
+| Staggered multi-image | ✅ | inline-block multi-column + different `padding-top` |
+| Left-image right-text poem card | ✅ | inline-block two-column + border/texture background |
+| Four-corner frame / certificate frame | ✅ | Plain border + four L-shaped corner mark sections |
+| Circular character heading | ✅ | Each character in fixed-size circular `inline-block` |
+| Image heading | ✅ | Background image + centered text; fallback to title below image when needed |
+| Textured paper background | ✅ | Light repeat background image + solid color fallback |
+| Corner-badge image over card | ✅ | Small image after + negative margin; text card预留内边距 |
+| Three-image crown / staggered group | ✅ | Three inline-block columns + center突出 or两侧下沉 |
+| Double-corner quote block | ✅ | Top-left / bottom-right corner marks + body text in middle |
+| Tag-dot-line separator | ✅ | Short tag + dotted/dashed line + small dot or image |
+| Tab title card | ✅ | Rounded top tab + bordered content card |
 
 ---
 
-## 七、交互组件与不支持能力
+## VII. Interactive Components & Unsupported Capabilities
 
-| 功能 | 状态 | 说明 |
+| Feature | Status | Notes |
 |:---|:---:|:---|
-| 引导关注 | ⚠️ | 纯文字+链接，无自动关注能力 |
-| 二维码 | ✅ | `<img>` 插入二维码图片 |
-| 视频 | ⚠️ | 微信支持 `<video>` 标签，但需上传至微信素材库 |
-| 音频 | ⚠️ | 微信支持音频组件，但需上传 |
-| 表单/问卷 | ❌ | `<input>`, `<form>` 不支持 |
-| 点击展开 | ❌ | 需要 JS |
-| 轮播图 | ❌ | 需要 JS + CSS animation |
-| 抽奖/抽签 | ❌ | 需要 JS |
-| 弹幕 | ❌ | 需要 JS + animation |
-| 答题 | ❌ | 需要 JS |
-| 文字打印效果 | ❌ | 需要 animation |
-| 点击换图 | ❌ | 需要 JS |
-| 点击弹出 | ❌ | 需要 JS |
+| Follow prompt | ⚠️ | Plain text + link, no auto-follow capability |
+| QR code | ✅ | Insert QR code image with `<img>` |
+| Video | ⚠️ | WeChat supports `<video>` tag, but must upload to WeChat media library |
+| Audio | ⚠️ | WeChat supports audio component, but must upload |
+| Form / Survey | ❌ | `<input>`, `<form>` not supported |
+| Click to expand | ❌ | Requires JS |
+| Carousel | ❌ | Requires JS + CSS animation |
+| Lottery / Draw | ❌ | Requires JS |
+| Danmaku | ❌ | Requires JS + animation |
+| Quiz | ❌ | Requires JS |
+| Typewriter effect | ❌ | Requires animation |
+| Click to change image | ❌ | Requires JS |
+| Click to popup | ❌ | Requires JS |
 
 ---
 
-## 八、动画效果
+## VIII. Animation Effects
 
-| 功能 | 状态 | 说明 |
+| Feature | Status | Notes |
 |:---|:---:|:---|
-| 淡入 | ❌ | `animation`/`transition` 被过滤 |
-| 移入 | ❌ | 同上 |
-| 放大 | ❌ | 同上 |
-| 旋转 | ❌ | 同上 |
-| 弹跳 | ❌ | 同上 |
-| 持续循环 | ❌ | 同上 |
-| SVG SMIL 动画 | ✅ | `<animate>` / `<animateTransform>` / `<animateMotion>` 实际发布验证可用 |
-| GIF 动图 | ✅ | `<img>` 插入 GIF |
+| Fade in | ❌ | `animation`/`transition` filtered |
+| Slide in | ❌ | Same as above |
+| Scale up | ❌ | Same as above |
+| Rotate | ❌ | Same as above |
+| Bounce | ❌ | Same as above |
+| Continuous loop | ❌ | Same as above |
+| SVG SMIL animation | ✅ | `<animate>` / `<animateTransform>` / `<animateMotion>` verified working through actual publishing |
+| GIF animation | ✅ | Insert GIF with `<img>` |
 
 ---
 
-## 九、基础能力：格式设置
+## IX. Basic Capabilities: Formatting
 
-| 功能 | 状态 | HTML/CSS 实现 |
+| Feature | Status | HTML/CSS Implementation |
 |:---|:---:|:---|
-| 字号调整 | ✅ | `font-size` |
-| 字间距 | ✅ | `letter-spacing` |
-| 行间距 | ✅ | `line-height` |
-| 段间距 | ✅ | `margin` |
-| 页边距 | ✅ | `padding` |
-| 文字颜色 | ✅ | `color` |
-| 背景颜色 | ✅ | `background-color` |
-| 全文背景图 | ✅ | `background-image` |
-| 区域背景图 | ✅ | 局部 section 的 `background-image` |
-| 主题色切换 | ⚠️ | AI 生成时可全局替换颜色值 |
-| 加粗 | ✅ | `<strong>` |
-| 斜体 | ✅ | `<em>` |
-| 下划线 | ✅ | `text-decoration: underline color thickness` |
-| 删除线 | ✅ | `text-decoration: line-through color thickness` |
-| 上标/下标 | ⚠️ | 微信支持度未知 |
+| Font size | ✅ | `font-size` |
+| Letter spacing | ✅ | `letter-spacing` |
+| Line height | ✅ | `line-height` |
+| Paragraph spacing | ✅ | `margin` |
+| Page margin | ✅ | `padding` |
+| Text color | ✅ | `color` |
+| Background color | ✅ | `background-color` |
+| Full-bleed background image | ✅ | `background-image` |
+| Section background image | ✅ | `background-image` on local section |
+| Theme color switch | ⚠️ | Can globally replace color values during AI generation |
+| Bold | ✅ | `<strong>` |
+| Italic | ✅ | `<em>` |
+| Underline | ✅ | `text-decoration: underline color thickness` |
+| Strikethrough | ✅ | `text-decoration: line-through color thickness` |
+| Superscript / Subscript | ⚠️ | WeChat support unknown |
 
 ---
 
-## 十、基础能力：版头与尾部
+## X. Basic Capabilities: Header & Footer
 
-| 功能 | 状态 | HTML/CSS 实现 |
+| Feature | Status | HTML/CSS Implementation |
 |:---|:---:|:---|
-| 顶部版头 | ✅ | 首屏 section，可加大图/色块 |
-| 底部品牌区 | ✅ | 尾图 + 品牌文字 |
-| 关注引导 | ⚠️ | 纯文字+链接形式 |
-| 二维码展示 | ✅ | `<img>` |
-| 原文链接 | ✅ | 文末文字链接 |
+| Top header | ✅ | First-screen section, can use large image/color block |
+| Bottom brand area | ✅ | Footer image + brand text |
+| Follow prompt | ⚠️ | Plain text + link form |
+| QR code display | ✅ | `<img>` |
+| Source link | ✅ | End-of-article text link |
 
 ---
 
-## 十一、不可实现功能汇总
+## XI. Summary of Unachievable Features
 
-以下功能需要 JavaScript、CSS animation、或复杂交互，**微信编辑器完全不支持**：
+The following require JavaScript, CSS animation, or complex interaction, and are **completely unsupported** by the WeChat editor:
 
-- 所有 CSS 动画（淡入、移入、放大、旋转等）
-- 所有 CSS 动画和 CSS 驱动的 SVG 效果（微信不支持 CSS `@keyframes` / `animation` / `transition`）
-- SVG 滤镜、渐变、裁剪路径（`clipPath`）、文字路径（`textPath`）
-- 滑动区域（上下滑动、左右滑动）
-- 表格（`<table>` 被过滤）
-- 表单（`<input>`, `<form>` 不支持）
-- 自由定位（`position: absolute/fixed` 被强制 static）
-- 点击交互（展开、切换、弹出、答题等）
-- 视频/音频自动播放
-- 文字逐字打印效果
-- 复杂图片滤镜
-
----
-
-## 使用建议
-
-**可放心使用的**：基础排版、标题样式、图文卡片、图片处理、分割线装饰、嵌套布局、格式设置、版头尾部。
-
-**需谨慎的**：竖排文字、渐变文字、文字阴影、视频/音频（需上传微信素材库）。
-
-**应避免的**：所有动画、所有交互、表格、表单、滑动区域、自由定位。
+- All CSS animations (fade in, slide in, scale up, rotate, etc.)
+- All CSS-driven SVG effects (WeChat does not support CSS `@keyframes` / `animation` / `transition`)
+- SVG filters, gradients, clipping paths (`clipPath`), text paths (`textPath`)
+- Scrollable areas (vertical/horizontal scroll)
+- Tables (`<table>` is filtered)
+- Forms (`<input>`, `<form>` not supported)
+- Free positioning (`position: absolute/fixed` forced to static)
+- Click interactions (expand, toggle, popup, quiz, etc.)
+- Video/audio autoplay
+- Typewriter text effects
+- Complex image filters
 
 ---
 
-## 附录：Transform 函数兼容性速查
+## Usage Recommendations
 
-以下函数常见于第三方编辑器导出代码，按微信编辑器兼容性分类：
+**Safe to use freely**: Basic layout, heading styles, image-text cards, image processing, divider decorations, nested layouts, formatting, headers/footers.
 
-| 函数 | 状态 | 说明 |
+**Use with caution**: Vertical text, gradient text, text shadow, video/audio (must upload to WeChat media library).
+
+**Avoid entirely**: All animations, all interactions, tables, forms, scrollable areas, free positioning.
+
+---
+
+## Appendix: Transform Function Compatibility Quick Reference
+
+The following functions commonly appear in third-party editor export code, categorized by WeChat editor compatibility:
+
+| Function | Status | Notes |
 |:---|:---:|:---|
-| `rotate(deg)` / `rotateZ(deg)` | ✅ | 2D 旋转，移动端稳定；PC 端通常保留 |
-| `translate(x, y)` | ✅ | 2D 位移，可用 `margin` 替代 |
-| `translate3d(x, y, 0)` | ⚠️ | 可用但建议改写为 `margin/padding` |
-| `scale(s)` | ✅ | 缩放，用于 subtle inset/outset 效果 |
-| `matrix(a, b, c, d, e, f)` | ⚠️ | 等价于 rotate/scale/translate 组合；建议展开为独立函数 |
-| `rotateX(180deg)` / `rotateY(180deg)` | ❌ | 3D 翻转，用于镜像装饰；改用静态 duplicated ornament |
-| `rotateX(67deg)` | ❌ | 3D 倾斜，接近平面透视；视觉效果不可靠 |
-| `perspective(px)` | ❌ | `perspective(0px)` 数学无效；其他值在微信中不支持 |
+| `rotate(deg)` / `rotateZ(deg)` | ✅ | 2D rotation, stable on mobile; usually retained on PC |
+| `translate(x, y)` | ✅ | 2D translation; can be replaced with `margin` |
+| `translate3d(x, y, 0)` | ⚠️ | Usable but recommended to rewrite as `margin/padding` |
+| `scale(s)` | ✅ | Scaling, for subtle inset/outset effects |
+| `matrix(a, b, c, d, e, f)` | ⚠️ | Equivalent to rotate/scale/translate combination; recommended to expand into separate functions |
+| `rotateX(180deg)` / `rotateY(180deg)` | ❌ | 3D flip, used for mirror decoration; use static duplicated ornament instead |
+| `rotateX(67deg)` | ❌ | 3D tilt,接近平面透视；视觉效果不可靠 |
+| `perspective(px)` | ❌ | `perspective(0px)` mathematically invalid; other values unsupported in WeChat |

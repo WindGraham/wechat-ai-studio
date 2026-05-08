@@ -7,6 +7,8 @@ description: Generate and iteratively refine WeChat Official Account (微信公�
 
 Generate HTML that renders correctly in WeChat's rich-text editor and looks good on mobile (375px width).
 
+> **Language Rule**: All user-facing responses and generated article content must be in Chinese. Internal reasoning and code comments may remain in English, but every explanation, label, caption, and body paragraph delivered to the user must be Chinese.
+
 ## Task Scope
 
 Use this skill to produce paste-ready HTML fragments for WeChat Official Account articles. The output should be self-contained HTML with inline styles, not a full standalone web app.

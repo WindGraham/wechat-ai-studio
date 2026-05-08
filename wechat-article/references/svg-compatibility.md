@@ -73,8 +73,12 @@
 
 | Source | Status | Notes |
 |:---|:---:|:---|
-| WeChat CDN (`mmbiz.qpic.cn`) | ✅ | Only usable source |
-| `<image>` tag | ✅ | Usable, but MUST use `href` attribute |
+| WeChat CDN (`mmbiz.qpic.cn`) | ✅ | **Only usable source in SVG** |
+| Third-party image hosts (e.g. `ps.ssl.qhimg.com`) | ❌ | Verified unavailable in SVG `<image>` even with `href` |
+| External public HTTPS URLs | ❌ | Verified unavailable in SVG `<image>` |
+| `<image>` tag | ✅ | Usable, but MUST use `href` attribute and WeChat CDN URL |
+
+**Critical distinction**: Third-party image hosts (360, unsplash, picsum, etc.) work fine in ordinary HTML `<img>` tags, but are **filtered in SVG `<image>`**. For SVG-based layouts, all images must be uploaded to WeChat CDN via API (`/cgi-bin/media/uploadimg`) first.
 
 ---
 
@@ -146,6 +150,23 @@ Since filters and clipping are unavailable, **image effects in WeChat SVG are li
 
 ---
 
+## HTML/CSS Supplement: `box-shadow`
+
+> Although `box-shadow` is not an SVG feature, it is frequently used alongside SVG in WeChat article layouts, so it is included here for unified verification.
+
+| Feature | Status | Notes |
+|:---|:---:|:---|
+| Basic shadow (size variation) | ✅ | `2px` / `6px` / `16px` blur all work |
+| Shadow color (solid) | ✅ | Black, red, blue all work |
+| Semi-transparent shadow (`rgba`) | ✅ | `rgba(0,0,0,0.5)` etc. work on both mobile and PC |
+| Inset shadow | ✅ | `inset` shadows display correctly |
+| Multiple shadows | ✅ | Two-layer, three-layer, glow effects all work |
+| Spread radius | ✅ | `-4px` / `0` / `+4px` all work |
+
+**Conclusion**: `box-shadow` is **fully usable** in the WeChat editor, including `rgba()` transparent shadows, `inset`, multiple shadows, and `spread` radius. The previous documentation warning "PC client may lose shadow" has been **disproven**.
+
+---
+
 ## Mandatory Rules
 
 1. **Images MUST use WeChat CDN** — any external URL, Base64, Data URI will be filtered
@@ -170,6 +191,6 @@ Images: WeChat CDN (mmbiz.qpic.cn)
 
 ---
 
-*Document version: v2.0*  
+*Document version: v2.1*  
 *Last updated: 2026-05-08*  
-*Test verification: ✅ Passed 9 rounds of actual publishing verification*
+*Test verification: ✅ Passed 9 rounds of SVG actual publishing verification + `box-shadow`专项验证*
