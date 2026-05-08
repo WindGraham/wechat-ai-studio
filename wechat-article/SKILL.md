@@ -593,7 +593,7 @@ Properties are grouped by safety based on extensive testing in the WeChat editor
 #### Safe — Use freely
 These properties are stable in both mobile and PC WeChat clients:
 
-- **Layout**: `display` (`flex`, `inline-block`, `block`), `flex-flow`, `justify-content`, `align-self`, `flex`, `width`, `height`, `max-width`, `min-width`, `margin`, `padding`, `vertical-align`, `overflow`, `box-sizing`
+- **Layout**: `display` (`inline-block`, `block`), `width`, `height`, `max-width`, `min-width`, `margin`, `padding`, `vertical-align`, `overflow`, `box-sizing`
 - **Text**: `font-size`, `color`, `line-height`, `text-align`, `text-indent`, `letter-spacing`, `white-space`, `font-style`, `font-weight`, `word-break`
 - **Decoration**: `background-color`, `background-image` (public HTTPS URLs only), `background-position`, `background-repeat`, `background-size`, `background-attachment`, `border-*`, `border-radius`, `opacity`, `box-shadow`
 - **Container**: `section`, `p`, `span`, `strong`, `em`, `br`, `img`
@@ -603,7 +603,7 @@ These work in mobile WeChat but may render differently or fail in PC client. Alw
 
 | Property | Notes |
 |:---|:---|
-| `transform: rotate()`, `rotateZ()`, `translate()`, `translate3d()`, `scale()` | 2D transforms are stable on mobile and mostly retain on PC. Safe for decorative elements (tilted frames, rotated shapes, micro-offsets). `translate3d()` and small `scale()` values are often just source-export offsets; convert them to margins/padding when possible. We recommend reserving these for decorative elements rather than critical text readability. |
+| `transform: rotate()`, `rotateZ()`, `translate()`, `scale()` | 2D transforms are stable on mobile and mostly retain on PC. Safe for decorative elements (tilted frames, rotated shapes, micro-offsets). We recommend reserving these for decorative elements rather than critical text readability. |
 | `transform: rotateX()`, `rotateY()`, `perspective()` | 3D transforms are unsupported or render as flat/blank in WeChat. `perspective(0px)` is mathematically invalid (zero distance = invisible). Avoid entirely. |
 | `text-shadow` | Mobile OK; PC support weaker. Fallback: none or bold color contrast. |
 | `-webkit-background-clip: text` | Gradient text effect. Mobile OK; PC may show transparent or solid color. Always set a solid `color` fallback. |
@@ -611,6 +611,12 @@ These work in mobile WeChat but may render differently or fail in PC client. Alw
 | `float` | Can break inline-block/flex flow. Prefer inline-block columns. |
 | `text-decoration` (and split properties) | Use shorthand `text-decoration: line-through/underline color thickness` for better compatibility. |
 | Negative `margin` (e.g., `margin-top: -40px`) | Safe for overlap effects. Keep magnitude under ~120px to avoid editor clipping. |
+
+#### Flex — Use only with explicit fallback
+`display: flex` works on mobile WeChat but may break on WeChat PC client. **Default to `inline-block` for all column layouts.** Only use flex when:
+1. The user explicitly requests flex behavior
+2. You include `flex: 0 0 auto` on every flex child
+3. You provide an inline-block fallback structure
 
 #### Avoid — Do not use
 
@@ -628,7 +634,14 @@ These work in mobile WeChat but may render differently or fail in PC client. Alw
 
 ### Two-Column Layout (Recommended: Inline-Block)
 
-WeChat editor handles flex differently from browsers. We recommend inline-block columns for the best compatibility. If you must use flex, include:
+**Default to `display: inline-block` for all column layouts.** WeChat editor handles flex differently from browsers, and flex may break on WeChat PC client.
+
+Only use flex when:
+1. The user explicitly requests flex behavior
+2. You include `flex: 0 0 auto` on every flex child
+3. You provide an inline-block fallback structure
+
+If you must use flex, include:
 
 ```html
 <section style="display: flex; flex-flow: row;">
@@ -742,7 +755,7 @@ WeChat PC client width > 375px. Must work on both mobile and PC.
 </section>
 ```
 
-**Key**: Use `margin-left: auto; margin-right: auto` (not `margin: 0 auto`) for reliable centering in WeChat PC client.
+**Key**: Always use `margin-left: auto; margin-right: auto` (never `margin: 0 auto`) for reliable centering in WeChat PC client.
 
 #### Text Paragraphs
 ```html

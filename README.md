@@ -201,7 +201,7 @@ AppSecret: your_appsecret_here
 生成的 HTML 符合以下要求：
 
 - ✅ 只使用内联样式（`style="..."`）
-- ✅ 根容器 `max-width: 375px; margin: 0 auto`
+- ✅ 根容器 `width: 100%; max-width: 375px; margin-left: auto; margin-right: auto;`
 - ✅ 优先用 `<section>` 做布局容器
 - ✅ 避免 `<script>`、`<style>`、`<iframe>`、`<table>`
 - ✅ 图片使用用户提供的 URL 或中性占位 URL

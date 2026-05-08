@@ -283,12 +283,18 @@ Skeleton:
 
 ## Capability: Light Transform
 
-2D transforms (`rotate`, `rotateZ`, `translate`, `translate3d`, `scale`) are safe for decorative effects. Use freely for:
+**2D transforms are safe for decorative effects only.** Use for tilted frames, rotated shapes, and micro-offsets. Never apply to body text or critical layout elements.
 
-- small `rotate(45deg)` on decorative shapes (diamonds, corner accents);
-- `rotateZ(5deg~20deg)` on image frames or cards for a dynamic feel;
-- `translate3d(1px~70px, 0, 0)` for pixel-perfect alignment adjustments;
-- `scale(0.95~1.05)` for subtle zoom effects.
+**Allowed (decorative only):**
+- `transform: rotate(45deg)` — diamond shapes, tilted frames
+- `transform: rotate(-2deg)` / `rotate(2deg)` — subtle tilt pairs
+- `transform: scale(0.95)` — subtle shrinking
+- `transform: translate(5px, 0)` — micro-offsets
+
+**Prohibited (layout-critical):**
+- `transform: rotateX()`, `rotateY()`, `perspective()` — 3D transforms render poorly or produce no visible effect
+- Multiple transform functions in one declaration — use nested wrappers instead
+- Transform on text containers that affect readability
 
 Typical values seen in source exports and their intended effects:
 
@@ -304,7 +310,6 @@ Typical values seen in source exports and their intended effects:
 
 Rules:
 - Only apply to decorative elements or image containers, never to body text.
-- Avoid `rotateX()`, `rotateY()`, and `perspective()` — these are 3D transforms that either render poorly or produce no visible effect (`perspective(0px)` is mathematically invalid).
 - Keep angles small for frames (under 20°); large tilts hurt readability.
 - Do not combine multiple transform functions in one declaration; use nested wrappers if needed.
 - `matrix(...)` should be rewritten as explicit `rotate` or `scale` for clarity.

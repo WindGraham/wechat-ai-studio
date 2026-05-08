@@ -235,7 +235,9 @@ Structure formula: `card container with background/border -> paragraph block wit
 
 ## Pattern 25: Tilted Elements (Transform)
 
-`transform: rotate()` and `rotateZ()` are safe for decorative frames, image wrappers, stickers, and small badges. The source HTML often also uses `translate3d()` and `scale()` for micro-offsets or subtle shrinking. Treat those as spacing tools, not as layout foundations.
+`transform: rotate()` and `rotateZ()` are safe for decorative frames, image wrappers, stickers, and small badges. Never apply to body text or critical layout elements.
+
+The source HTML often also uses `translate3d()` and `scale()` for micro-offsets or subtle shrinking. Treat those as spacing tools, not as layout foundations.
 
 Structure formula: `slightly rotated outer frame -> counter-rotated inner image/content wrapper`.
 

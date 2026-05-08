@@ -4,13 +4,19 @@ This file contains hard compatibility rules for HTML that will be pasted into th
 
 ## Safe HTML Contract
 
+**Document Priority (when rules conflict):**
+1. **wechat-rules.md** — Hard constraints. Never violate unless deliberately testing editor behavior.
+2. **SKILL.md** — Workflow and scheduling. Follow the execution order and mandatory checks.
+3. **visual-patterns.md** / **refined-layout-blocks.md** — Optional pattern libraries. Use when they improve visual rhythm; drop if they conflict with wechat-rules.md.
+
 - Use one root `<section>` with `width: 100%; max-width: 375px; margin-left: auto; margin-right: auto;`.
 - Use inline styles only. Do not emit `<style>` blocks or external CSS.
 - Prefer `<section>` for layout containers.
 - Use `<p>`, `<span>`, `<strong>`, `<em>`, `<br>`, and `<img>` for content.
 - Avoid `<script>`, `<iframe>`, `<table>`, `<form>`, `<input>`, and interactive controls.
 - Avoid `position: absolute`, `position: fixed`, CSS animation, CSS transition, `filter`, and layout that depends on JavaScript.
-- Prefer `display: inline-block` rows over `display: flex`; do not use CSS grid for final paste-ready HTML.
+- **Default to `display: inline-block` for all column layouts.** Only use `display: flex` when the user explicitly requests it AND you include `flex: 0 0 auto` on every flex child with an inline-block fallback.
+- Do not use CSS grid for final paste-ready HTML.
 - `<svg>`, `<animate>`, `<animateTransform>`, and `<animateMotion>` are **verified working** in WeChat articles when used correctly. See `references/svg-compatibility.md` for the full compatibility matrix.
 - **SVG is safe for**: basic shapes, SMIL animations (opacity, transform, path motion), and `<image>` with WeChat CDN URLs.
 - **SVG is NOT safe for**: filters (`<filter>`), gradients (`<linearGradient>`, `<radialGradient>`), `clipPath`, `textPath`, CSS animations, `style` attributes inside SVG, `class`/`id`, or external/non-CDN image URLs.
