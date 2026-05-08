@@ -27,6 +27,7 @@ Use this checklist before returning paste-ready HTML. It is a practical self-che
 - Text uses `<p>`, `<span>`, `<strong>`, `<em>`, and `<br>`.
 - Images use `<img>` with `width: 100%; max-width: 100%; display: block; margin: 0 auto;` unless intentionally narrower.
 - Do not use final-output `display: grid`, `position: absolute`, `position: fixed`, animation, forms, tables, or JavaScript.
+- Do not use final-output `<svg>`, `<foreignObject>`, `<animateTransform>`, or `<animateMotion>`; rewrite them into plain HTML/CSS or a raster image.
 - Prefer `inline-block` rows over flex. Use `<!-- -->` between inline-block columns.
 - Keep two-column and three-column total widths conservative, normally at or below 96%.
 
@@ -65,5 +66,6 @@ Use this checklist before returning paste-ready HTML. It is a practical self-che
 - Screenshot check was run for visually complex drafts, reference-matched layouts, or any update that changes spacing, overlap, or image grouping.
 - Placeholder text and placeholder URLs are obvious and neutral.
 - No private contact details, organizations, QR codes, or publication metadata were invented.
-- No unsupported source-editor artifacts remain, such as SVG animation wrappers, grid coordinates, or transform-heavy positioning.
+- No unsupported source-editor artifacts remain, such as SVG wrappers, animation wrappers, grid coordinates, 3D flips, or transform-heavy positioning.
+- If the source used an SVG image stack, confirm it was downgraded to normal-flow HTML, a static image, or a plain decorative block.
 - Desktop preview should remain centered; mobile width should remain readable at 375px.

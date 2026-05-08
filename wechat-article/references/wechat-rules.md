@@ -11,6 +11,7 @@ This file contains hard compatibility rules for HTML that will be pasted into th
 - Avoid `<script>`, `<iframe>`, `<table>`, `<form>`, `<input>`, and interactive controls.
 - Avoid `position: absolute`, `position: fixed`, CSS animation, CSS transition, `filter`, and layout that depends on JavaScript.
 - Prefer `display: inline-block` rows over `display: flex`; do not use CSS grid for final paste-ready HTML.
+- Do not emit `<svg>`, `<foreignObject>`, `<animateTransform>`, or `<animateMotion>` in final paste-ready HTML. Treat them as source-only artifacts and rewrite them into normal HTML/CSS or static images.
 - Every `<img>` should include `width: 100%; max-width: 100%; display: block; margin: 0 auto;` unless a narrower image is intentional.
 - Use `box-sizing: border-box` on layout blocks when padding or borders are involved.
 - Use `overflow: hidden` on image containers when `border-radius` clipping is needed.

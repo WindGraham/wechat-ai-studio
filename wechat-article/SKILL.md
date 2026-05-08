@@ -307,7 +307,7 @@ These work in mobile WeChat but may render differently or fail in PC client. Alw
 
 | Property | Notes |
 |:---|:---|
-| `transform: rotate()`, `rotateZ()`, `translate()`, `translate3d()`, `scale()` | 2D transforms are stable on mobile and mostly retain on PC. Safe for decorative elements (tilted frames, rotated shapes, micro-offsets). Do NOT use for critical text readability. |
+| `transform: rotate()`, `rotateZ()`, `translate()`, `translate3d()`, `scale()` | 2D transforms are stable on mobile and mostly retain on PC. Safe for decorative elements (tilted frames, rotated shapes, micro-offsets). `translate3d()` and small `scale()` values are often just source-export offsets; convert them to margins/padding when possible. Do NOT use for critical text readability. |
 | `transform: rotateX()`, `rotateY()`, `perspective()` | 3D transforms are unsupported or render as flat/blank in WeChat. `perspective(0px)` is mathematically invalid (zero distance = invisible). Avoid entirely. |
 | `box-shadow` | Mobile OK; PC may lose shadow. Fallback: solid border or layered background blocks. |
 | `text-shadow` | Mobile OK; PC support weaker. Fallback: none or bold color contrast. |
@@ -324,6 +324,7 @@ These work in mobile WeChat but may render differently or fail in PC client. Alw
 | `position: absolute` / `position: fixed` | Editor forces to `static`; layout will break. |
 | `animation` / `@keyframes` / `transition` | Filtered by WeChat editor. |
 | `display: grid` / `grid-template-*` | Poor PC client support; use inline-block instead. |
+| `<svg>`, `<foreignObject>`, `<animateTransform>`, `<animateMotion>` | Source-export artifacts and animation wrappers do not belong in final paste-ready HTML. Rebuild as normal HTML/CSS or rasterize if needed. |
 | `pointer-events` / `user-select` / `-webkit-tap-highlight-color` | No meaningful effect in WeChat articles; may be filtered. |
 | `transform-style: preserve-3d` / `perspective` | 3D transforms unsupported in WeChat. `perspective(0px)` produces no visible effect. |
 | `direction: rtl` | Can cause unexpected line breaking with Chinese text. |

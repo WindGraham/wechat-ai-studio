@@ -235,7 +235,7 @@ Structure formula: `card container with background/border -> paragraph block wit
 
 ## Pattern 25: Tilted Elements (Transform)
 
-`transform: rotate()` and `rotateZ()` are safe for decorative frames and images in mobile WeChat; PC client may render them slightly differently but generally retains the effect.
+`transform: rotate()` and `rotateZ()` are safe for decorative frames, image wrappers, stickers, and small badges. The source HTML often also uses `translate3d()` and `scale()` for micro-offsets or subtle shrinking. Treat those as spacing tools, not as layout foundations.
 
 Structure formula: `slightly rotated outer frame -> counter-rotated inner image/content wrapper`.
 
@@ -250,8 +250,11 @@ Structure formula: `slightly rotated outer frame -> counter-rotated inner image/
 
 **Rules**:
 - Counter-rotate the inner element to keep the image straight while the frame is tilted.
-- Small angles (1-5deg) work best; larger tilts (15deg+) are acceptable for playful designs but keep text readable.
-- Only use 2D rotation (`rotate`, `rotateZ`). Avoid `rotateX`, `rotateY`, and `perspective` — these either flatten or disappear in WeChat.
+- Small angles (1-5deg) work best for polished layouts. Larger angles (10-15deg) are for playful poster-like sections only.
+- Use `transform-origin` when the frame should pivot from a corner rather than the center.
+- `scale(0.97-0.99)` is useful for slight inset or layered effects. Do not use it to fix broken widths.
+- `translate3d(x, y, 0)` is often only a source-export offset. Rewrite it as margin/padding in final HTML when possible.
+- Only use 2D rotation (`rotate`, `rotateZ`). Avoid `rotateX`, `rotateY`, and `perspective` in final HTML. They are source-export artifacts or unsafe in WeChat.
 - Never rotate body text; apply rotation only to frames, images, or small decorative shapes.
 
 ## Pattern 26: Decorative Divider with Stickers
@@ -443,9 +446,22 @@ Translation rules:
 - `display: flex` rows -> `inline-block` rows with `<!-- -->` between columns.
 - `transform: translate3d(...)` -> margins, padding, or text alignment.
 - `position: static; z-index: ...` wrappers -> ordinary section order; render the lower layer first, then the upper layer.
-- SVG decorations -> ignore, replace with simple HTML/CSS dots, lines, circles, corner marks, or use exported PNG images if the SVG is essential.
+- `svg` / `foreignObject` / `animateTransform` -> source-only structures. Rebuild them as plain sections, borders, circles, corner marks, or static images.
 - `box-shadow` -> border, double border, offset color block, or a very subtle shadow only when tested.
 - Gradient text/backgrounds -> solid theme colors unless the user specifically asks for the gradient and accepts possible degradation.
+
+### Source Export Tricks Worth Preserving
+
+These tricks appear in exported layouts and are useful as visual intent, even when the final HTML must be rewritten:
+
+- `rotateY(180deg)` / `rotateX(180deg)` -> mirror a decoration or reuse the same ornament on the opposite side. In final HTML, duplicate the ornament with normal HTML/CSS instead of using 3D transform.
+- `translate3d(...)` -> precise slice placement or slight floating. In final HTML, convert to margins, padding, or wrapper alignment.
+- `scale(...)` -> subtle compression of a card, badge, or image block. Keep it near `1.0`.
+- `background-position: 50% 50%` + `background-size: cover/contain` -> clipped background panel or decorative image fill.
+- Zero-size border triangles -> safe CSS triangles for pointers, tabs, and corner markers.
+- `conic-gradient(...)` -> circular badge fills or ring-like decorations. Use only when the effect is decorative and simple.
+
+If a source block depends on animation, 3D flip, or SVG masking, freeze it into one static frame and simplify the shape.
 
 ## Pattern 33: Two-Corner Quote Block
 
@@ -520,6 +536,86 @@ Rules:
 - Use one tab per section; repeated tabs should share the same color system.
 - Keep tab labels short so they do not wrap.
 - Use `margin-top: -1px` to visually connect the tab and card border.
+
+## Pattern 36: SVG Decoration Source Translation
+
+Many exported article layouts use SVG as an internal composition tool rather than as a final WeChat-safe element. Use the SVG to read the intent, then rebuild the result in normal HTML/CSS.
+
+Structure formula: `svg source intent -> static HTML/CSS approximation -> optional raster fallback`.
+
+Common source patterns:
+
+- `<svg>` with `<foreignObject>` -> text or block layout embedded in a drawing surface. Rebuild as ordinary sections and borders.
+- `<animateTransform>` -> motion or slideshow sequencing. Drop the animation and keep a single frame.
+- `background-image` inside SVG -> sliced background fill. Move the image to a normal section background or an `<img>`.
+- `rotateX/rotateY` on small ornaments -> mirrored corners or flipped decorations. Use duplicated static ornaments instead.
+- Nested translated groups -> layered offsets. Recreate with margin, padding, and normal flow stacking.
+
+Rules:
+
+- Final paste-ready HTML should not contain SVG tags unless the user explicitly wants to paste raw source for inspection.
+- Do not rely on SVG for text wrapping, clipping, or animation.
+- If the SVG is only decorative, replace it with a plain divider, corner frame, dot, circle, or small image.
+- If the SVG carries a critical illustration and no safe HTML rewrite is practical, rasterize it to a PNG/JPG asset first.
+
+### 36.1 How to Recognize an SVG Image Stack
+
+Treat the block as a source-only image stack when it has most of these traits:
+
+- `<svg>` wraps one or more `<foreignObject>` nodes.
+- The visible content is driven by `background-image` on the inner SVG, not by paths or shapes.
+- `animateTransform type="translate"` appears alongside repeated inner SVG frames.
+- The same image is duplicated several times in a row, often with crop parameters in the URL.
+- The wrapper is paired with `border`, `overflow: hidden`, `margin-top: -NNpx`, or a rotated outer block.
+
+Interpretation:
+
+- The SVG is acting like a slide tray, crop mask, or compositing shell.
+- The real design intent is the cropped image + offset + frame, not the SVG syntax itself.
+
+Rewrite target:
+
+- one static `<section>` frame
+- one `<img>` or `background-image`
+- normal-flow overlap via margins if needed
+
+### 36.2 How to Downgrade `foreignObject`
+
+When `<foreignObject>` appears inside SVG, read it as "HTML content embedded in a drawing shell".
+
+Downgrade rule:
+
+- extract the text/image blocks from inside the `foreignObject`
+- rebuild them as ordinary `<section>`, `<p>`, `<img>`, and border/padding wrappers
+- do not preserve the SVG wrapper if the final HTML is meant for WeChat paste
+
+If the embedded content is only decorative, simplify further:
+
+- text-on-color-block -> plain card
+- icon-in-circle -> inline-block circle
+- caption-strip -> bordered label row
+
+### 36.3 How to Rebuild `rotateZ + translate3d`
+
+When the source uses `rotateZ(...)` together with `translate3d(...)`, split the intent into two parts:
+
+- `rotateZ(...)` = tilt or playful skew
+- `translate3d(...)` = spacing / nudge / alignment correction
+
+Rewrite order:
+
+1. Keep the tilt only if it helps the composition.
+2. Convert the translation into `margin-left`, `margin-right`, `margin-top`, `padding-left`, or `padding-top`.
+3. If the inner content must stay upright, wrap it in a second container and cancel the tilt there.
+
+Typical replacements:
+
+- slight offset around a sticker -> `margin-left/right`
+- lifted label -> `margin-top: -NNpx`
+- nudged title block -> `padding-left` or `padding-right`
+- tilted outer card with straight inner content -> nested wrappers, outer rotated, inner unrotated
+
+Do not keep `translate3d()` as a core layout dependency in final HTML unless the same visual result cannot be achieved with normal-flow spacing.
 
 ## Visual Design Principles
 
