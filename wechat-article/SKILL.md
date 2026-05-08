@@ -243,10 +243,11 @@ Treat this skill as a mandatory checklist, not a suggestion. Do NOT skip steps t
 Specifically:
 1. Before generating ANY HTML, you MUST read `references/interaction-workflow.md` and `references/formatting-guide.md`. **Even if the user provided a detailed brief, you MUST summarize your understanding of the requirements (content, style, tone, images, layout intent) and ask the user to confirm before proceeding. Do NOT start layout until the user explicitly confirms.**
 2. **ALWAYS ask whether the user wants to use the Auto-Publish Workflow (WeChat API) or the Manual Paste workflow.** Do NOT assume either path. If the user does not mention auto-publish, default to asking.
-3. Before generating the first draft, you MUST initialize local git versioning in the article working directory and commit the draft.
-4. Before presenting a draft as ready for review, you MUST run screenshot checks per `references/screenshot-check.md`.
-5. Before returning final HTML, you MUST use `references/generation-checklist.md`.
-6. Do NOT generate HTML directly without confirming style requirements first, even if the user says "make a push article" or similar.
+3. **CRITICAL: Before any layout work, test the image hosting solution.** If using WeChat API, verify `access_token` works and one test image uploads successfully. If using external hosting, verify one test image URL is accessible. Do NOT proceed with HTML generation until image hosting is confirmed working.
+4. Before generating the first draft, you MUST initialize local git versioning in the article working directory and commit the draft.
+5. Before presenting a draft as ready for review, you MUST run screenshot checks per `references/screenshot-check.md`.
+6. Before returning final HTML, you MUST use `references/generation-checklist.md`.
+7. Do NOT generate HTML directly without confirming style requirements first, even if the user says "make a push article" or similar.
 
 ## Quick Start
 
@@ -286,16 +287,21 @@ Keep these six parts separate when generating or revising an article:
 
 ## Workflow
 
-1. Preflight local images before layout: upload/verify local images if needed; leave already-public HTTPS image URLs unchanged.
-2. Ask the first-round style questions from `references/interaction-workflow.md` unless the user already gave equivalent preferences.
-3. Identify the article type and image roles, but do not impose a fixed article structure. Choose reusable layout capability blocks that fit the user's preferences and content.
-4. Do not default to a long opening image. Use a large visual opening only when the user asks for it, the reference style requires it, or the content/images clearly benefit from it.
-5. Apply WeChat constraints from `references/wechat-rules.md`.
-6. Choose basic capabilities first; add refined or special layout blocks only when they improve visual rhythm, image presentation, or reference style matching.
-7. After the first draft, initialize local git versioning in the article working directory if appropriate, commit the draft, and commit every later user-requested update.
-8. Use screenshot checks before presenting a draft as ready for review.
-9. When the user approves the layout, run the final image URL pass and keep one final HTML file for WeChat paste.
-10. **Deliver based on the user's chosen workflow:**
+1. **Preflight image hosting test**: Before ANY layout work, test the user's image hosting solution:
+   - If using **WeChat API** (Auto-Publish): Test `access_token` retrieval and one image upload to verify API connectivity
+   - If using **external image hosting** (图床): Test upload one image and verify the returned URL is accessible via HTTPS
+   - If using **local images**: Confirm the user has a hosting plan or use the built-in upload workflow
+   - **Do NOT proceed with layout until image hosting is confirmed working**
+2. Preflight local images before layout: upload/verify local images if needed; leave already-public HTTPS image URLs unchanged.
+3. Ask the first-round style questions from `references/interaction-workflow.md` unless the user already gave equivalent preferences.
+4. Identify the article type and image roles, but do not impose a fixed article structure. Choose reusable layout capability blocks that fit the user's preferences and content.
+5. Do not default to a long opening image. Use a large visual opening only when the user asks for it, the reference style requires it, or the content/images clearly benefit from it.
+6. Apply WeChat constraints from `references/wechat-rules.md`.
+7. Choose basic capabilities first; add refined or special layout blocks only when they improve visual rhythm, image presentation, or reference style matching.
+8. After the first draft, initialize local git versioning in the article working directory if appropriate, commit the draft, and commit every later user-requested update.
+9. Use screenshot checks before presenting a draft as ready for review.
+10. When the user approves the layout, run the final image URL pass and keep one final HTML file for WeChat paste.
+11. **Deliver based on the user's chosen workflow:**
     - **Auto-Publish**: Run `scripts/auto_publish.py` with the user's AppID/AppSecret to create or update the WeChat draft directly.
     - **Manual Paste**: Instruct the user to open the final HTML file in a browser, press `Ctrl+A` to select all content, then `Ctrl+C` to copy, and paste into the WeChat Official Account editor (mp.weixin.qq.com) with `Ctrl+V`. Remind the user to verify the mobile preview before saving.
 
