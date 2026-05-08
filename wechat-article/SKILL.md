@@ -244,10 +244,15 @@ Specifically:
 1. Before generating ANY HTML, you MUST read `references/interaction-workflow.md` and `references/formatting-guide.md`. **Even if the user provided a detailed brief, you MUST summarize your understanding of the requirements (content, style, tone, images, layout intent) and ask the user to confirm before proceeding. Do NOT start layout until the user explicitly confirms.**
 2. **ALWAYS ask whether the user wants to use the Auto-Publish Workflow (WeChat API) or the Manual Paste workflow.** Do NOT assume either path. If the user does not mention auto-publish, default to asking.
 3. **CRITICAL: Before any layout work, test the image hosting solution.** If using WeChat API, verify `access_token` works and one test image uploads successfully. If using external hosting, verify one test image URL is accessible. Do NOT proceed with HTML generation until image hosting is confirmed working.
-4. Before generating the first draft, you MUST initialize local git versioning in the article working directory and commit the draft.
-5. Before presenting a draft as ready for review, you MUST run screenshot checks per `references/screenshot-check.md`.
-6. Before returning final HTML, you MUST use `references/generation-checklist.md`.
-7. Do NOT generate HTML directly without confirming style requirements first, even if the user says "make a push article" or similar.
+4. **CRITICAL: After generating HTML, run the 3-round self-check** per `references/self-check-workflow.md`:
+   - Round 1: Code Compliance (12 checks)
+   - Round 2: Visual Consistency (10 checks)
+   - Round 3: Content Integrity (8 checks)
+   - Do NOT deliver until all critical checks pass.
+5. Before generating the first draft, you MUST initialize local git versioning in the article working directory and commit the draft.
+6. Before presenting a draft as ready for review, you MUST run screenshot checks per `references/screenshot-check.md`.
+7. Before returning final HTML, you MUST use `references/generation-checklist.md`.
+8. Do NOT generate HTML directly without confirming style requirements first, even if the user says "make a push article" or similar.
 
 ## Quick Start
 
@@ -301,7 +306,12 @@ Keep these six parts separate when generating or revising an article:
 8. After the first draft, initialize local git versioning in the article working directory if appropriate, commit the draft, and commit every later user-requested update.
 9. Use screenshot checks before presenting a draft as ready for review.
 10. When the user approves the layout, run the final image URL pass and keep one final HTML file for WeChat paste.
-11. **Deliver based on the user's chosen workflow:**
+11. **CRITICAL: Run 3-round self-check before delivery** per `references/self-check-workflow.md`:
+    - **Round 1**: Code Compliance Check (12 items) - auto-check by AI
+    - **Round 2**: Visual Consistency Check (10 items) - auto-check + screenshot
+    - **Round 3**: Content Integrity Check (8 items) - auto-check + user confirm
+    - Fix issues and re-check until all pass
+12. **Deliver based on the user's chosen workflow:**
     - **Auto-Publish**: Run `scripts/auto_publish.py` with the user's AppID/AppSecret to create or update the WeChat draft directly.
     - **Manual Paste**: Instruct the user to open the final HTML file in a browser, press `Ctrl+A` to select all content, then `Ctrl+C` to copy, and paste into the WeChat Official Account editor (mp.weixin.qq.com) with `Ctrl+V`. Remind the user to verify the mobile preview before saving.
 
