@@ -23,6 +23,8 @@ Treat this skill as a mandatory checklist, not a suggestion. Do NOT skip steps t
 
 ### Phase 0: Preflight
 
+0. **Create todo list**: After reading the workflow and understanding the user's content, create a todo list that covers every phase and step below. Mark items as completed only after they are actually done. Do NOT skip steps.
+
 1. **Read required references**: Before generating ANY HTML, read `references/interaction-workflow.md` and `references/formatting-guide.md`.
 
 2. **Ask first-round style questions** (from `references/interaction-workflow.md`):
@@ -34,7 +36,9 @@ Treat this skill as a mandatory checklist, not a suggestion. Do NOT skip steps t
 
    **Do NOT skip this step.** Even if the user says "you decide" in the first message, present the questions and wait for explicit answers. Once answered, briefly summarize your understanding and ask the user to confirm before proceeding.
 
-3. **Ask publish workflow**: ALWAYS ask whether to use Auto-Publish (WeChat API) or Manual Paste. Do not assume either path.
+2b. **Ask SVG usage**: Explicitly ask whether the user wants SVG-based visual effects (animations, interactive components). If yes, remind the user that SVG content cannot be pasted directly via Manual Paste — it requires Auto-Publish (WeChat API) or browser extension injection. See `references/svg-compatibility.md`.
+
+3. **Ask publish workflow**: ALWAYS ask whether to use Auto-Publish (WeChat API) or Manual Paste. Do not assume either path. If SVG is requested, strongly recommend Auto-Publish.
 
 4. **Ask layout guidance**: After style preferences are confirmed, ask the layout structure question:
    ```text
@@ -47,10 +51,11 @@ Treat this skill as a mandatory checklist, not a suggestion. Do NOT skip steps t
    - Option 2 → follow **Reference Screenshot Workflow** below.
    - Option 3 → proceed with AI-chosen layout; do not read `visual-layout-workflow.md`.
 
-5. **Test image hosting**: Before ANY layout work, verify the image hosting solution:
-   - Auto-Publish: test `access_token` + one image upload
+5. **Test image hosting immediately after receiving content**: Before ANY layout work, verify the image hosting solution:
+   - Auto-Publish: test `access_token` + one image upload to WeChat CDN
    - Manual Paste + local images: upload one test image to the default provider (360 via `wzapi`) and verify with `curl -I`
    - External hosting provided by user: verify one URL is accessible
+   - **If SVG is used**: test SVG `<image>` source URLs separately — 360图床 fails in API-published SVG but works in Manual Paste; WeChat CDN (`mmbiz.qpic.cn`) works in both. See `references/image-url-workflow.md`.
 
 ### Phase 1: Layout & Generation
 
@@ -72,7 +77,7 @@ Treat this skill as a mandatory checklist, not a suggestion. Do NOT skip steps t
    - Use `<!-- -->` between inline-block elements
    - `vertical-align: top` for consistent alignment
 
-10. **Initialize git**: After first draft, `git init` in the article directory and commit.
+10. **Initialize git in WORK directory**: After first draft, `git init` in the AI's working directory (the actual project folder where the article is being built — NOT inside the skill directory). Copy any needed scripts from `wechat-article/scripts/` to the working directory before running them. Never modify files inside the skill directory.
 
 ### Phase 2: Verification
 
