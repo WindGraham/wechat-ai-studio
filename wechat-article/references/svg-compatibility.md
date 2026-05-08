@@ -1,7 +1,7 @@
 # WeChat SVG Compatibility Matrix
 
 > **Test date**: 2026-05-08  
-> **Test account**: Subscription account wx87892513e3561af8  
+> **Test account**: Subscription account wx1234567890abcdef (example)  
 > **Test method**: Create draft via WeChat Official Account API, verify in editor  
 > **Test rounds**: 4 historical + 5 today = 9 verified rounds  
 > **Status**: ✅ Verified through actual publishing
