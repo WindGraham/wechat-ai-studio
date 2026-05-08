@@ -274,6 +274,7 @@ Specifically:
 **Conditional references — only read when the specific scenario applies:**
 - `references/background-color-guide.md` — colored backgrounds, dark themes, full-article background coverage
 - `references/visual-layout-workflow.md` — only when the user actively chooses the visual drag-and-drop composer (Option 1 in the layout guidance question). Do not read this file if the user lets AI decide or uploads a reference screenshot.
+- `references/svg-compatibility.md` — SVG animations or SVG-based visual effects in WeChat articles
 
 ## Skill Update Check
 
@@ -957,3 +958,56 @@ Copy HTML → Paste into mp.weixin.qq.com editor → Verify rendering
 - Container must have `line-height: 0` to remove gap
 - Image URLs must be from your own domain (WeChat blocks external hotlinking)
 - Recommended: Upload to WeChat material library first, then use WeChat CDN URLs
+
+## SVG Animation Support
+
+When the user wants SVG animations or SVG-based visual effects in WeChat articles:
+
+### Critical Rules (Must Follow)
+
+| # | Rule | Reason |
+|:---|:---|:---|
+| 1 | **Images must use WeChat CDN** (`mmbiz.qpic.cn`) | External image URLs are filtered by WeChat |
+| 2 | **Animations must use SMIL** | CSS animations (`@keyframes`, `animation`, `transition`) are completely unsupported |
+| 3 | **Styles must use inline attributes** | `style` attributes and `<style>` tags are filtered out |
+| 4 | **No interaction events** | `onclick`, `onmouseover`, `ontouchstart` are unsupported |
+| 5 | **2D transforms only** | `rotate()`, `translate()`, `scale()` are safe; 3D transforms (`rotateX`, `rotateY`, `perspective`) are unsupported |
+| 6 | **No `class`/`id` attributes** | Removed by WeChat editor |
+| 7 | **No `<script>` tags** | Completely prohibited in WeChat articles |
+| 8 | **Auto-play only** | Use `repeatCount="indefinite"` for loops, `begin` for delays |
+
+### Supported SMIL Animation Tags
+
+- `<animate>` - Attribute animation (fully supported)
+- `<animateTransform>` - Transform animation (fully supported)
+- `<animateMotion>` - Path animation (supported)
+- `<set>` - Set animation (supported)
+
+### Supported Animatable Attributes
+
+`x`, `y`, `width`, `height`, `cx`, `cy`, `r`, `opacity`, `fill`, `stroke`, `stroke-width`, `stroke-dashoffset`, `d` (path), `points`, `textContent`
+
+### Supported 2D Transforms
+
+`translate()`, `scale()`, `rotate()` - Safe for decorative elements
+
+### Image Handling for SVG
+
+All images in SVG must use WeChat CDN URLs:
+
+```
+External Image → Download to Server → Call WeChat API (/cgi-bin/media/uploadimg) → Get WeChat CDN URL → Use in SVG
+```
+
+**API**: `POST https://api.weixin.qq.com/cgi-bin/media/uploadimg?access_token=TOKEN`
+
+**Example**:
+```svg
+<image x="0" y="0" width="335" height="200" 
+       xlink:href="http://mmbiz.qpic.cn/mmbiz_jpg/..." 
+       preserveAspectRatio="xMidYMid slice"/>
+```
+
+### Full Documentation
+
+See `references/svg-compatibility.md` for complete compatibility matrix, test records, and practical component templates.
