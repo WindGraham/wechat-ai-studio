@@ -246,3 +246,138 @@ def content_integrity_check(html, original_text):
 - `self-check-workflow.md`：告诉 AI "怎么检查、何时检查、怎么报告"（How & When）
 
 两者配合使用，确保从"知道要查"到"实际执行"的闭环。
+## 背景色处理检查（新增）
+
+### 为什么背景色需要特殊检查？
+
+微信编辑器会**强制将文章背景设为白色**！这意味着：
+
+| 错误做法 | 后果 |
+|:---|:---|
+| 根容器设置 `background-color` | 被微信覆盖，显示为白色 |
+| 使用 `rgba(..., 0.x)` 半透明色 | 与白色背景混合，颜色变灰/脏 |
+| 依赖透明背景实现效果 | 在微信中显示异常 |
+
+### 正确的背景色处理方式
+
+```html
+<!-- ❌ 错误：根容器设置背景色（会被微信覆盖） -->
+<section style="max-width: 375px; background-color: rgb(250,248,245);">
+  <!-- 内容 -->
+</section>
+
+<!-- ✅ 正确：用 wrapper section 包裹内容区块 -->
+<section style="max-width: 375px; margin: 0 auto;">
+  <!-- 深色主题区块 -->
+  <section style="background-color: rgb(45,45,55); padding: 30px 20px;">
+    <p style="color: rgb(255,255,255);">白色文字</p>
+  </section>
+  
+  <!-- 浅色主题区块 -->
+  <section style="background-color: rgb(250,248,245); padding: 30px 20px;">
+    <p style="color: rgb(62,62,62);">深色文字</p>
+  </section>
+</section>
+```
+
+### 自查要点
+
+| # | 检查项 | 正确做法 | 错误做法 |
+|:---|:---|:---|:---|
+| 1 | 根容器背景 | 不设置 `background-color` | 设置 `background-color` |
+| 2 | 区块背景 | 用 wrapper `section` 包裹 | 直接给内容元素加背景 |
+| 3 | 渐变背景 | 开始和结束色都用不透明 `rgb()` | 使用 `rgba()` 半透明 |
+| 4 | 深色主题 | 每个区块单独设深色背景 | 期望根容器深色 |
+| 5 | 纹理/图片背景 | 用 `background-image` 在 wrapper 上 | 依赖透明层叠 |
+
+### 检查代码示例
+
+```python
+def background_check(html):
+    errors = []
+    
+    # 1. 检查根容器是否设置了 background-color
+    root_pattern = r'<section[^>]*style="[^"]*max-width:\s*375px[^"]*"[^>]*>'
+    root_match = re.search(root_pattern, html)
+    if root_match and 'background-color' in root_match.group(0):
+        errors.append("❌ 根容器设置了 background-color，会被微信覆盖")
+    
+    # 2. 检查是否使用了 rgba 半透明
+    rgba_pattern = r'rgba\([^)]*\d+\.?\d*\)'
+    rgba_matches = re.findall(rgba_pattern, html)
+    for match in rgba_matches:
+        # 提取 alpha 值
+        alpha = float(match.split(',')[-1].strip().rstrip(')'))
+        if alpha < 1.0:
+            errors.append(f"⚠️ 发现半透明颜色: {match}，可能与白色背景混合变灰")
+    
+    # 3. 检查渐变是否使用不透明色
+    gradient_pattern = r'linear-gradient\([^)]+\)'
+    gradients = re.findall(gradient_pattern, html)
+    for grad in gradients:
+        if 'rgba' in grad:
+            errors.append(f"⚠️ 渐变使用 rgba: {grad[:50]}...")
+    
+    # 4. 检查深色主题实现方式
+    dark_colors = ['rgb(30', 'rgb(40', 'rgb(45', 'rgb(50', '#2d2d', '#1a1a']
+    for color in dark_colors:
+        if color in html:
+            # 检查是否包裹在 section 中
+            idx = html.find(color)
+            surrounding = html[max(0, idx-200):idx+200]
+            if '<section' not in surrounding:
+                errors.append(f"⚠️ 深色颜色 {color} 未包裹在 section 中")
+    
+    return errors
+```
+
+### 常见场景处理
+
+#### 场景 1：全篇深色主题
+```html
+<!-- ✅ 正确：每个区块单独设置 -->
+<section style="max-width: 375px; margin: 0 auto;">
+  <section style="background: rgb(45,45,55); padding: 40px 20px;">
+    <p style="color: rgb(255,255,255); font-size: 24px;"><strong>标题</strong></p>
+  </section>
+  <section style="background: rgb(55,55,65); padding: 30px 20px;">
+    <p style="color: rgb(220,220,230);">正文内容...</p>
+  </section>
+</section>
+```
+
+#### 场景 2：区块交替色
+```html
+<!-- ✅ 正确：每个区块独立背景 -->
+<section style="max-width: 375px; margin: 0 auto;">
+  <!-- 白色区块 -->
+  <section style="background: rgb(255,255,255); padding: 30px 20px;">
+    <p>内容...</p>
+  </section>
+  
+  <!-- 米色区块 -->
+  <section style="background: rgb(250,248,245); padding: 30px 20px;">
+    <p>内容...</p>
+  </section>
+  
+  <!-- 深色区块 -->
+  <section style="background: rgb(78,128,88); padding: 30px 20px;">
+    <p style="color: rgb(255,255,255);">内容...</p>
+  </section>
+</section>
+```
+
+#### 场景 3：渐变背景区块
+```html
+<!-- ✅ 正确：不透明渐变 -->
+<section style="background: linear-gradient(135deg, rgb(78,128,88), rgb(95,145,105)); 
+                padding: 40px 20px;">
+  <p style="color: rgb(255,255,255);">渐变背景内容</p>
+</section>
+
+<!-- ❌ 错误：半透明渐变 -->
+<section style="background: linear-gradient(135deg, rgba(78,128,88,0.9), rgba(95,145,105,0.9));
+                padding: 40px 20px;">
+  <p>内容</p>
+</section>
+```
