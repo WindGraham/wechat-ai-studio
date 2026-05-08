@@ -273,7 +273,7 @@ Specifically:
 
 **Conditional references — only read when the specific scenario applies:**
 - `references/background-color-guide.md` — colored backgrounds, dark themes, full-article background coverage
-- `references/visual-layout-workflow.md` — complex layered/overlapped layouts, "half-cover" boundary effects, or when the user explicitly asks for drag-and-drop spatial design. Launch `wechat-article/tools/layout-composer.html` only when this workflow is triggered.
+- `references/visual-layout-workflow.md` — only when the user actively chooses the visual drag-and-drop composer (Option 1 in the layout guidance question). Do not read this file if the user lets AI decide or uploads a reference screenshot.
 
 ## Skill Update Check
 
@@ -308,7 +308,16 @@ Keep these six parts separate when generating or revising an article:
    - **Do NOT proceed with layout until image hosting is confirmed working**
 2. Preflight local images before layout: upload/verify local images if needed; leave already-public HTTPS image URLs unchanged.
 3. Ask the first-round style questions from `references/interaction-workflow.md` unless the user already gave equivalent preferences.
-4. **Optional: Visual Layout Composer** — If the user has complex spatial layout intent (layered overlap, diagonal image placement, staggered grids, or "half-cover" boundary effects), offer to open `wechat-article/tools/layout-composer.html`. The user drags 5 basic rectangle types onto a 375px canvas; AI reads `layout-draft.json` and translates spatial relationships into WeChat-safe HTML. See `references/visual-layout-workflow.md` for the full workflow, fit strategy, and source code.
+4. **Ask whether the user wants guidance on layout structure.** After style preferences are confirmed, ask:
+   ```text
+   Do you want to arrange the layout yourself? You can:
+   1. Open the visual drag-and-drop composer to place components
+   2. Upload a reference screenshot / template for me to match
+   3. Let me decide the layout based on the content
+   ```
+   - If the user chooses **Option 1 (composer)**: Launch `wechat-article/tools/layout-composer.html`. The user drags 5 basic rectangle types onto a 375px canvas; AI reads `layout-draft.json` and translates spatial relationships into WeChat-safe HTML. See `references/visual-layout-workflow.md` for the full workflow, fit strategy, and source code.
+   - If the user chooses **Option 2 (reference screenshot)**: Follow the **Reference Screenshot Workflow** below.
+   - If the user chooses **Option 3 (AI decides)** or gives no preference: Proceed with normal layout generation without reading `visual-layout-workflow.md`.
 5. Identify the article type and image roles, but do not impose a fixed article structure. Choose reusable layout capability blocks that fit the user's preferences and content.
 6. Do not default to a long opening image. Use a large visual opening only when the user asks for it, the reference style requires it, or the content/images clearly benefit from it.
 7. Apply WeChat constraints from `references/wechat-rules.md`.
