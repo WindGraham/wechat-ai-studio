@@ -18,6 +18,32 @@ This file contains hard compatibility rules for HTML that will be pasted into th
 - `background-image` is safe when the URL is a public HTTPS image (or WeChat material-library URL). It can be used for decorative backgrounds, hero banners, and texture fills.
 - Use `overflow: hidden` on image containers when border-radius or clipping is needed.
 
+## Background Color Limitations
+
+WeChat rich-text editor **does not support custom article background colors**. Any `background-color` set on the root container will be overridden to white by the editor. This is a platform-level restriction, not a rendering bug.
+
+### Rules
+
+- **Do not rely on a dark or colored root background.** The editor forces the page background to white regardless of what the HTML specifies.
+- **Dark themes must be built with dark card blocks.** Use explicit wrapper sections with solid dark `background-color` values so each content block carries its own color.
+- **Avoid semi-transparent dark colors (`rgba`) for overlays or gradient end-stops.** On a browser with a dark background, `rgba(18,18,24,0.98)` looks nearly solid dark. On WeChat's forced-white background, the same value mixes with white and becomes a muddy light-gray/blue. Always use opaque `rgb()` for the final layer of any gradient or overlay that is meant to look dark.
+- **Wrap related elements in a shared dark wrapper** when a section (cover, chapter header, content block) is meant to appear as one continuous dark area. This prevents white gaps from showing between the image and the text/card beneath it.
+
+Example structure:
+
+```html
+<!-- The editor background is forced white; the outer section carries the dark block -->
+<section style="background-color: rgb(28,28,36);">
+  <img src="..." style="width: 100%; display: block; margin: 0 auto;">
+  <section style="margin-top: -110px; padding: 50px 20px 25px; background: linear-gradient(to top, rgb(28,28,36), rgba(28,28,36,0));">
+    <p>Title</p>
+  </section>
+  <section style="background-color: rgb(22,22,28); padding: 20px;">
+    <p>Content...</p>
+  </section>
+</section>
+```
+
 ## Alignment Rules (Critical for PC View)
 
 WeChat mobile app width = 375px. WeChat PC client width > 375px. **Alignment must work in both.**
@@ -119,6 +145,14 @@ Text card overlap rules:
 - Use a small overlay image or decoration for corner overlaps; large overlaps can make the text hard to read.
 - Use a white border around overlapping images when they sit on busy backgrounds.
 
+### Gradient Overlay Rules
+
+When a gradient is used to blend an image into a text card or background block:
+
+- **The final color stop must be an opaque `rgb()` value** that exactly matches the background color of the element that follows. Do not use `rgba(..., 0.98)` or similar near-opaque values as the final stop, because the tiny remaining transparency will blend with WeChat's forced-white background and produce a visibly different, muddy color.
+- **Prefer solid-color end-stops.** It is safe to start a gradient from a fully-transparent `rgba(..., 0)` and transition to a fully-opaque `rgb(...)`. It is not safe to end on a semi-transparent color when the intent is a solid dark surface.
+- Example: use `linear-gradient(to top, rgb(28,28,36), rgba(28,28,36,0))` instead of `linear-gradient(to top, rgba(18,18,24,0.98), rgba(18,18,24,0))`.
+
 ### Multi-Element Row Alignment
 
 When placing multiple elements in one row, use `inline-block` children inside a parent container. The parent's `text-align` controls the horizontal alignment of the row as a whole, while each child's `vertical-align` controls how the columns line up vertically.
@@ -149,11 +183,12 @@ Child vertical alignment:
 
 Spacing rules:
 1. Use `<!-- -->` comments between inline-block children to remove whitespace gaps.
-2. **PC client**: total width ≤ 96%. **Mobile**: total width ≤ 92% (mobile WeChat counts inline-block whitespace differently and may add 1-2px extra).
-3. Prefer `padding-left` or inner wrappers for gaps. Avoid `padding-right` on a fixed-width left column when the row is close to 100%.
-4. For staggered layouts, use `padding-top` on selected columns instead of `position` or `transform`.
-5. **Do not nest `display: inline-block`** — outer columns can be inline-block, but inner image wrappers should use plain `section` without `display: inline-block` to prevent mobile from treating them as block-level breaks.
-6. **`box-sizing: border-box` is not fully reliable on mobile** — WeChat mobile editor sometimes adds padding outside the declared width. Leave extra margin (≤ 92% total) rather than relying on exact box-sizing math.
+2. **Total rendered width must stay ≤ 92%** for reliable mobile safety. PC client tolerates up to 96%, but mobile WeChat counts inline-block whitespace differently and may add extra pixels, so design for 90%-92% total.
+3. **Use `padding-left` on columns for gaps.** `padding` is absorbed inside `width` when `box-sizing: border-box` is used, so it does not increase total rendered width. Avoid `margin` for column gaps — margin adds to the total and can push the row over the mobile limit.
+4. Avoid `padding-right` on a fixed-width left column when the row is close to 100%. Use `padding-left` on the right/adjacent column instead.
+5. For staggered layouts, use `padding-top` on selected columns instead of `position` or `transform`.
+6. **Do not nest `display: inline-block`** — outer columns can be inline-block, but inner image wrappers should use plain `section` without `display: inline-block` to prevent mobile from treating them as block-level breaks.
+7. **`box-sizing: border-box` is not fully reliable on mobile** — WeChat mobile editor sometimes adds padding outside the declared width. Leave a safety margin (≤ 92% total) rather than relying on exact box-sizing math.
 
 ### Inline-Block Two-Column (Safe Method)
 
@@ -209,10 +244,10 @@ Three columns are possible, but less forgiving than two columns. Keep widths con
   <section style="display: inline-block; width: 30%; vertical-align: top; box-sizing: border-box;">
     <!-- Left column -->
   </section><!--
-  --><section style="display: inline-block; width: 32%; vertical-align: top; margin: 0 2%; box-sizing: border-box;">
+  --><section style="display: inline-block; width: 30%; vertical-align: top; padding-left: 8px; box-sizing: border-box;">
     <!-- Center column -->
   </section><!--
-  --><section style="display: inline-block; width: 30%; vertical-align: top; box-sizing: border-box;">
+  --><section style="display: inline-block; width: 30%; vertical-align: top; padding-left: 8px; box-sizing: border-box;">
     <!-- Right column -->
   </section>
 </section>
@@ -223,6 +258,7 @@ Safe three-column widths:
 | Left | Center | Right | Gap | Total | Safe? |
 |:---:|:---:|:---:|:---:|:---:|:---:|
 | 30% | 30% | 30% | 0 | 90% | ✅ Safe on both PC and mobile |
+| 30% | 30% | 30% | 8px padding-left x2 | 90% | ✅ Recommended |
 | 31% | 31% | 31% | 0 | 93% | ✅ Safe, tighter visuals |
 | 33% | 33% | 33% | whitespace or margin | 99%+ | ⚠️ Risky |
 | 33.33% | 33.33% | 33.33% | any gap | >100% | ❌ Avoid |

@@ -29,7 +29,10 @@ Use this checklist before returning paste-ready HTML. It is a practical self-che
 - Do not use final-output `display: grid`, `position: absolute`, `position: fixed`, animation, forms, tables, or JavaScript.
 - Do not use final-output `<svg>`, `<foreignObject>`, `<animateTransform>`, or `<animateMotion>`; rewrite them into plain HTML/CSS or a raster image.
 - Prefer `inline-block` rows over flex. Use `<!-- -->` between inline-block columns.
-- Keep two-column and three-column total widths conservative, normally at or below 96%.
+- Keep two-column and three-column total widths conservative; **mobile total width must be ≤ 92%** (recommend 90%).
+- **Three-column gaps use `padding-left`** (absorbed by `box-sizing: border-box`), not `margin`, so the total rendered width does not exceed the limit.
+- **Do not rely on root `background-color`.** WeChat editor forces the article background to white. Any dark theme must be built with explicit dark wrapper sections.
+- **Gradient overlays must end on an opaque `rgb()` color**, not `rgba(..., 0.98)` or other semi-transparent values. Semi-transparent dark colors blend with the forced-white background and become muddy gray.
 
 ## Layout And Typography
 

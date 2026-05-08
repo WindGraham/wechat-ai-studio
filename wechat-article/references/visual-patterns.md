@@ -157,7 +157,7 @@ One row with three images where the left and right images sit lower and the cent
 
 Structure formula: `left narrow image with top padding -> center emphasized image -> right narrow image with top padding`.
 
-**Use inline-block, not flex.** Three columns are tight on a 375px WeChat canvas, so keep total width at or below 96%.
+**Use inline-block, not flex.** Three columns are tight on a 375px WeChat canvas, so keep total width at or below 92%.
 
 ```html
 <section style="text-align: center; padding: 0 12px; box-sizing: border-box;">
@@ -166,12 +166,12 @@ Structure formula: `left narrow image with top padding -> center emphasized imag
       <img src="URL_LEFT" style="vertical-align: middle; max-width: 100%; width: 100%; display: block; margin: 0 auto;">
     </section>
   </section><!--
-  --><section style="display: inline-block; width: 32%; vertical-align: top; margin: 0 2%; box-sizing: border-box;">
+  --><section style="display: inline-block; width: 30%; vertical-align: top; padding-left: 8px; box-sizing: border-box;">
     <section style="display: inline-block; width: 100%; vertical-align: top; line-height: 0; border-radius: 16px; overflow: hidden; box-sizing: border-box; border: 3px solid rgb(78, 128, 88);">
       <img src="URL_CENTER" style="vertical-align: middle; max-width: 100%; width: 100%; display: block; margin: 0 auto;">
     </section>
   </section><!--
-  --><section style="display: inline-block; width: 30%; vertical-align: top; padding-top: 24px; box-sizing: border-box;">
+  --><section style="display: inline-block; width: 30%; vertical-align: top; padding-top: 24px; padding-left: 8px; box-sizing: border-box;">
     <section style="display: inline-block; width: 100%; vertical-align: top; line-height: 0; border-radius: 12px; overflow: hidden; box-sizing: border-box;">
       <img src="URL_RIGHT" style="vertical-align: middle; max-width: 100%; width: 100%; display: block; margin: 0 auto;">
     </section>
@@ -184,7 +184,7 @@ Structure formula: `left narrow image with top padding -> center emphasized imag
 2. Each column uses `vertical-align: top` so `padding-top` creates the visible stagger.
 3. Left and right columns use `padding-top: 20px-28px`; center column uses no top padding.
 4. Use `<!-- -->` comments between columns to remove inline-block whitespace.
-5. Keep total width safe: `30% + 32% + 30% + 2% + 2% = 96%`.
+5. Keep total width safe: `30% + 30% + 30% = 90%`. Gaps are created with `padding-left` (absorbed by `box-sizing: border-box`) so the rendered total stays ≤ 92%.
 
 **Visual guidance:**
 - Use images with similar aspect ratios. Mixed ratios can make the layout look accidental instead of designed.

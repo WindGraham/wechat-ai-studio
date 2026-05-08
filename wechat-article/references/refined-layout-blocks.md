@@ -177,7 +177,7 @@ Skeleton:
 
 ## Capability: Three-Image Rhythm
 
-Use for three related photos. Keep total width at or below 96%.
+Use for three related photos. Keep total width at or below 92% for mobile safety.
 
 Use similar aspect ratios. If the images differ too much, use a vertical stack or two-image group instead.
 
@@ -190,12 +190,12 @@ Skeleton:
       <img src="IMAGE_LEFT" style="width: 100%; max-width: 100%; display: block; margin: 0 auto;">
     </section>
   </section><!--
-  --><section style="display: inline-block; width: 32%; vertical-align: top; margin: 0 2%; box-sizing: border-box;">
+  --><section style="display: inline-block; width: 30%; vertical-align: top; padding-left: 8px; box-sizing: border-box;">
     <section style="line-height: 0; border: 3px solid rgb(255,255,255); border-radius: 14px; overflow: hidden; box-sizing: border-box;">
       <img src="IMAGE_CENTER" style="width: 100%; max-width: 100%; display: block; margin: 0 auto;">
     </section>
   </section><!--
-  --><section style="display: inline-block; width: 30%; vertical-align: top; padding-top: 22px; box-sizing: border-box;">
+  --><section style="display: inline-block; width: 30%; vertical-align: top; padding-top: 22px; padding-left: 8px; box-sizing: border-box;">
     <section style="line-height: 0; border-radius: 10px; overflow: hidden; box-sizing: border-box;">
       <img src="IMAGE_RIGHT" style="width: 100%; max-width: 100%; display: block; margin: 0 auto;">
     </section>
