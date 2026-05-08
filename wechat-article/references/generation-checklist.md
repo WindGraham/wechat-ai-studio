@@ -11,7 +11,8 @@ Use this checklist before returning paste-ready HTML. It is a practical self-che
   - Collaboration and local versioning from `interaction-workflow.md`.
   - Image URL preflight/finalization from `image-url-workflow.md`.
   - Refined capability blocks from `refined-layout-blocks.md` when requested.
-  - Optional special layout patterns from `visual-patterns.md`.
+  - Optional special layout patterns from `refined-layout-blocks.md`.
+  - Optional decorative patterns from `decorative-patterns.md`.
   - Adaptable typography and image habits from `formatting-guide.md`.
 - Use special layout patterns only when they improve the layout structure. Do not add complex decoration by default.
 - Preserve user-provided facts, names, dates, captions, and source notes. Do not invent missing metadata.

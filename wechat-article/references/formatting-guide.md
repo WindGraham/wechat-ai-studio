@@ -2,7 +2,7 @@
 
 Use this file for adaptable formatting guidance. The values below are defaults, not hard requirements. If the user provides brand guidelines, column conventions, font sizes, spacing, or footer rules, follow the user's requirements instead.
 
-This file describes common editorial habits, not hard compatibility rules. Hard HTML/CSS limits belong in `wechat-rules.md`; component capability belongs in `editor-features.md`; richer visual patterns belong in `visual-patterns.md`.
+This file describes common editorial habits, not hard compatibility rules. Hard HTML/CSS limits belong in `wechat-rules.md`; component capability belongs in `editor-features.md`; richer visual patterns belong in `decorative-patterns.md`.
 
 ## Title Area
 

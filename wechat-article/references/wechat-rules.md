@@ -7,7 +7,7 @@ This file contains hard compatibility rules for HTML that will be pasted into th
 **Document Priority (when rules conflict):**
 1. **wechat-rules.md** — Hard constraints. Never violate unless deliberately testing editor behavior.
 2. **SKILL.md** — Workflow and scheduling. Follow the execution order and mandatory checks.
-3. **visual-patterns.md** / **refined-layout-blocks.md** — Optional pattern libraries. Use when they improve visual rhythm; drop if they conflict with wechat-rules.md.
+3. **decorative-patterns.md** / **refined-layout-blocks.md** — Optional pattern libraries. Use when they improve visual rhythm; drop if they conflict with wechat-rules.md.
 
 - Use one root `<section>` with `width: 100%; max-width: 375px; margin-left: auto; margin-right: auto;`.
 - Use inline styles only. Do not emit `<style>` blocks or external CSS.
