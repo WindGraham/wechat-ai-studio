@@ -12,8 +12,12 @@
 |:---|:---|
 | 🎨 **智能排版** | 根据内容自动生成移动端优先（375px）的微信公众号 HTML |
 | 📐 **精细组件** | 标题区、卡片、图片框、分割线、引用块、错落布局、三图皇冠等 |
-| 🖼️ **图片处理** | 本地图片自动上传图床 / 微信 CDN，外部 URL 直接可用 |
-| 🤖 **自动发布** | 通过微信公众号 API 直接创建/更新草稿箱，无需手动粘贴 |
+| 🧭 **强制工作流** | 先确认风格、发布方式、布局方式，再生成 HTML，避免无约束乱排版 |
+| 🧩 **可视化布局草稿** | 使用本地拖拽工具表达空间意图，再由 AI 转成微信兼容 HTML |
+| 🖼️ **图片预检与处理** | 本地图片上传图床 / 微信 CDN，最终交付前验证图片 URL 可访问 |
+| 🧪 **自查流程** | 代码合规、视觉一致、内容完整三轮检查，减少微信编辑器兼容问题 |
+| 🧷 **Chrome 注入扩展** | 可从本地 HTML 页面捕获内容并注入到微信公众号编辑器 |
+| 🤖 **自动发布** | 通过微信公众号 API 创建/更新草稿箱，支持封面、作者、摘要参数 |
 | 🔄 **版本管理** | 本地 Git 追踪排版迭代，每轮调整都有记录 |
 | 📸 **视觉检查** | 浏览器截图验证布局，防止重叠、溢出、空白 |
 
@@ -29,13 +33,23 @@
 
 生成后：浏览器打开 → **Ctrl+A** → **Ctrl+C** → mp.weixin.qq.com → **Ctrl+V**
 
-### 方式二：自动发布（Auto-Publish）
+### 方式二：Chrome 扩展注入（Extension Inject）
+
+```text
+使用 $wechat-article，生成一份可在浏览器打开的公众号 HTML。
+```
+
+生成后：浏览器打开 HTML → 打开微信公众号图文编辑页 → 使用 `tools/wechat-inject-extension` 捕获页面并注入编辑器。
+
+### 方式三：自动发布（Auto-Publish）
 
 ```text
 使用 $wechat-article，自动发布这篇文章到公众号草稿箱。AppID: xxx, AppSecret: xxx
+封面图: /path/to/thumb.jpg
+作者: 作者姓名
 ```
 
-一键创建/更新草稿，图片自动上传微信 CDN，中文编码正确处理。
+自动创建/更新草稿，正文图片上传微信 CDN，中文编码正确处理。封面图和作者需要用户明确提供；摘要可提供，也可由脚本从正文自动生成。
 
 ---
 
@@ -88,17 +102,25 @@ wechat-article/
   📜 scripts/
      └── auto_publish.py         # 自动发布脚本
   🧰 tools/
-     └── layout-composer.html    # 本地拖拽草稿工具（非最终公众号 HTML）
+     ├── layout-composer.html    # 本地拖拽草稿工具（非最终公众号 HTML）
+     ├── save-layout-server.py   # 接收布局草稿 JSON 的本地服务
+     └── wechat-inject-extension/ # Chrome 注入扩展
   📚 references/
      ├── auto-publish.md         # 自动发布文档
+     ├── background-color-guide.md # 微信背景色限制与替代方案
+     ├── decorative-patterns.md  # 装饰模式
      ├── editor-features.md      # 编辑器能力说明
      ├── formatting-guide.md     # 排版规范
      ├── generation-checklist.md # 生成检查清单
+     ├── image-hosting-preflight.md # 图片托管预检
      ├── image-url-workflow.md   # 图片处理流程
+     ├── inline-block-safety.md  # 双栏/多栏安全规则
      ├── interaction-workflow.md # 用户协作流程
      ├── refined-layout-blocks.md # 精细排版组件
      ├── screenshot-check.md     # 截图检查流程
-     ├── visual-patterns.md      # 视觉模式库
+     ├── self-check-workflow.md  # 三轮自查流程
+     ├── svg-compatibility.md    # SVG/SMIL 兼容矩阵
+     ├── visual-layout-workflow.md # 可视化布局草稿流程
      └── wechat-rules.md         # 微信兼容性规则
 ```
 
@@ -147,6 +169,15 @@ cp -R wechat-article "${SKILLS_DIR}/"
 
 ## 📝 使用示例
 
+### 标准工作流
+
+Skill 会先确认以下信息，再开始生成 HTML：
+
+1. 风格选择：色彩方向、精细程度、图片样式、开头形式、正文习惯
+2. 发布方式：手动粘贴、Chrome 扩展注入、API 自动发布
+3. 布局方式：AI 决定、参考截图、可视化拖拽草稿
+4. 图片方案：本地图片上传、外部 HTTPS URL、微信 CDN
+
 ### 基础排版
 
 ```text
@@ -161,12 +192,31 @@ cp -R wechat-article "${SKILLS_DIR}/"
 图片先用占位 URL，无法在微信里精确实现的效果请用兼容写法近似。
 ```
 
+### 可视化布局草稿
+
+```text
+使用 $wechat-article，我想先用拖拽工具安排大致版面，再让你生成公众号 HTML。
+```
+
+流程：打开 `wechat-article/tools/layout-composer.html` → 拖拽组件 → 保存布局 JSON → AI 读取空间关系并生成微信安全 HTML。
+
+### Chrome 扩展注入
+
+```text
+使用 $wechat-article，生成可用 Chrome 扩展注入到公众号后台的 HTML。
+```
+
+扩展位置：`wechat-article/tools/wechat-inject-extension/`
+
 ### 自动发布
 
 ```text
 使用 $wechat-article，自动发布这篇文章到公众号草稿箱。
 AppID: wx1234567890abcdef
 AppSecret: your_appsecret_here
+封面图: /path/to/thumb.jpg
+作者: 作者姓名
+摘要: 可选；不填时从正文自动生成
 ```
 
 ---
@@ -185,7 +235,26 @@ AppSecret: your_appsecret_here
 |:---|:---|
 | `AppID` | 微信公众号应用 ID |
 | `AppSecret` | 微信公众号应用密钥 |
+| `thumb_source` | 必填，封面图本地路径或 HTTPS URL，用于上传 `thumb_media_id` |
+| `author` | 必填，文章作者；脚本不会自动编造 |
+| `digest` | 可选，文章摘要；不传时从正文自动生成，最长 120 字 |
 | `DRAFT_ID_FILE` | `.wechat_draft_id`（自动保存草稿 ID） |
+
+### Python 调用示例
+
+```python
+from scripts.auto_publish import publish_article
+
+media_id = publish_article(
+    appid="your_appid",
+    appsecret="your_appsecret",
+    title="文章标题",
+    html_content=html_string,
+    thumb_source="/path/to/thumb.jpg",
+    author="作者姓名",
+    digest="可选摘要；不传时脚本会从正文自动生成"
+)
+```
 
 ---
 
@@ -195,8 +264,22 @@ AppSecret: your_appsecret_here
 - ✅ 不打开可视化编辑器，直接生成移动端排版
 - ✅ 在公众号富文本限制内做标题区、信息卡、金句卡、图片框
 - ✅ 参考截图风格，生成相近的公众号排版
+- ✅ 用拖拽工具表达布局意图，再生成微信兼容 HTML
+- ✅ 用 Chrome 扩展从本地 HTML 注入到公众号编辑器
 - ✅ CI/CD 自动化发布流程集成
 - ✅ 批量内容生产，保持排版一致性
+
+---
+
+## 🔎 检查与交付
+
+生成或发布前，skill 会按文档执行检查：
+
+- **图片预检**：本地图片先上传，外部 URL 验证可访问，最终 HTML 不保留本地路径。
+- **截图检查**：用 430px 宽度浏览器截图检查移动端布局。
+- **代码合规检查**：检查根容器、内联样式、禁用标签、图片样式、多栏宽度等。
+- **视觉一致检查**：检查主题色、字号层级、间距、圆角、重叠和溢出。
+- **内容完整检查**：检查原文内容、图片、占位符、作者/来源等元数据。
 
 ---
 
@@ -211,6 +294,8 @@ AppSecret: your_appsecret_here
 - ✅ 图片使用用户提供的 URL 或中性占位 URL
 - ✅ 字号、行距、缩进、落款按用户习惯调整
 - ✅ 不编造组织名称、作者姓名、邮箱、二维码
+- ✅ 最终交付前确认图片是 public HTTPS URL 或微信 CDN URL
+- ✅ 默认使用 `inline-block` 做多栏；只有明确需要时才使用 flex
 
 ---
 
