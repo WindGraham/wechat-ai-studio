@@ -214,3 +214,20 @@
 **需谨慎的**：竖排文字、渐变文字、文字阴影、视频/音频（需上传微信素材库）。
 
 **应避免的**：所有动画、所有交互、表格、表单、滑动区域、自由定位。
+
+---
+
+## 附录：Transform 函数兼容性速查
+
+以下函数常见于第三方编辑器导出代码，按微信编辑器兼容性分类：
+
+| 函数 | 状态 | 说明 |
+|:---|:---:|:---|
+| `rotate(deg)` / `rotateZ(deg)` | ✅ | 2D 旋转，移动端稳定；PC 端通常保留 |
+| `translate(x, y)` | ✅ | 2D 位移，可用 `margin` 替代 |
+| `translate3d(x, y, 0)` | ⚠️ | 可用但建议改写为 `margin/padding` |
+| `scale(s)` | ✅ | 缩放，用于 subtle inset/outset 效果 |
+| `matrix(a, b, c, d, e, f)` | ⚠️ | 等价于 rotate/scale/translate 组合；建议展开为独立函数 |
+| `rotateX(180deg)` / `rotateY(180deg)` | ❌ | 3D 翻转，用于镜像装饰；改用静态 duplicated ornament |
+| `rotateX(67deg)` | ❌ | 3D 倾斜，接近平面透视；视觉效果不可靠 |
+| `perspective(px)` | ❌ | `perspective(0px)` 数学无效；其他值在微信中不支持 |

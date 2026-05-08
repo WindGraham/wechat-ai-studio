@@ -617,6 +617,60 @@ Typical replacements:
 
 Do not keep `translate3d()` as a core layout dependency in final HTML unless the same visual result cannot be achieved with normal-flow spacing.
 
+### 36.4 How to Downgrade SVG Background-Image Containers
+
+Some source layouts use `<svg>` purely as a rectangular viewport with `background-image`. The SVG adds no vector drawing; it only holds a raster image at a specific aspect ratio.
+
+Recognition signs:
+- The `<svg>` has no `<path>`, `<rect>`, `<circle>`, or other drawing elements.
+- The only visible styling is `background-image`, `background-size`, and `background-position`.
+- There is no animation inside this particular SVG.
+
+Downgrade rule:
+
+Replace with `<section style="background-image: url(...); background-size: cover; width: 100%; ...">` or with a plain `<img>`.
+
+```html
+<!-- Source -->
+<svg viewBox="0 0 528 1426" style="width: 100%; background-image: url('URL'); background-size: 100%;"></svg>
+
+<!-- Target -->
+<section style="width: 100%; line-height: 0;">
+  <img src="URL" style="width: 100%; max-width: 100%; display: block; margin: 0 auto;">
+</section>
+```
+
+If the original `viewBox` aspect ratio is important and the image must be cropped:
+```html
+<section style="width: 100%; height: 0; padding-top: 270%; overflow: hidden; box-sizing: border-box;">
+  <img src="URL" style="width: 100%; display: block; margin: 0 auto;">
+</section>
+```
+
+### 36.5 How to Downgrade SVG Image Carousels
+
+Source carousels are built from stacked `<foreignObject>` frames driven by `<animateTransform type="translate">`. The visual intent is a timed slideshow or a multi-image gallery.
+
+Recognition signs:
+- Outer `<svg>` with carousel-related class names.
+- Multiple `<g>` groups, each containing a `<foreignObject>`.
+- `<animateTransform>` with `type="translate"` and `repeatCount="indefinite"`.
+- Inner frames are often `<svg>` elements with `background-image`, not vector art.
+
+Downgrade rule:
+
+1. Extract every distinct image URL from the inner frame backgrounds.
+2. Discard the entire SVG wrapper, `<foreignObject>`, `<animate>`, and `<animateTransform>` structure.
+3. Choose a static replacement based on image count and layout context:
+
+| Image Count | Replacement |
+|:---|:---|
+| 1 dominant image | Single `<img>` in a framed container |
+| 2~3 images | Inline-block row or staggered grid |
+| 4+ images | Vertical stack or multi-row grid |
+
+If the carousel occupied a narrow sidebar column (e.g., 20% width in a multi-column row), keep that width context and replace the animated block with a single static image or a compact vertical stack.
+
 ## Visual Design Principles
 
 ### Layering Creates Depth

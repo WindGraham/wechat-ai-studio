@@ -290,11 +290,42 @@ Skeleton:
 - `translate3d(1px~70px, 0, 0)` for pixel-perfect alignment adjustments;
 - `scale(0.95~1.05)` for subtle zoom effects.
 
+Typical values seen in source exports and their intended effects:
+
+| Value | Visual Intent | Safe Replacement |
+|:---|:---|:---|
+| `translate3d(1px, 0, 0)` | 1px micro-nudge | `margin-left: 1px` or drop |
+| `translate3d(10px~25px, 0, 0)` | Small horizontal shift of ornament | `margin-left/right` |
+| `translate3d(60px~70px, 0, 0)` | Large offset for mirrored ornament pair | Duplicate ornament + `text-align` wrapper |
+| `translate3d(-2.5%, 0, 0)` | Percentage-level center correction | Adjust parent `padding` or child `width` |
+| `scale(0.97)` | Slight shrink to create inset frame feel | Keep; nest inside a larger background block |
+| `rotateZ(6deg)` | Playful tilt on frame or card | Keep for decorative wrappers only |
+| `rotateZ(315deg)` / `rotateZ(342deg)` | Near-complete rotation of diamond/leaf shape | Rebuild with `rotate(45deg)` or asymmetric `border-radius` |
+
 Rules:
 - Only apply to decorative elements or image containers, never to body text.
 - Avoid `rotateX()`, `rotateY()`, and `perspective()` — these are 3D transforms that either render poorly or produce no visible effect (`perspective(0px)` is mathematically invalid).
 - Keep angles small for frames (under 20°); large tilts hurt readability.
 - Do not combine multiple transform functions in one declaration; use nested wrappers if needed.
+- `matrix(...)` should be rewritten as explicit `rotate` or `scale` for clarity.
+
+### Mirror Ornament (Static Replacement for 3D Flip)
+
+When a source uses `rotateX(180deg)` or `rotateY(180deg)` to mirror a decoration on the opposite side, do not preserve the 3D transform. Instead, duplicate the ornament HTML and place it in the correct position with normal flow.
+
+```html
+<!-- Left ornament -->
+<section style="text-align: left; line-height: 0;">
+  <section style="display: inline-block; width: 24px; height: 24px; background-color: rgb(80,105,92); border-radius: 0 100% 0 100%;"></section>
+</section>
+
+<!-- Right ornament -->
+<section style="text-align: right; line-height: 0; margin-top: -24px;">
+  <section style="display: inline-block; width: 24px; height: 24px; background-color: rgb(80,105,92); border-radius: 100% 0 100% 0;"></section>
+</section>
+```
+
+Note: The right ornament uses a different `border-radius` pattern to achieve the mirrored look without any transform.
 
 ## Capability: SVG As Container
 
@@ -313,6 +344,43 @@ Guidance:
 - Prefer plain `<section>` with `background-image` over `<svg>` for background fills.
 - If the user asks for an SVG-like effect (rotating badges, geometric shapes), implement with CSS `transform` + `border-radius` instead.
 - Never rely on SVG animation for critical content. Provide a static fallback.
+
+### SVG Background-Image Container Downgrade
+
+When a source block uses `<svg style="background-image: url(...)">` as a static image holder, replace it with a plain `<section>` or `<img>`.
+
+Source intent:
+```html
+<svg viewBox="0 0 528 1426" style="width: 100%; background-image: url('URL'); background-size: 100%;"></svg>
+```
+
+Rewrite target:
+```html
+<section style="width: 100%; line-height: 0;">
+  <img src="URL" style="width: 100%; max-width: 100%; display: block; margin: 0 auto;">
+</section>
+```
+
+Or, if the aspect ratio must be preserved and cropping is intentional:
+```html
+<section style="width: 100%; height: 0; padding-top: 270%; overflow: hidden; box-sizing: border-box;">
+  <img src="URL" style="width: 100%; display: block; margin: 0 auto;">
+</section>
+```
+
+### SVG Carousel / Slideshow Downgrade
+
+When a source uses SVG with `<animateTransform>` and multiple `<foreignObject>` frames to create a sliding image gallery, the animation will be lost in WeChat. Downgrade to one of these static alternatives:
+
+**Option A: Single featured image** — Keep only the first frame image.
+**Option B: Static image group** — Arrange the gallery images as a normal-flow multi-image grid.
+**Option C: Vertical stack** — If the gallery was tall, stack images with captions between them.
+
+Key downgrade steps:
+1. Extract each image URL from the `<foreignObject>` / inner `<svg>` backgrounds.
+2. Discard all `<animate>`, `<animateTransform>`, and timing attributes.
+3. Rebuild as static `<img>` tags inside normal-flow `<section>` containers.
+4. Preserve any outer frame, border, or `overflow: hidden` wrapper that gave the gallery its shape.
 
 ## Capability: Gradient Text
 
