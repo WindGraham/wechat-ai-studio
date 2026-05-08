@@ -87,6 +87,8 @@ wechat-article/
      └── template.html           # 起始模板
   📜 scripts/
      └── auto_publish.py         # 自动发布脚本
+  🧰 tools/
+     └── layout-composer.html    # 本地拖拽草稿工具（非最终公众号 HTML）
   📚 references/
      ├── auto-publish.md         # 自动发布文档
      ├── editor-features.md      # 编辑器能力说明
@@ -99,6 +101,8 @@ wechat-article/
      ├── visual-patterns.md      # 视觉模式库
      └── wechat-rules.md         # 微信兼容性规则
 ```
+
+> `layout-composer.html` 只是本地可视化草稿工具，用于表达空间布局意图；它输出的 JSON 需要再由 AI 拟合成微信安全的内联样式 HTML，不能直接粘贴到公众号编辑器。
 
 ---
 

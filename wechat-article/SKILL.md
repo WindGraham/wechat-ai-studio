@@ -159,7 +159,10 @@ media_id = publish_article(
     appid="your_appid",
     appsecret="your_appsecret",
     title="文章标题",
-    html_content=html_string
+    html_content=html_string,
+    thumb_source="/path/to/thumb.jpg",
+    author="作者姓名",
+    digest="可选摘要；不传时脚本会从正文自动生成"
 )
 ```
 

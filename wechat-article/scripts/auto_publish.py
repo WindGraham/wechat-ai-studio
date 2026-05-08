@@ -7,6 +7,16 @@ import re
 import os
 
 DRAFT_ID_FILE = ".wechat_draft_id"
+DIGEST_MAX_LENGTH = 120
+
+def build_digest(html_content, digest=None):
+    """Use the provided digest, or derive one from article text."""
+    if digest:
+        return digest[:DIGEST_MAX_LENGTH]
+
+    text = re.sub(r"<[^>]+>", "", html_content)
+    text = re.sub(r"\s+", " ", text).strip()
+    return text[:DIGEST_MAX_LENGTH]
 
 def get_access_token(appid, appsecret):
     url = f"https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid={appid}&secret={appsecret}"
@@ -14,16 +24,26 @@ def get_access_token(appid, appsecret):
     data = response.json()
     return data.get("access_token")
 
-def upload_thumb_image(access_token):
-    """Upload thumbnail (required)"""
+def upload_thumb_image(access_token, thumb_source):
+    """Upload user-provided thumbnail image (required)."""
     url = f"https://api.weixin.qq.com/cgi-bin/material/add_material?access_token={access_token}&type=thumb"
-    # Download and upload a 200x200 thumbnail
-    thumb_url = "https://picsum.photos/200/200"
-    response = requests.get(thumb_url)
-    with open("/tmp/thumb.jpg", "wb") as f:
-        f.write(response.content)
-    
-    with open("/tmp/thumb.jpg", "rb") as f:
+
+    if not thumb_source:
+        raise ValueError("thumb_source is required; provide a local image path or HTTPS image URL.")
+
+    if thumb_source.startswith(("http://", "https://")):
+        response = requests.get(thumb_source)
+        response.raise_for_status()
+        with open("/tmp/wechat_thumb.jpg", "wb") as f:
+            f.write(response.content)
+        upload_path = "/tmp/wechat_thumb.jpg"
+    else:
+        upload_path = thumb_source
+
+    if not os.path.exists(upload_path):
+        raise FileNotFoundError(f"Thumbnail image not found: {upload_path}")
+
+    with open(upload_path, "rb") as f:
         files = {"media": f}
         response = requests.post(url, files=files)
         data = response.json()
@@ -60,9 +80,13 @@ def process_html_images(access_token, html_content):
     
     return html_content
 
-def create_or_update_draft(access_token, title, content, media_id=None):
+def create_or_update_draft(access_token, title, content, thumb_source, author, digest=None, media_id=None):
     """Create new draft or update existing"""
-    thumb_media_id = upload_thumb_image(access_token)
+    if not author:
+        raise ValueError("author is required; ask the user for the article author before publishing.")
+
+    thumb_media_id = upload_thumb_image(access_token, thumb_source)
+    article_digest = build_digest(content, digest)
     
     if media_id:
         # Update existing
@@ -74,8 +98,8 @@ def create_or_update_draft(access_token, title, content, media_id=None):
                 "title": title,
                 "content": content,
                 "thumb_media_id": thumb_media_id,
-                "author": "AI助手",
-                "digest": "文章摘要",
+                "author": author,
+                "digest": article_digest,
                 "need_open_comment": 1,
                 "only_fans_can_comment": 0
             }
@@ -88,8 +112,8 @@ def create_or_update_draft(access_token, title, content, media_id=None):
                 "title": title,
                 "content": content,
                 "thumb_media_id": thumb_media_id,
-                "author": "AI助手",
-                "digest": "文章摘要",
+                "author": author,
+                "digest": article_digest,
                 "need_open_comment": 1,
                 "only_fans_can_comment": 0
             }]
@@ -113,7 +137,7 @@ def create_or_update_draft(access_token, title, content, media_id=None):
         print(f"Error: {result}")
         return None
 
-def publish_article(appid, appsecret, title, html_content):
+def publish_article(appid, appsecret, title, html_content, thumb_source, author, digest=None):
     """Main entry point"""
     token = get_access_token(appid, appsecret)
     if not token:
@@ -129,4 +153,4 @@ def publish_article(appid, appsecret, title, html_content):
             media_id = f.read().strip()
     
     # Create or update draft
-    return create_or_update_draft(token, title, html_content, media_id)
+    return create_or_update_draft(token, title, html_content, thumb_source, author, digest, media_id)

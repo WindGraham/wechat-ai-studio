@@ -100,7 +100,10 @@ media_id = publish_article(
     appid="wx1234567890abcdef",
     appsecret="your_appsecret_here",
     title="文章标题",
-    html_content=html_string
+    html_content=html_string,
+    thumb_source="/path/to/thumb.jpg",
+    author="作者姓名",
+    digest="可选摘要；不传时脚本会从正文自动生成"
 )
 
 if media_id:
@@ -109,9 +112,7 @@ if media_id:
 
 ## 命令行用法
 
-```bash
-python scripts/auto_publish.py <appid> <appsecret> <title> <html_file>
-```
+当前脚本以 Python 函数调用为主；命令行参数封装待实现。
 
 ## 文件位置
 
