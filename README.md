@@ -27,7 +27,7 @@
 </p>
 
 <p align="center">
-  <img src="assets/extension-inject.png" width="360" alt="WeChat Extension Inject">
+  <img src="assets/terminal-block.png" width="780" alt="Terminal Block">
 </p>
 
 ---
