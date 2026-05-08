@@ -417,6 +417,55 @@ Requirements:
 </section>
 ```
 
+## Capability: Multi-Layer Stack Card
+
+Use for cover frames, hero banners, or prominent intro cards that need visible depth through layered shadows or nested color blocks.
+
+Requirements:
+- Mobile WeChat renders `box-shadow` well; PC client may lose it. Always provide a nested-background fallback.
+- Do not rely on shadow alone for structural depth; the layout must still read clearly if shadows disappear.
+
+### Option A: Multiple Box Shadows (Concise)
+
+Stack two or three shadow layers for a soft elevation effect. Keep each layer subtle.
+
+```html
+<section style="background: linear-gradient(135deg, rgb(0,61,106), rgb(9,108,181)); border-radius: 24px; padding: 40px 30px; margin: 20px 15px; box-sizing: border-box; box-shadow: 0 4px 12px rgba(0,0,0,0.08), 0 12px 32px rgba(0,0,0,0.12);">
+  <p style="margin: 0; font-size: 22px; color: rgb(255,255,255); text-align: center;"><strong>标题</strong></p>
+  <p style="margin: 10px 0 0; font-size: 14px; color: rgb(220,230,240); text-align: center;">副标题</p>
+</section>
+```
+
+Rules:
+- List shadows from tight/blur-small to loose/blur-large.
+- Keep opacity low (0.06~0.15) to avoid muddy edges on mobile.
+- Pair with a solid `background` or `background-color` so the card does not vanish if shadows are lost.
+
+### Option B: Nested Background Blocks (More Compatible)
+
+Simulate depth with nested sections and slightly offset background colors. This works even when PC client drops `box-shadow`.
+
+```html
+<!-- Outer layer (shadow color) -->
+<section style="background-color: rgb(220,230,240); border-radius: 24px; padding: 5px; margin: 20px 15px; box-sizing: border-box;">
+  <!-- Middle layer (accent frame) -->
+  <section style="background-color: rgb(0,61,106); border-radius: 20px; padding: 4px; box-sizing: border-box;">
+    <!-- Inner layer (content surface) -->
+    <section style="background: linear-gradient(135deg, rgb(0,61,106), rgb(9,108,181)); border-radius: 18px; padding: 36px 26px; box-sizing: border-box;">
+      <p style="margin: 0; font-size: 22px; color: rgb(255,255,255); text-align: center;"><strong>标题</strong></p>
+      <p style="margin: 10px 0 0; font-size: 14px; color: rgb(220,230,240); text-align: center;">副标题</p>
+    </section>
+  </section>
+</section>
+```
+
+Rules:
+- Outer layer provides the "shadow" color; keep it close to the page background.
+- Middle layer can be a solid accent color or omitted for a simpler 2-layer stack.
+- Inner layer holds the actual gradient or content background.
+- Each layer reduces `border-radius` by 2~4px so borders nest cleanly.
+- On very narrow mobile screens, reduce outer `padding` to 3~4px to save space.
+
 ## Capability: Text Stroke / Glow
 
 Use for decorative numbers, large initial letters, or short labels.
