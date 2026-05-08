@@ -266,11 +266,14 @@ Specifically:
 8. Read `references/visual-patterns.md` only when a more designed or reference-matched layout needs lower-level HTML patterns
 9. Read `references/background-color-guide.md` when the user wants colored backgrounds, dark themes, or full-article background coverage
 10. Read `references/inline-block-safety.md` when using two-column, three-column, or multi-card layouts
-11. Read `references/visual-layout-workflow.md` when the user wants complex layered, overlapped, or "half-cover" boundary layouts; launch `wechat-article/tools/layout-composer.html` to capture spatial intent
-12. Use `references/generation-checklist.md` before returning final HTML
-13. Use `references/self-check-workflow.md` for mandatory 3-round self-check before delivery
-14. Use `assets/template.html` as starting point
-15. Replace content placeholders with actual text/images
+11. Use `references/generation-checklist.md` before returning final HTML
+12. Use `references/self-check-workflow.md` for mandatory 3-round self-check before delivery
+13. Use `assets/template.html` as starting point
+14. Replace content placeholders with actual text/images
+
+**Conditional references — only read when the specific scenario applies:**
+- `references/background-color-guide.md` — colored backgrounds, dark themes, full-article background coverage
+- `references/visual-layout-workflow.md` — complex layered/overlapped layouts, "half-cover" boundary effects, or when the user explicitly asks for drag-and-drop spatial design. Launch `wechat-article/tools/layout-composer.html` only when this workflow is triggered.
 
 ## Skill Update Check
 
@@ -307,31 +310,31 @@ Keep these six parts separate when generating or revising an article:
 3. Ask the first-round style questions from `references/interaction-workflow.md` unless the user already gave equivalent preferences.
 4. **Optional: Visual Layout Composer** — If the user has complex spatial layout intent (layered overlap, diagonal image placement, staggered grids, or "half-cover" boundary effects), offer to open `wechat-article/tools/layout-composer.html`. The user drags 5 basic rectangle types onto a 375px canvas; AI reads `layout-draft.json` and translates spatial relationships into WeChat-safe HTML. See `references/visual-layout-workflow.md` for the full workflow, fit strategy, and source code.
 5. Identify the article type and image roles, but do not impose a fixed article structure. Choose reusable layout capability blocks that fit the user's preferences and content.
-5. Do not default to a long opening image. Use a large visual opening only when the user asks for it, the reference style requires it, or the content/images clearly benefit from it.
-6. Apply WeChat constraints from `references/wechat-rules.md`.
-7. Choose basic capabilities first; add refined or special layout blocks only when they improve visual rhythm, image presentation, or reference style matching.
-8. After the first draft, initialize local git versioning in the article working directory if appropriate, commit the draft, and commit every later user-requested update.
-9. Use screenshot checks before presenting a draft as ready for review.
-10. When the user approves the layout, run the final image URL pass and keep one final HTML file for WeChat paste.
-11. **CRITICAL: Run 3-round self-check before delivery** per `references/self-check-workflow.md`:
+6. Do not default to a long opening image. Use a large visual opening only when the user asks for it, the reference style requires it, or the content/images clearly benefit from it.
+7. Apply WeChat constraints from `references/wechat-rules.md`.
+8. Choose basic capabilities first; add refined or special layout blocks only when they improve visual rhythm, image presentation, or reference style matching.
+9. After the first draft, initialize local git versioning in the article working directory if appropriate, commit the draft, and commit every later user-requested update.
+10. Use screenshot checks before presenting a draft as ready for review.
+11. When the user approves the layout, run the final image URL pass and keep one final HTML file for WeChat paste.
+12. **CRITICAL: Run 3-round self-check before delivery** per `references/self-check-workflow.md`:
     - **Round 1**: Code Compliance Check (12 items) - auto-check by AI
     - **Round 2**: Visual Consistency Check (10 items) - auto-check + screenshot
     - **Round 3**: Content Integrity Check (8 items) - auto-check + user confirm
     - Fix issues and re-check until all pass
-12. **Background Color Handling** - per `references/background-color-guide.md`:
+13. **Background Color Handling** - per `references/background-color-guide.md`:
     - WeChat editor forces white background on root
     - Use **wrapper sections** for colored blocks (not root container)
     - Use **opaque `rgb()`** colors (not `rgba()` transparency)
     - For full-article background: tile colored wrapper sections edge-to-edge
     - For dark themes: each section must explicitly set dark background + light text
     - Never rely on root `background-color` or transparent overlays
-13. **Inline-Block Layout Safety** - per `references/inline-block-safety.md`:
+14. **Inline-Block Layout Safety** - per `references/inline-block-safety.md`:
     - **Total width ≤ 92%** (recommend ≤ 90%) for mobile safety
     - **Gap must use `padding-left`** (not `margin-right`) with `box-sizing: border-box`
     - **One row = one container**: never stuff multiple rows into same parent relying on natural wrapping
     - Use `<!-- -->` comments between inline-block elements to remove whitespace
     - Use `vertical-align: top` for consistent alignment
-14. **Deliver based on the user's chosen workflow:**
+15. **Deliver based on the user's chosen workflow:**
     - **Auto-Publish**: Run `scripts/auto_publish.py` with the user's AppID/AppSecret to create or update the WeChat draft directly.
     - **Manual Paste**: Instruct the user to open the final HTML file in a browser, press `Ctrl+A` to select all content, then `Ctrl+C` to copy, and paste into the WeChat Official Account editor (mp.weixin.qq.com) with `Ctrl+V`. Remind the user to verify the mobile preview before saving.
 
