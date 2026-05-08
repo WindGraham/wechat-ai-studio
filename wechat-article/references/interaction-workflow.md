@@ -8,7 +8,9 @@ The user provides content and images. The agent collaborates with the user to ch
 
 ## First-Round Questions
 
-Ask one compact question before the first layout unless the user already provided these choices:
+**MANDATORY: Ask one compact question before the first layout. Do not generate any HTML until the user has responded.**
+
+The agent must present these questions even if the user says "you decide", "based on content", "随你", or "按内容定". The user must confirm or select from the choices; the agent must not proceed unilaterally.
 
 ```text
 Before I typeset this WeChat article, I need a few layout choices:
@@ -19,7 +21,12 @@ Before I typeset this WeChat article, I need a few layout choices:
 5. Body habit: first-line indent / no indent / left aligned / justified
 ```
 
-If the user says to decide based on content, proceed with a reasonable style and state the choices briefly.
+Only after the user has answered (or explicitly skipped by choosing from the options) may the agent proceed.
+
+**Critical ordering rule:**
+- If the user's **first** message already includes "you decide", "随你", or "based on content", the agent MUST still present the questions. Pre-emptive delegation does not bypass the asking requirement.
+- If the user **still** insists on "you decide" / "随你" / "based on content" **after seeing the questions**, only then may the agent choose reasonable defaults and briefly state them before generating HTML.
+- The agent must NEVER assume "default to auto-decide" when the user simply has not been asked yet.
 
 ## Opening Image Rule
 

@@ -336,7 +336,9 @@ Use this workflow when the user provides a screenshot, reference image, or says 
 
 ## Clarifying Style Requirements
 
-If the user asks for a WeChat article but does not provide enough style direction, ask concise follow-up questions before generating HTML. Continue asking until either the key style choices are known or the user says to decide based on the article content.
+**MANDATORY: The agent MUST ask the first-round style questions before generating any HTML, unless the user has already explicitly answered all of them in the current conversation.**
+
+Do not skip the questions even if the user says "you decide", "based on the content", "随你", "按内容定", or similar. The user must confirm or select from the choices; the agent should not unilaterally decide.
 
 Ask only for high-impact missing information. Prefer one compact question with grouped choices instead of a long questionnaire.
 
@@ -348,7 +350,7 @@ High-impact inputs:
 - Layout density: clean text-first, card-based, magazine-like, lively decorative, or compact announcement.
 - Footer fields: author, editor, source, organization, date, QR code/logo URL, or omit footer.
 
-Recommended follow-up question format:
+Required follow-up question format (must be asked every time unless already answered):
 
 ```text
 Before I generate the WeChat HTML, I need a few style choices:
@@ -359,10 +361,14 @@ Before I generate the WeChat HTML, I need a few style choices:
 ```
 
 Decision rule:
-- If the user answers with concrete preferences, follow them.
-- If the user says "you decide", "based on the content", "随你", "按内容定", or similar, choose a style that fits the article type and proceed without asking again.
-- If the user provides only article text and asks for direct output, make reasonable defaults based on the content instead of blocking on minor style details.
+- **Step 1 (Ask):** The agent MUST ask the style questions first. The user's initial silence, brevity, or lack of style direction does NOT constitute permission to decide unilaterally.
+- **Step 2 (Evaluate response):**
+  - If the user answers with concrete preferences, follow them.
+  - If the user says "you decide", "based on the content", "随你", "按内容定", or similar **AFTER being asked**, the agent may choose a style that fits the article type. Briefly state the chosen defaults before generating HTML.
+  - If the user says "you decide", "based on the content", "随你", "按内容定", or similar **BEFORE being asked** (e.g., in the very first message), the agent MUST still present the questions and wait for explicit answers. Do not treat pre-emptive "随意" as a waiver of the asking requirement.
+- **Step 3 (Proceed only after Step 2 is resolved):** Do not generate HTML until the user has either given concrete preferences OR explicitly confirmed "decide for me" in response to the asked questions.
 - Ask again only when a missing input affects factual correctness or cannot be safely guessed, such as required footer names, real image URLs, event time/place, contact details, or official organization identity.
+- **Exception: If the user has already answered the equivalent questions earlier in the same conversation thread, do not repeat them.**
 
 ## Image Upload Workflow for WeChat Paste
 
