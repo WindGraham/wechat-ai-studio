@@ -408,11 +408,11 @@ Fallback rule: the `color` property (here `rgb(0,61,106)`) is the solid color sh
 Use for emphasis blocks, quotes, or feature cards that need to feel slightly elevated.
 
 Requirements:
-- Mobile WeChat renders `box-shadow` well; PC client may lose it. Always pair with a subtle border or background-color difference so the card still works without shadow.
-- Keep shadow values conservative: small blur, low opacity.
+- **Do not use `box-shadow` or `rgba()` transparency.** PC client may drop shadows entirely, and `rgba` blends with WeChat's forced-white background producing muddy gray. Use a solid `border` or layered background-color blocks instead.
+- If depth is needed, simulate it with nested sections and slightly offset background colors.
 
 ```html
-<section style="background-color: rgb(255,255,255); padding: 20px; margin: 15px; box-sizing: border-box; border-left: 4px solid rgb(78,128,88); box-shadow: 0 1px 4px rgba(0,0,0,0.08);">
+<section style="background-color: rgb(255,255,255); padding: 20px; margin: 15px; box-sizing: border-box; border-left: 4px solid rgb(78,128,88); border: 1px solid rgb(220,220,220);">
   <p style="margin: 0; text-indent: 2em;">卡片内容...</p>
 </section>
 ```
@@ -422,15 +422,16 @@ Requirements:
 Use for cover frames, hero banners, or prominent intro cards that need visible depth through layered shadows or nested color blocks.
 
 Requirements:
-- Mobile WeChat renders `box-shadow` well; PC client may lose it. Always provide a nested-background fallback.
-- Do not rely on shadow alone for structural depth; the layout must still read clearly if shadows disappear.
+- **Do not use `box-shadow` or `rgba()` transparency.** Use nested background-color blocks to create depth instead.
+- The layout must read clearly without any shadow effects.
 
-### Option A: Multiple Box Shadows (Concise)
+### Option A: Nested Background Blocks (Safe)
 
-Stack two or three shadow layers for a soft elevation effect. Keep each layer subtle.
+Create depth by layering slightly offset solid-color sections. This works reliably on both mobile and PC WeChat.
 
 ```html
-<section style="background: linear-gradient(135deg, rgb(0,61,106), rgb(9,108,181)); border-radius: 24px; padding: 40px 30px; margin: 20px 15px; box-sizing: border-box; box-shadow: 0 4px 12px rgba(0,0,0,0.08), 0 12px 32px rgba(0,0,0,0.12);">
+<!-- Outer frame -->
+<section style="background-color: rgb(0,50,90); border-radius: 24px; padding: 40px 30px; margin: 20px 15px; box-sizing: border-box; border: 2px solid rgb(9,108,181);">
   <p style="margin: 0; font-size: 22px; color: rgb(255,255,255); text-align: center;"><strong>标题</strong></p>
   <p style="margin: 10px 0 0; font-size: 14px; color: rgb(220,230,240); text-align: center;">副标题</p>
 </section>
@@ -515,10 +516,10 @@ Requirements:
 </section>
 ```
 
-With dark overlay for better text readability:
+With dark overlay for better text readability (use opaque `rgb()`, not `rgba()`):
 ```html
 <section style="background-image: url('BACKGROUND_IMAGE_URL'); background-size: cover; background-position: center; padding: 40px 20px; box-sizing: border-box; text-align: center;">
-  <section style="background-color: rgba(0,0,0,0.4); padding: 20px; box-sizing: border-box;">
+  <section style="background-color: rgb(60,60,60); padding: 20px; box-sizing: border-box;">
     <p style="margin: 0; font-size: 22px; color: rgb(255,255,255);"><strong>带遮罩的标题</strong></p>
   </section>
 </section>

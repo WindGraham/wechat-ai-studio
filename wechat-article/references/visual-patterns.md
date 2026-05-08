@@ -226,9 +226,9 @@ Structure formula: `card container with background/border -> paragraph block wit
 </section>
 ```
 
-### Card with Shadow
+### Card with Border
 ```html
-<section style="background-color: rgb(255, 255, 255); padding: 20px; margin: 15px 15px; box-sizing: border-box; border-left: 4px solid rgb(78, 128, 88); box-shadow: 0 1px 3px rgba(0,0,0,0.08);">
+<section style="background-color: rgb(255, 255, 255); padding: 20px; margin: 15px 15px; box-sizing: border-box; border-left: 4px solid rgb(78, 128, 88); border: 1px solid rgb(220, 220, 220);">
   <p style="white-space: normal; margin: 0; padding: 0; text-indent: 2em;">正文内容...</p>
 </section>
 ```

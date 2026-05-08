@@ -226,6 +226,8 @@ AI 读取 `layout-draft.json` 后，提取三类空间关系：
 
 合并到 skill 时，以下代码直接作为 `wechat-article/tools/layout-composer.html` 写入。
 
+> **Note**: This is a browser-based drag-and-drop UI tool. The CSS inside this file (including `rgba()` and `box-shadow`) runs in the user's local browser, **not** inside the WeChat editor. It does not affect paste-ready HTML compatibility.
+
 ```html
 <!DOCTYPE html>
 <html lang="zh-CN">

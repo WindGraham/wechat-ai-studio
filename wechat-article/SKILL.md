@@ -274,7 +274,7 @@ Specifically:
 **Conditional references — only read when the specific scenario applies:**
 - `references/background-color-guide.md` — colored backgrounds, dark themes, full-article background coverage
 - `references/visual-layout-workflow.md` — only when the user actively chooses the visual drag-and-drop composer (Option 1 in the layout guidance question). Do not read this file if the user lets AI decide or uploads a reference screenshot.
-- `references/svg-compatibility.md` — SVG animations or SVG-based visual effects in WeChat articles
+- `references/svg-compatibility.md` — only when the user explicitly requests experimental SVG animations or SVG-based visual effects
 
 ## Skill Update Check
 
@@ -867,7 +867,7 @@ Use this for one row of three images where the left and right images sit lower a
 </section>
 
 <!-- Card with shadow and left border -->
-<section style="background-color: rgb(255,255,255); padding: 20px; margin: 15px; box-sizing: border-box; border-left: 4px solid rgb(78,128,88); box-shadow: 0 1px 3px rgba(0,0,0,0.08);">
+<section style="background-color: rgb(255,255,255); padding: 20px; margin: 15px; box-sizing: border-box; border-left: 4px solid rgb(78,128,88); border: 1px solid rgb(220,220,220);">
   <p style="margin: 0; text-indent: 2em;">正文内容...</p>
 </section>
 ```
@@ -959,7 +959,9 @@ Copy HTML → Paste into mp.weixin.qq.com editor → Verify rendering
 - Image URLs must be from your own domain (WeChat blocks external hotlinking)
 - Recommended: Upload to WeChat material library first, then use WeChat CDN URLs
 
-## SVG Animation Support
+## SVG Animation Support (Experimental)
+
+> **Status**: Experimental / Compatibility matrix not fully verified. Use only when the user explicitly requests SVG-based visual effects and accepts potential PC-client degradation.
 
 When the user wants SVG animations or SVG-based visual effects in WeChat articles:
 
@@ -1011,3 +1013,4 @@ External Image → Download to Server → Call WeChat API (/cgi-bin/media/upload
 ### Full Documentation
 
 See `references/svg-compatibility.md` for complete compatibility matrix, test records, and practical component templates.
+

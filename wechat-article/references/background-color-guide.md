@@ -242,7 +242,7 @@ def background_color_check(html):
                   margin: 15px; 
                   padding: 25px; 
                   border-radius: 12px;
-                  box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+                  border: 1px solid rgb(220,220,220);">
     <p>白色卡片内容</p>
   </section>
 </section>
