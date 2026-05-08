@@ -86,6 +86,27 @@ width: 45% + width: 45% + padding-left: 4% = 90%
 | PC 端差异 | PC 端 WeChat 对 inline-block 处理与移动端不一致，连续排列更易崩 |
 | 结构失控 | 依赖"自然换行"属于赌运气，无法精确控制 |
 
+**但：层叠/重叠布局不需要行容器！**
+
+行容器是为了"控制并排结构"，不是为了"限制重叠"。
+
+```html
+<!-- ✅ 不需要行容器：层叠重叠（用负 margin） -->
+<section style="text-align: center;">
+  <!-- 底层：大图 -->
+  <section style="line-height: 0;">
+    <img src="大图.jpg" style="width: 100%;">
+  </section>
+  
+  <!-- 上层：文字卡片，负 margin 压在大图上 -->
+  <section style="margin-top: -60px; padding: 0 20px;">
+    <section style="background: white; padding: 20px; border-radius: 12px;">
+      <p>重叠的文字内容</p>
+    </section>
+  </section>
+</section>
+```
+
 ---
 
 ## 安全宽度参考表
@@ -206,17 +227,18 @@ width: 45% + width: 45% + padding-left: 4% = 90%
 |:---|:---|:---|:---|
 | 1 | 双栏总宽度 | ≤ 92%（推荐 ≤ 90%） | > 92% |
 | 2 | 间隙方式 | `padding-left` + `box-sizing: border-box` | `margin-right` |
-| 3 | 行容器结构 | 每行独立父容器 | 多行塞进同一容器赌换行 |
+| 3 | 行容器结构 | 需要并排时：每行独立父容器 | 多行塞进同一容器赌换行 |
 | 4 | 注释分隔 | `<!-- -->` 消除 inline-block 间隙 | 无注释或空格 |
 | 5 | 垂直对齐 | `vertical-align: top` | 默认 baseline |
+| 6 | 层叠布局 | 负 margin 实现重叠（不需要行容器） | 误用行容器限制重叠 |
 
 ### 视觉层面
 
 | # | 检查项 | 正确 | 错误 |
 |:---|:---|:---|:---|
-| 6 | 两列高度 | 基本一致或可控 | 差异大导致第二行错位 |
-| 7 | PC 端显示 | 两列正常并排 | 第二列被挤下 |
-| 8 | 移动端显示 | 两列正常并排 | 出现水平滚动 |
+| 7 | 两列高度 | 基本一致或可控 | 差异大导致第二行错位 |
+| 8 | PC 端显示 | 两列正常并排 | 第二列被挤下 |
+| 9 | 移动端显示 | 两列正常并排 | 出现水平滚动 |
 
 ---
 
