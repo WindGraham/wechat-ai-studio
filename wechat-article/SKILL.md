@@ -265,10 +265,11 @@ Specifically:
 7. Read `references/screenshot-check.md` before reporting a layout draft as ready for review
 8. Read `references/visual-patterns.md` only when a more designed or reference-matched layout needs lower-level HTML patterns
 9. Read `references/background-color-guide.md` when the user wants colored backgrounds, dark themes, or full-article background coverage
-10. Use `references/generation-checklist.md` before returning final HTML
-11. Use `references/self-check-workflow.md` for mandatory 3-round self-check before delivery
-12. Use `assets/template.html` as starting point
-13. Replace content placeholders with actual text/images
+10. Read `references/inline-block-safety.md` when using two-column, three-column, or multi-card layouts
+11. Use `references/generation-checklist.md` before returning final HTML
+12. Use `references/self-check-workflow.md` for mandatory 3-round self-check before delivery
+13. Use `assets/template.html` as starting point
+14. Replace content placeholders with actual text/images
 
 ## Skill Update Check
 
@@ -320,7 +321,13 @@ Keep these six parts separate when generating or revising an article:
     - For full-article background: tile colored wrapper sections edge-to-edge
     - For dark themes: each section must explicitly set dark background + light text
     - Never rely on root `background-color` or transparent overlays
-13. **Deliver based on the user's chosen workflow:**
+13. **Inline-Block Layout Safety** - per `references/inline-block-safety.md`:
+    - **Total width ≤ 92%** (recommend ≤ 90%) for mobile safety
+    - **Gap must use `padding-left`** (not `margin-right`) with `box-sizing: border-box`
+    - **One row = one container**: never stuff multiple rows into same parent relying on natural wrapping
+    - Use `<!-- -->` comments between inline-block elements to remove whitespace
+    - Use `vertical-align: top` for consistent alignment
+14. **Deliver based on the user's chosen workflow:**
     - **Auto-Publish**: Run `scripts/auto_publish.py` with the user's AppID/AppSecret to create or update the WeChat draft directly.
     - **Manual Paste**: Instruct the user to open the final HTML file in a browser, press `Ctrl+A` to select all content, then `Ctrl+C` to copy, and paste into the WeChat Official Account editor (mp.weixin.qq.com) with `Ctrl+V`. Remind the user to verify the mobile preview before saving.
 
