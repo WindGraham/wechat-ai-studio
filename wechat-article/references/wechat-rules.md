@@ -11,7 +11,11 @@ This file contains hard compatibility rules for HTML that will be pasted into th
 - Avoid `<script>`, `<iframe>`, `<table>`, `<form>`, `<input>`, and interactive controls.
 - Avoid `position: absolute`, `position: fixed`, CSS animation, CSS transition, `filter`, and layout that depends on JavaScript.
 - Prefer `display: inline-block` rows over `display: flex`; do not use CSS grid for final paste-ready HTML.
-- Do not emit `<svg>`, `<foreignObject>`, `<animateTransform>`, or `<animateMotion>` in final paste-ready HTML **unless the user explicitly requests experimental SVG features** (see SKILL.md "SVG Animation Support (Experimental)"). By default, treat them as source-only artifacts and rewrite them into normal HTML/CSS or static images.
+- `<svg>`, `<animate>`, `<animateTransform>`, and `<animateMotion>` are **verified working** in WeChat articles when used correctly. See `references/svg-compatibility.md` for the full compatibility matrix.
+- **SVG is safe for**: basic shapes, SMIL animations (opacity, transform, path motion), and `<image>` with WeChat CDN URLs.
+- **SVG is NOT safe for**: filters (`<filter>`), gradients (`<linearGradient>`, `<radialGradient>`), `clipPath`, `textPath`, CSS animations, `style` attributes inside SVG, `class`/`id`, or external/non-CDN image URLs.
+- `<foreignObject>` embedding HTML/images remains high-risk; prefer plain HTML/CSS alternatives when possible.
+- By default, if the user does not request SVG features, use normal HTML/CSS. If the user explicitly requests SVG-based visual effects, follow `references/svg-compatibility.md`.
 - Every `<img>` should include `width: 100%; max-width: 100%; display: block; margin: 0 auto;` unless a narrower image is intentional.
 - Use `box-sizing: border-box` on layout blocks when padding or borders are involved.
 - Use `overflow: hidden` on image containers when `border-radius` clipping is needed.

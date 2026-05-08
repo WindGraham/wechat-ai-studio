@@ -151,7 +151,7 @@
 | 旋转 | ❌ | 同上 |
 | 弹跳 | ❌ | 同上 |
 | 持续循环 | ❌ | 同上 |
-| SVG 路径动画 | ❌ | `animate` 标签被过滤 |
+| SVG SMIL 动画 | ✅ | `<animate>` / `<animateTransform>` / `<animateMotion>` 实际发布验证可用 |
 | GIF 动图 | ✅ | `<img>` 插入 GIF |
 
 ---
@@ -195,7 +195,8 @@
 以下功能需要 JavaScript、CSS animation、或复杂交互，**微信编辑器完全不支持**：
 
 - 所有 CSS 动画（淡入、移入、放大、旋转等）
-- 所有 SVG 交互（轮播、点击展开、路径动画、视差等）
+- 所有 CSS 动画和 CSS 驱动的 SVG 效果（微信不支持 CSS `@keyframes` / `animation` / `transition`）
+- SVG 滤镜、渐变、裁剪路径（`clipPath`）、文字路径（`textPath`）
 - 滑动区域（上下滑动、左右滑动）
 - 表格（`<table>` 被过滤）
 - 表单（`<input>`, `<form>` 不支持）

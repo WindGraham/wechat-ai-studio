@@ -26,7 +26,7 @@
 | 3 | 无 `<script>`、`<iframe>`、`<table>`、`<form>` | 搜索禁用标签 | 内容被过滤或显示异常 |
 | 4 | 无 `position: absolute/fixed` | 搜索 `position:` | 布局错乱 |
 | 5 | 无 `display: grid` | 搜索 `grid` | PC 端微信不支持 |
-| 6 | 无 `<svg>`、`<foreignObject>` | 搜索 `<svg` | 被过滤或显示为代码 |
+| 6 | 无 `<foreignObject>`；若使用 SVG 需符合 `svg-compatibility.md` | 搜索 `<foreignObject` | 高风险标签导致布局崩溃 |
 | 7 | 无 CSS 动画/过渡（`animation`、`transition`） | 搜索动画属性 | 被过滤，无效果 |
 | 8 | 图片有 `width: 100%; display: block; margin: 0 auto;` | 搜索 `<img` 检查样式 | 图片错位或溢出 |
 | 9 | 双栏总宽度 ≤ 92%（移动端安全） | 计算 width + padding | 右栏被挤到下一行 |
@@ -48,7 +48,7 @@ def code_compliance_check(html):
         errors.append("❌ 发现 <style> 或 class 属性")
     
     # 3. 禁用标签检查
-    forbidden_tags = ['<script', '<iframe', '<table', '<form', '<svg', '<foreignObject']
+    forbidden_tags = ['<script', '<iframe', '<table', '<form', '<foreignObject']
     for tag in forbidden_tags:
         if tag in html:
             errors.append(f"❌ 发现禁用标签: {tag}")

@@ -959,9 +959,11 @@ Copy HTML → Paste into mp.weixin.qq.com editor → Verify rendering
 - Image URLs must be from your own domain (WeChat blocks external hotlinking)
 - Recommended: Upload to WeChat material library first, then use WeChat CDN URLs
 
-## SVG Animation Support (Experimental)
+## SVG Support
 
-> **Status**: Experimental / Compatibility matrix not fully verified. Use only when the user explicitly requests SVG-based visual effects and accepts potential PC-client degradation.
+> **Status**: ✅ Verified through 9 rounds of actual publishing (2026-05-08). Use when the user explicitly requests SVG-based visual effects.
+>
+> See `references/svg-compatibility.md` for the complete compatibility matrix.
 
 When the user wants SVG animations or SVG-based visual effects in WeChat articles:
 
@@ -969,29 +971,29 @@ When the user wants SVG animations or SVG-based visual effects in WeChat article
 
 | # | Rule | Reason |
 |:---|:---|:---|
-| 1 | **Images must use WeChat CDN** (`mmbiz.qpic.cn`) | External image URLs are filtered by WeChat |
+| 1 | **Images must use WeChat CDN** (`mmbiz.qpic.cn`) | External URLs, Base64, Data URI are filtered |
 | 2 | **Animations must use SMIL** | CSS animations (`@keyframes`, `animation`, `transition`) are completely unsupported |
 | 3 | **Styles must use inline attributes** | `style` attributes and `<style>` tags are filtered out |
 | 4 | **No interaction events** | `onclick`, `onmouseover`, `ontouchstart` are unsupported |
-| 5 | **2D transforms only** | `rotate()`, `translate()`, `scale()` are safe; 3D transforms (`rotateX`, `rotateY`, `perspective`) are unsupported |
+| 5 | **2D transforms only** | `rotate()`, `translate()`, `scale()`, `skewX()` are safe; 3D transforms (`rotateX`, `rotateY`, `perspective`, `matrix()`) are unsupported |
 | 6 | **No `class`/`id` attributes** | Removed by WeChat editor |
 | 7 | **No `<script>` tags** | Completely prohibited in WeChat articles |
 | 8 | **Auto-play only** | Use `repeatCount="indefinite"` for loops, `begin` for delays |
+| 9 | **No filters** | `<filter>`, `<feGaussianBlur>`, etc. are filtered |
+| 10 | **No gradients** | `<linearGradient>`, `<radialGradient>`, `<stop>` are filtered |
+| 11 | **No clipping** | `clipPath`, `clip-path` are filtered |
+| 12 | **Use `href` not `xlink:href`** | `xlink:href` is filtered; `href` (SVG2) works |
 
-### Supported SMIL Animation Tags
+### Verified Working SMIL Animation Tags
 
-- `<animate>` - Attribute animation (fully supported)
-- `<animateTransform>` - Transform animation (fully supported)
-- `<animateMotion>` - Path animation (supported)
-- `<set>` - Set animation (supported)
+- `<animate>` - Attribute animation (opacity, r, fill, stroke-width, etc.) ✅
+- `<animateTransform>` - Transform animation (translate/scale/rotate/skewX) ✅
+- `<animateMotion>` - Path motion ✅
+- `<set>` - Set animation ✅
 
-### Supported Animatable Attributes
+### Verified Working 2D Transforms
 
-`x`, `y`, `width`, `height`, `cx`, `cy`, `r`, `opacity`, `fill`, `stroke`, `stroke-width`, `stroke-dashoffset`, `d` (path), `points`, `textContent`
-
-### Supported 2D Transforms
-
-`translate()`, `scale()`, `rotate()` - Safe for decorative elements
+`translate()`, `scale()`, `rotate()`, `skewX()` / `skewY()`
 
 ### Image Handling for SVG
 
@@ -1006,7 +1008,7 @@ External Image → Download to Server → Call WeChat API (/cgi-bin/media/upload
 **Example**:
 ```svg
 <image x="0" y="0" width="335" height="200" 
-       xlink:href="http://mmbiz.qpic.cn/mmbiz_jpg/..." 
+       href="https://mmbiz.qpic.cn/mmbiz_jpg/..." 
        preserveAspectRatio="xMidYMid slice"/>
 ```
 

@@ -335,15 +335,21 @@ What works:
 - Simple `<svg>` wrapper with `background-image` for texture or decorative fills.
 - Static SVG icons or shapes (basic `<rect>`, `<circle>`) — likely retained by the editor.
 
+What works (verified through actual publishing):
+- **SMIL animation** (`<animateTransform>`, `<animate>`, `<animateMotion>`) works in WeChat. See `references/svg-compatibility.md`.
+- Basic shapes (`<rect>`, `<circle>`, `<path>`, `<text>`) and 2D transforms (`translate`, `scale`, `rotate`, `skewX`) are safe.
+- `<image>` with WeChat CDN URLs (`mmbiz.qpic.cn`) works when using `href` attribute.
+
 What fails:
-- **SMIL animation** (`<animateTransform>`, `<animate>`) is filtered by the WeChat editor. Pasted result is a static frame or blank.
 - **`<foreignObject>`** embedding HTML/images is high-risk; the wrapper may be stripped, causing layout collapse.
-- Complex nested SVG structures (multi-layer `<g>` with transforms) may be flattened or broken.
+- Filters (`<filter>`), gradients (`<linearGradient>`, `<radialGradient>`), `clipPath`, `textPath` are filtered.
+- CSS animations, `style` attributes, `class`/`id` inside SVG are removed.
 
 Guidance:
-- Prefer plain `<section>` with `background-image` over `<svg>` for background fills.
-- If the user asks for an SVG-like effect (rotating badges, geometric shapes), implement with CSS `transform` + `border-radius` instead.
-- Never rely on SVG animation for critical content. Provide a static fallback.
+- If the user does not request SVG, prefer plain HTML/CSS.
+- If the user explicitly requests SVG-based visual effects, follow `references/svg-compatibility.md`.
+- For SVG-like static effects (rotating badges, geometric shapes), CSS `transform` + `border-radius` is still the simpler alternative.
+- Never rely on SVG animation for critical content without a static fallback.
 
 ### SVG Background-Image Container Downgrade
 

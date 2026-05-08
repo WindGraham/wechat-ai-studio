@@ -446,7 +446,8 @@ Translation rules:
 - `display: flex` rows -> `inline-block` rows with `<!-- -->` between columns.
 - `transform: translate3d(...)` -> margins, padding, or text alignment.
 - `position: static; z-index: ...` wrappers -> ordinary section order; render the lower layer first, then the upper layer.
-- `svg` / `foreignObject` / `animateTransform` -> source-only structures. Rebuild them as plain sections, borders, circles, corner marks, or static images.
+- `foreignObject` / complex nested SVG with filters or gradients -> source-only structures. Rebuild as plain sections, borders, circles, corner marks, or static images.
+- Basic SVG shapes and SMIL animation (`<animate>`, `<animateTransform>`, `<animateMotion>`) -> usable when the user explicitly requests them and they comply with `references/svg-compatibility.md`.
 - `box-shadow` -> border, double border, offset color block, or a very subtle shadow only when tested.
 - Gradient text/backgrounds -> solid theme colors unless the user specifically asks for the gradient and accepts possible degradation.
 
@@ -541,21 +542,25 @@ Rules:
 
 Many exported article layouts use SVG as an internal composition tool rather than as a final WeChat-safe element. Use the SVG to read the intent, then rebuild the result in normal HTML/CSS.
 
-Structure formula: `svg source intent -> static HTML/CSS approximation -> optional raster fallback`.
+However, **basic SVG and SMIL animation are verified working** in WeChat when following `references/svg-compatibility.md`. Use the downgrade path below only when the source SVG uses unsupported features (filters, gradients, `clipPath`, `foreignObject`, CSS animation).
 
-Common source patterns:
+Structure formula: `svg source intent -> check compatibility -> if unsupported, downgrade to static HTML/CSS or raster image -> if supported, keep as compliant SVG`.
+
+Common source patterns and their handling:
 
 - `<svg>` with `<foreignObject>` -> text or block layout embedded in a drawing surface. Rebuild as ordinary sections and borders.
-- `<animateTransform>` -> motion or slideshow sequencing. Drop the animation and keep a single frame.
+- `<animateTransform>` with unsupported features (filters, gradients, 3D transforms) -> drop unsupported parts, keep animation if the remaining features are compliant.
+- `<animateTransform>` with only 2D transforms and basic shapes -> keep as compliant SVG animation.
 - `background-image` inside SVG -> sliced background fill. Move the image to a normal section background or an `<img>`.
 - `rotateX/rotateY` on small ornaments -> mirrored corners or flipped decorations. Use duplicated static ornaments instead.
 - Nested translated groups -> layered offsets. Recreate with margin, padding, and normal flow stacking.
 
 Rules:
 
-- Final paste-ready HTML should not contain SVG tags unless the user explicitly wants to paste raw source for inspection.
-- Do not rely on SVG for text wrapping, clipping, or animation.
-- If the SVG is only decorative, replace it with a plain divider, corner frame, dot, circle, or small image.
+- If the user does not request SVG, default to normal HTML/CSS.
+- If the user explicitly requests SVG-based visual effects, verify compliance with `references/svg-compatibility.md` before keeping SVG tags.
+- Do not rely on SVG for text wrapping, clipping, or unsupported effects (filters, gradients).
+- If the SVG is only decorative and no animation is needed, replace it with a plain divider, corner frame, dot, circle, or small image.
 - If the SVG carries a critical illustration and no safe HTML rewrite is practical, rasterize it to a PNG/JPG asset first.
 
 ### 36.1 How to Recognize an SVG Image Stack

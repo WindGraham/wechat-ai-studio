@@ -27,7 +27,8 @@ Use this checklist before returning paste-ready HTML. It is a practical self-che
 - Text uses `<p>`, `<span>`, `<strong>`, `<em>`, and `<br>`.
 - Images use `<img>` with `width: 100%; max-width: 100%; display: block; margin: 0 auto;` unless intentionally narrower.
 - Do not use final-output `display: grid`, `position: absolute`, `position: fixed`, animation, forms, tables, or JavaScript.
-- Do not use final-output `<svg>`, `<foreignObject>`, `<animateTransform>`, or `<animateMotion>`; rewrite them into plain HTML/CSS or a raster image.
+- Do not use final-output `<foreignObject>` or complex nested SVG structures; prefer plain HTML/CSS when possible.
+- If the user requests SVG features, ensure they comply with `references/svg-compatibility.md`: no filters, no gradients, no `clipPath`, no CSS animation, WeChat CDN images only, inline attributes only.
 - Prefer `inline-block` rows over flex. Use `<!-- -->` between inline-block columns.
 - Keep two-column and three-column total widths conservative; **mobile total width must be ≤ 92%** (recommend 90%).
 - **Three-column gaps use `padding-left`** (absorbed by `box-sizing: border-box`), not `margin`, so the total rendered width does not exceed the limit.
