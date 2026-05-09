@@ -11,7 +11,7 @@
     "128": "icons/icon-128.png"
   },
 
-  "permissions": ["tabs", "scripting", "activeTab", "alarms"],
+  "permissions": ["tabs", "scripting", "activeTab", "alarms", "storage"],
 
   "host_permissions": ["https://mp.weixin.qq.com/*"],
 

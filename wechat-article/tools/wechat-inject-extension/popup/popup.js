@@ -7,12 +7,62 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('version').textContent = 'v' + manifest.version;
 
   const captureBtn = document.getElementById('captureBtn');
+  const saveBtn = document.getElementById('saveBtn');
   const refreshBtn = document.getElementById('refreshBtn');
   const injectBtn = document.getElementById('injectBtn');
   const pageCard = document.getElementById('pageCard');
   const targetSection = document.getElementById('targetSection');
   const targetList = document.getElementById('targetList');
   const statusArea = document.getElementById('statusArea');
+
+  // --- Settings gear ---
+  const gearBtn = document.getElementById('gearBtn');
+  const settingsPanel = document.getElementById('settingsPanel');
+  const pathInput = document.getElementById('pathInput');
+  const savePathBtn = document.getElementById('savePathBtn');
+  const cancelPathBtn = document.getElementById('cancelPathBtn');
+  const currentPathRow = document.getElementById('currentPathRow');
+  const currentPathValue = document.getElementById('currentPathValue');
+  const editPathLink = document.getElementById('editPathLink');
+
+  loadPath();
+
+  gearBtn.addEventListener('click', () => {
+    settingsPanel.classList.toggle('hidden');
+    if (!settingsPanel.classList.contains('hidden')) {
+      pathInput.value = currentPathValue.textContent || '';
+      pathInput.focus();
+    }
+  });
+
+  savePathBtn.addEventListener('click', () => {
+    const path = pathInput.value.trim();
+    chrome.storage.local.set({ projectPath: path }, () => {
+      settingsPanel.classList.add('hidden');
+  loadPath();
+    });
+  });
+
+  cancelPathBtn.addEventListener('click', () => {
+    settingsPanel.classList.add('hidden');
+  });
+
+  editPathLink.addEventListener('click', () => {
+    settingsPanel.classList.remove('hidden');
+    pathInput.value = currentPathValue.textContent || '';
+    pathInput.focus();
+  });
+
+  function loadPath() {
+    chrome.storage.local.get(['projectPath'], (result) => {
+      if (result.projectPath) {
+        currentPathValue.textContent = result.projectPath;
+        currentPathRow.classList.remove('hidden');
+      } else {
+        currentPathRow.classList.add('hidden');
+      }
+    });
+  }
 
   function showStatus(text, type) {
     statusArea.innerHTML = `<div class="status status-${type}">${text}</div>`;
@@ -29,56 +79,143 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!tab) {
         showStatus('无法获取当前标签页', 'error');
         captureBtn.disabled = false;
-        captureBtn.textContent = '📋 捕获页面内容';
+        captureBtn.textContent = '📋 捕获选区';
         return;
       }
 
+      // Capture current page selection
       const results = await chrome.scripting.executeScript({
         target: { tabId: tab.id },
         func: () => {
-          let content = '';
-          // prefer the root <section> wrapper used by wechat articles
-          const rootSection = document.body.querySelector('section');
-          if (rootSection && rootSection.parentElement === document.body) {
-            content = rootSection.outerHTML;
-          } else {
-            // fallback: all children of body
-            const children = Array.from(document.body.children);
-            content = children.map(c => c.outerHTML).join('\n');
+          // Priority 1: current selection (user Ctrl+A'd)
+          const sel = window.getSelection();
+          if (sel && !sel.isCollapsed && sel.rangeCount > 0) {
+            const range = sel.getRangeAt(0);
+            if (!range.collapsed) {
+              const container = document.createElement('div');
+              container.appendChild(range.cloneContents());
+
+              // fix lazy images
+              container.querySelectorAll('img[data-src]').forEach(function(img) {
+                if (!img.src || img.src === '' || img.src === window.location.href) {
+                  img.src = img.getAttribute('data-src');
+                }
+              });
+              container.querySelectorAll('img[data-original]').forEach(function(img) {
+                if (!img.src || img.src === '' || img.src === window.location.href) {
+                  img.src = img.getAttribute('data-original');
+                }
+              });
+              container.querySelectorAll('[data-bg]').forEach(function(el) {
+                var bg = el.getAttribute('data-bg');
+                if (bg) el.style.backgroundImage = 'url(' + bg + ')';
+              });
+              // strip SVG style tags (WeChat incompatible)
+              container.querySelectorAll('svg style').forEach(function(s) { s.remove(); });
+
+              var html = container.innerHTML;
+              if (html && html.length > 100) {
+                return { content: html, title: document.title || '', source: 'selection' };
+              }
+            }
           }
-          const title = document.title || '';
-          return { content, title };
+
+          // Priority 2: try iframes
+          const iframes = document.querySelectorAll('iframe');
+          for (const iframe of iframes) {
+            try {
+              const inner = iframe.contentDocument || iframe.contentWindow.document;
+              if (inner && inner.body && inner.body.children.length > 2) {
+                const ser = new XMLSerializer();
+                return { content: ser.serializeToString(inner.body), title: document.title || '', source: 'iframe' };
+              }
+            } catch (_) {}
+          }
+
+          // Priority 3: body
+          const ser = new XMLSerializer();
+          return { content: ser.serializeToString(document.body), title: document.title || '', source: 'body' };
         },
         world: 'MAIN'
       });
 
-      const { content, title } = results[0]?.result || {};
+      const result = results[0]?.result || {};
+      content = result.content;
+      title = result.title;
+      source = result.source;
+
       if (!content) {
-        showStatus('页面内容为空', 'error');
-        pageCard.innerHTML = '<div class="no-content">页面内容为空</div>';
+        showStatus('页面内容为空 — 请先选中内容', 'error');
+        pageCard.innerHTML = '<div class="no-content">未检测到选区，请选中内容后重试</div>';
         captureBtn.disabled = false;
-        captureBtn.textContent = '📋 捕获页面内容';
+        captureBtn.textContent = '📋 捕获选区';
         return;
       }
 
       capturedHtml = content;
       capturedTitle = title;
       const sizeKB = (new Blob([content]).size / 1024).toFixed(1);
+      const sourceLabel = source === 'selection' ? ' [选区]' : source === 'iframe' ? ' [iframe]' : '';
       pageCard.innerHTML = `
-        <div class="page-title">${esc(title || '无标题')}</div>
+        <div class="page-title">${esc(title || '无标题')}${sourceLabel}</div>
         <div class="page-url">${esc(tab.url)}</div>
         <div class="page-size">${sizeKB} KB · ${content.length} 字符</div>
       `;
 
       showStatus('捕获成功', 'success');
+      saveBtn.classList.remove('hidden');
       targetSection.classList.remove('hidden');
       injectBtn.classList.remove('hidden');
       updateInjectBtn();
     } catch (e) {
-      showStatus('捕获失败: ' + e.message + ' — 需在 chrome://extensions 中开启"允许访问文件网址"', 'error');
+      showStatus('捕获失败: ' + e.message, 'error');
     } finally {
       captureBtn.disabled = false;
-      captureBtn.textContent = '📋 捕获页面内容';
+      captureBtn.textContent = '📋 捕获 Ctrl+A 选区';
+    }
+  });
+
+  // --- Save template to local project ---
+  saveBtn.addEventListener('click', async () => {
+    if (!capturedHtml) {
+      showStatus('请先捕获页面内容', 'error');
+      return;
+    }
+
+    saveBtn.disabled = true;
+    saveBtn.textContent = '⏳ 正在保存...';
+
+    try {
+      const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+
+      const stored = await chrome.storage.local.get(['projectPath']);
+      const savePath = stored.projectPath || '';
+
+      const payload = {
+        html: capturedHtml,
+        title: capturedTitle || '',
+        sourceUrl: tab?.url || '',
+        capturedAt: new Date().toISOString(),
+        savePath: savePath
+      };
+
+      const resp = await fetch('http://localhost:8081/save-template', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      if (resp.ok) {
+        const data = await resp.json();
+        showStatus(`模板已保存 (${(data.sizeBytes / 1024).toFixed(1)}KB) → ${data.path}`, 'success');
+      } else {
+        showStatus('保存失败: HTTP ' + resp.status, 'error');
+      }
+    } catch (e) {
+      showStatus('保存失败: ' + e.message + ' — 请确认服务器已启动 (python3 save-layout-server.py)', 'error');
+    } finally {
+      saveBtn.disabled = false;
+      saveBtn.textContent = '💾 保存为模板';
     }
   });
 

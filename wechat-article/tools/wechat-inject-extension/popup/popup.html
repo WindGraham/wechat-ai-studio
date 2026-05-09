@@ -5,6 +5,9 @@
   <style>
     * { margin:0; padding:0; box-sizing:border-box; }
     body { width:320px; padding:16px; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif; font-size:14px; color:#333; background:#fafafa; }
+    .header { display:flex; align-items:center; justify-content:space-between; margin-bottom:2px; }
+    .gear { font-size:16px; background:none; border:none; cursor:pointer; padding:2px 4px; border-radius:4px; color:#999; width:auto; }
+    .gear:hover { background:#e0e0e0; color:#333; }
     h2 { font-size:15px; font-weight:600; margin-bottom:2px; }
     .ver { font-size:11px; color:#999; margin-bottom:10px; }
     .section { margin-bottom:12px; }
@@ -18,6 +21,9 @@
     .btn-capture { background:#1a73e8; color:#fff; }
     .btn-capture:hover { background:#1557b0; }
     .btn-capture:disabled { background:#ccc; cursor:not-allowed; }
+    .btn-save { background:#ff9800; color:#fff; margin-top:8px; }
+    .btn-save:hover { background:#f57c00; }
+    .btn-save:disabled { background:#ccc; cursor:not-allowed; }
     .btn-inject { background:#07c160; color:#fff; margin-top:8px; }
     .btn-inject:hover { background:#06ae56; }
     .btn-inject:disabled { background:#ccc; cursor:not-allowed; }
@@ -36,6 +42,17 @@
     .status-success { background:#e8f5e9; color:#2e7d32; }
     .status-error { background:#fce8e6; color:#c5221f; }
     .hidden { display:none; }
+    .settings-panel { background:#fff; border:1px solid #e0e0e0; border-radius:8px; padding:10px; margin-bottom:12px; }
+    .settings-panel label { display:block; font-size:12px; color:#666; margin-bottom:4px; }
+    .settings-panel input { width:100%; padding:6px 8px; border:1px solid #ccc; border-radius:4px; font-size:12px; font-family:monospace; margin-bottom:8px; }
+    .settings-panel input:focus { border-color:#1a73e8; outline:none; }
+    .settings-row { display:flex; gap:6px; }
+    .settings-row button { width:auto; padding:6px 12px; font-size:12px; }
+    .btn-sm-ok { background:#1a73e8; color:#fff; }
+    .btn-sm-ok:hover { background:#1557b0; }
+    .current-path { font-size:11px; color:#999; margin:4px 0 8px; word-break:break-all; }
+    .current-path .edit-link { color:#1a73e8; cursor:pointer; margin-left:4px; }
+    .current-path .edit-link:hover { text-decoration:underline; }
     .hint { font-size:11px; color:#999; margin-top:6px; line-height:1.4; }
     .steps { font-size:11px; color:#666; line-height:1.6; margin-bottom:10px; }
     .steps span { color:#1a73e8; font-weight:600; }
@@ -43,17 +60,34 @@
 </head>
 <body>
 
-  <h2>📡 注入到微信公众号</h2>
+  <div class="header">
+    <h2>📡 注入到微信公众号</h2>
+    <button class="gear" id="gearBtn" title="设置保存目录">⚙️</button>
+  </div>
   <div class="ver" id="version">v1.0.0</div>
+
+  <div class="settings-panel hidden" id="settingsPanel">
+    <label>模板保存目录（绝对路径）</label>
+    <input type="text" id="pathInput" placeholder="/home/user/my-project">
+    <div class="settings-row">
+      <button class="btn-sm-ok" id="savePathBtn">保存</button>
+      <button class="btn-refresh" id="cancelPathBtn" style="width:auto;padding:6px 12px;font-size:12px;">取消</button>
+    </div>
+  </div>
+
+  <div class="current-path hidden" id="currentPathRow">
+    保存到: <span id="currentPathValue"></span><span class="edit-link" id="editPathLink">修改</span>
+  </div>
 
   <div class="section">
     <div class="label">当前页面</div>
     <div class="card" id="pageCard">
-      <div class="no-content">点击下方按钮捕获页面内容</div>
+      <div class="no-content">Ctrl+A 选中内容后点击捕获</div>
     </div>
   </div>
 
-  <button class="btn-capture" id="captureBtn">📋 捕获页面内容</button>
+  <button class="btn-capture" id="captureBtn">📋 捕获选区</button>
+  <button class="btn-save hidden" id="saveBtn">💾 保存为模板</button>
 
   <div class="section hidden" id="targetSection">
     <div class="label">目标编辑器</div>
@@ -66,9 +100,10 @@
   <div id="statusArea"></div>
 
   <div class="hint">步骤：<br>
-  <span>1</span> 打开排版好的 HTML 页面<br>
-  <span>2</span> 另开标签页进入微信图文编辑页<br>
-  <span>3</span> 回到 HTML 页 → 点扩展 → 捕获页面 → 查找编辑器 → 注入</div>
+  <span>1</span> 在任意页面 Ctrl+A 选中内容<br>
+  <span>2</span> 点击 ⚙️ 填入项目目录，启动 save-layout-server.py<br>
+  <span>3</span> 点击「捕获选区」→ 可「保存为模板」或继续注入<br>
+  <span>4</span> 注入需另开标签页进入微信图文编辑页</div>
 
   <script src="popup.js"></script>
 </body>

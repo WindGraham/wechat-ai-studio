@@ -7,4 +7,6 @@ __pycache__/
 .pytest_cache/
 .wechat_draft_id
 layout-draft.json
+template-source.html
+template-meta.json
 wechat_inject.py
