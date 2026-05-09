@@ -63,6 +63,7 @@
   .shape-card   { width: 80%; height: 40px; background: #0f3460; border-radius: 6px; margin: 0 auto 8px; border: 2px solid #533483; }
   .shape-image  { width: 60%; height: 40px; background: #533483; border-radius: 4px; margin: 0 auto 8px; }
   .shape-small  { width: 40%; height: 30px; background: #16213e; border-radius: 4px; margin: 0 auto 8px; border: 1px solid #e94560; }
+  .shape-text   { width: 70%; height: 6px; background: #ccc; border-radius: 3px; margin: 6px auto; box-shadow: 0 8px 0 #ccc, 0 16px 0 #ccc, 0 24px 0 #ccc; }
   .shape-line   { width: 70%; height: 6px; background: #533483; border-radius: 3px; margin: 12px auto; }
 
   .btn {
@@ -183,6 +184,7 @@
   .bg-card   { background: rgba(83, 52, 131, 0.85); }
   .bg-image  { background: rgba(15, 52, 96, 0.85); }
   .bg-small  { background: rgba(22, 33, 62, 0.85); }
+  .bg-text   { background: rgba(200, 200, 200, 0.5); }
   .bg-line   { background: rgba(100, 100, 100, 0.6); }
 
   .label-overlay {
@@ -256,6 +258,11 @@
   <div class="component-source" draggable="true" data-type="small" data-w="160" data-h="100">
     <div class="shape-small"></div>
     小组件
+  </div>
+
+  <div class="component-source" draggable="true" data-type="text" data-w="345" data-h="120">
+    <div class="shape-text"></div>
+    文字区
   </div>
 
   <div class="component-source" draggable="true" data-type="line" data-w="200" data-h="6">
@@ -378,7 +385,7 @@ function createComponent(type, x, y, w, h) {
 }
 
 function typeLabel(t) {
-  return { hero: '标题/大图', card: '卡片', image: '图片', small: '小组件', line: '分割线' }[t] || t;
+  return { hero: '标题/大图', card: '卡片', image: '图片', small: '小组件', text: '文字区', line: '分割线' }[t] || t;
 }
 
 function selectComponent(el) {

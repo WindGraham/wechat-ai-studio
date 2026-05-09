@@ -25,7 +25,7 @@
 ```
 [用户打开 layout-composer.html]
     ↓
-[从左侧面板拖拽 5 种基础矩形到 375px 画布]
+[从左侧面板拖拽 6 种基础矩形到 375px 画布]
     ↓
 [拖动组件中心 = 移动位置]
 [拖动组件边框/角部 = 8 方向缩放]
@@ -37,7 +37,7 @@
 [AI 拟合为微信 HTML]
 ```
 
-### 2.1 组件类型（5 种基础矩形）
+### 2.1 组件类型（6 种基础矩形）
 
 | 类型 | 默认尺寸 | 空间语义 | 典型拟合 |
 |:---|:---|:---|:---|
@@ -45,6 +45,7 @@
 | `card` | 345×240 | 大背景卡片/内容容器 | 米色/浅色 wrapper section |
 | `image` | 345×200 | 图片占位 | 带白色边框的图片块 |
 | `small` | 160×100 | 小标签/装饰/头像 | 圆角色块标签、品牌标识 |
+| `text` | 345×120 | 纯文字段落区 | 正文段落、引用块、说明文字 |
 | `line` | 200×6 | 分割线/间距 | 虚线/实线/装饰分隔 |
 
 ### 2.2 画布特性
@@ -206,7 +207,7 @@ AI 读取 `layout-draft.json` 后，提取三类空间关系：
 
 ## 6. 已知限制
 
-1. **组件粒度粗**：只有 5 种基础矩形，无法表达圆角、阴影、渐变等细节。这些由 AI 根据类型和上下文推断。
+1. **组件粒度粗**：只有 6 种基础矩形，无法表达圆角、阴影、渐变等细节。这些由 AI 根据类型和上下文推断。
 2. **无文字内容输入**：拖拽器只表达空间，文字内容由 AI 根据用户提供的文章素材填充。
 3. **层叠仅限边界**：中间区域的复杂层叠在微信编辑器中难以优雅实现，可能退化为普通相邻布局。
 4. **PC 端预览偏差**：375px 画布模拟手机宽度，但在 PC 微信客户端中实际渲染可能存在细微差异，最终需以 WeChat 编辑器为准。
@@ -288,6 +289,7 @@ AI 读取 `layout-draft.json` 后，提取三类空间关系：
   .shape-card   { width: 80%; height: 40px; background: #0f3460; border-radius: 6px; margin: 0 auto 8px; border: 2px solid #533483; }
   .shape-image  { width: 60%; height: 40px; background: #533483; border-radius: 4px; margin: 0 auto 8px; }
   .shape-small  { width: 40%; height: 30px; background: #16213e; border-radius: 4px; margin: 0 auto 8px; border: 1px solid #e94560; }
+  .shape-text   { width: 70%; height: 6px; background: #ccc; border-radius: 3px; margin: 6px auto; box-shadow: 0 8px 0 #ccc, 0 16px 0 #ccc, 0 24px 0 #ccc; }
   .shape-line   { width: 70%; height: 6px; background: #533483; border-radius: 3px; margin: 12px auto; }
 
   .btn {
@@ -407,6 +409,7 @@ AI 读取 `layout-draft.json` 后，提取三类空间关系：
   .bg-card   { background: rgba(83, 52, 131, 0.85); }
   .bg-image  { background: rgba(15, 52, 96, 0.85); }
   .bg-small  { background: rgba(22, 33, 62, 0.85); }
+  .bg-text   { background: rgba(200, 200, 200, 0.5); }
   .bg-line   { background: rgba(100, 100, 100, 0.6); }
 
   .label-overlay {
@@ -480,6 +483,11 @@ AI 读取 `layout-draft.json` 后，提取三类空间关系：
   <div class="component-source" draggable="true" data-type="small" data-w="160" data-h="100">
     <div class="shape-small"></div>
     小组件
+  </div>
+
+  <div class="component-source" draggable="true" data-type="text" data-w="345" data-h="120">
+    <div class="shape-text"></div>
+    文字区
   </div>
 
   <div class="component-source" draggable="true" data-type="line" data-w="200" data-h="6">
@@ -595,7 +603,7 @@ function createComponent(type, x, y, w, h) {
 }
 
 function typeLabel(t) {
-  return { hero: '标题/大图', card: '卡片', image: '图片', small: '小组件', line: '分割线' }[t] || t;
+  return { hero: '标题/大图', card: '卡片', image: '图片', small: '小组件', text: '文字区', line: '分割线' }[t] || t;
 }
 
 function selectComponent(el) {
