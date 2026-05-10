@@ -13,7 +13,9 @@
 
 	<link href="css/editor.css" rel="stylesheet">
 	<style>
-	.canvas-block { position: absolute; cursor: move; box-sizing: border-box; user-select: none; }
+	#iframe-wrapper { height: 100% !important; overflow-y: auto !important; overflow-x: hidden !important; }
+	#block-canvas { touch-action: none; }
+	.canvas-block { position: absolute; cursor: move; box-sizing: border-box; user-select: none; touch-action: none; }
 	.canvas-block:hover { outline: 1px dashed var(--bs-primary, #0d6efd); }
 	.canvas-block.selected { outline: 2px solid var(--bs-primary, #0d6efd); outline-offset: 2px; z-index: 100; }
 	.canvas-block .resize-handle { position: absolute; background: var(--bs-primary, #0d6efd); border-radius: 2px; z-index: 20; opacity: 0; width: 8px; height: 8px; }
@@ -28,7 +30,7 @@
 	.resize-handle.bottom-center { bottom: -4px; left: 50%; margin-left: -4px; cursor: s-resize; }
 	.resize-handle.bottom-right { bottom: -4px; right: -4px; cursor: se-resize; }
 	</style>
-	<script src="https://cdn.jsdelivr.net/npm/interactjs@1.10/dist/interact.min.js"></script>
+	<script src="libs/interact/interact.min.js"></script>
 </head>
 
 <body>
@@ -2213,7 +2215,8 @@
 
 <!-- components-->
 <!-- script src="libs/builder/components-server.js"></script -->
-<script src="libs/builder/plugin-google-fonts.js"></script>
+<!-- Google Fonts plugin fetches /resources/google-fonts.json before local mocks are ready. Keep system fonts enabled. -->
+<!-- <script src="libs/builder/plugin-google-fonts.js"></script> -->
 <script src="libs/builder/components-common.js"></script>
 <script src="libs/builder/plugin-aos.js"></script>
 <script src="libs/builder/components-html.js"></script>
@@ -2751,17 +2754,139 @@ let blockIdCounter = 0;
 let undoStack = [];
 let redoStack = [];
 const MAX_UNDO = 50;
-let blockCounter = 0;
+let streamMode = true;
+const CANVAS_WIDTH = 375;
+const BLOCK_GAP = 20;
+const MIN_BLOCK_WIDTH = 50;
+const MIN_BLOCK_HEIGHT = 20;
 
 function getResizeHandles() {
-  return '<div class="resize-handle top" style="position:absolute;width:100%;height:4px;top:-2px;left:0;background:var(--bs-primary,#0d6efd);cursor:n-resize;z-index:20;border-radius:2px;opacity:0;"></div>' +
-    '<div class="resize-handle bottom" style="position:absolute;width:100%;height:4px;bottom:-2px;left:0;background:var(--bs-primary,#0d6efd);cursor:s-resize;z-index:20;border-radius:2px;opacity:0;"></div>' +
-    '<div class="resize-handle left" style="position:absolute;width:4px;height:100%;top:0;left:-2px;background:var(--bs-primary,#0d6efd);cursor:w-resize;z-index:20;border-radius:2px;opacity:0;"></div>' +
-    '<div class="resize-handle right" style="position:absolute;width:4px;height:100%;top:0;right:-2px;background:var(--bs-primary,#0d6efd);cursor:e-resize;z-index:20;border-radius:2px;opacity:0;"></div>' +
-    '<div class="resize-handle top-left" style="position:absolute;width:10px;height:10px;top:-5px;left:-5px;background:var(--bs-primary,#0d6efd);cursor:nw-resize;z-index:20;border-radius:2px;opacity:0;"></div>' +
-    '<div class="resize-handle top-right" style="position:absolute;width:10px;height:10px;top:-5px;right:-5px;background:var(--bs-primary,#0d6efd);cursor:ne-resize;z-index:20;border-radius:2px;opacity:0;"></div>' +
-    '<div class="resize-handle bottom-left" style="position:absolute;width:10px;height:10px;bottom:-5px;left:-5px;background:var(--bs-primary,#0d6efd);cursor:sw-resize;z-index:20;border-radius:2px;opacity:0;"></div>' +
-    '<div class="resize-handle bottom-right" style="position:absolute;width:10px;height:10px;bottom:-5px;right:-5px;background:var(--bs-primary,#0d6efd);cursor:se-resize;z-index:20;border-radius:2px;opacity:0;"></div>';
+	return ['top-left', 'top-center', 'top-right', 'center-left', 'center-right', 'bottom-left', 'bottom-center', 'bottom-right']
+		.map(function(cls) { return '<div class="resize-handle ' + cls + '"></div>'; })
+		.join('');
+}
+
+function clamp(value, min, max) {
+	return Math.max(min, Math.min(max, value));
+}
+
+function getCanvas() {
+	return document.getElementById('block-canvas');
+}
+
+function getCanvasWrapper() {
+	return document.getElementById('iframe-wrapper');
+}
+
+function syncBlockDataset(block) {
+	block.setAttribute('data-x', '0');
+	block.setAttribute('data-y', '0');
+	block.style.transform = '';
+}
+
+function getBlockContentElement(block) {
+	if (!block) return null;
+	return block.querySelector(':scope > :not(.resize-handle)') || block;
+}
+
+function getNextBlockId() {
+	blockIdCounter += 1;
+	return 'block-' + blockIdCounter;
+}
+
+function getVisibleInsertTop(canvas) {
+	var wrapper = getCanvasWrapper();
+	var canvasRect = canvas.getBoundingClientRect();
+	var wrapperRect = wrapper ? wrapper.getBoundingClientRect() : canvasRect;
+	var visibleTop = wrapper ? wrapper.scrollTop + Math.max(0, wrapperRect.top - canvasRect.top) : 0;
+	return Math.max(10, visibleTop + 24);
+}
+
+function getInsertionPosition(width) {
+	var canvas = getCanvas();
+	var left = Math.max(0, Math.floor((CANVAS_WIDTH - width) / 2));
+	var top = getVisibleInsertTop(canvas);
+	var blocks = Array.from(canvas.querySelectorAll(':scope > .canvas-block'));
+	var changed = true;
+
+	while (changed) {
+		changed = false;
+		blocks.forEach(function(block) {
+			var blockTop = parseFloat(block.style.top) || 0;
+			var blockBottom = blockTop + (block.offsetHeight || 100);
+			if (top >= blockTop - BLOCK_GAP && top <= blockBottom + BLOCK_GAP) {
+				top = blockBottom + BLOCK_GAP;
+				changed = true;
+			}
+		});
+	}
+
+	return { left: left, top: top };
+}
+
+function ensureCanvasHeight(extraBottom) {
+	var canvas = getCanvas();
+	if (!canvas) return;
+	var maxBottom = extraBottom || 0;
+	canvas.querySelectorAll(':scope > .canvas-block').forEach(function(block) {
+		var top = parseFloat(block.style.top) || 0;
+		maxBottom = Math.max(maxBottom, top + block.offsetHeight);
+	});
+	canvas.style.minHeight = Math.max(800, Math.ceil(maxBottom + 80)) + 'px';
+}
+
+function updateSelectionBox(block) {
+	if (!block) return;
+	var highlight = document.getElementById('highlight-box');
+	if (highlight) {
+		var rect = block.getBoundingClientRect();
+		var iframeLayer = document.getElementById('iframe-layer');
+		var layerRect = iframeLayer ? iframeLayer.getBoundingClientRect() : getCanvas().getBoundingClientRect();
+		highlight.style.display = 'block';
+		highlight.style.top = (rect.top - layerRect.top) + 'px';
+		highlight.style.left = (rect.left - layerRect.left) + 'px';
+		highlight.style.width = rect.width + 'px';
+		highlight.style.height = rect.height + 'px';
+	}
+}
+
+function renderSelectedProperties(block) {
+	if (typeof Vvveb === 'undefined' || !Vvveb.Builder) return;
+	var selectedEl = getBlockContentElement(block);
+	Vvveb.Builder.selectedEl = selectedEl;
+	if (selectedEl && Vvveb.Builder.loadNodeComponent) {
+		try {
+			Vvveb.Builder.loadNodeComponent(selectedEl);
+		} catch (err) {
+			console.warn('Unable to render Vvveb properties for selected canvas block', err);
+		}
+	}
+}
+
+function createCanvasBlock(html, options) {
+	var canvas = getCanvas();
+	if (!canvas) return null;
+	var width = clamp((options && options.width) || CANVAS_WIDTH, MIN_BLOCK_WIDTH, CANVAS_WIDTH);
+	var position = getInsertionPosition(width);
+	var block = document.createElement('div');
+	block.className = 'canvas-block';
+	block.id = getNextBlockId();
+	block.style.width = width + 'px';
+	block.style.left = position.left + 'px';
+	block.style.top = position.top + 'px';
+	block.setAttribute('data-type', (options && options.type) || '');
+	block.innerHTML = html;
+	canvas.appendChild(block);
+	ensureResizeHandles(block);
+	makeInteractable(block);
+	selectBlock(block);
+	ensureCanvasHeight(position.top + block.offsetHeight);
+	return block;
+}
+
+function ensureResizeHandles(element) {
+	element.querySelectorAll(':scope > .resize-handle').forEach(function(handle) { handle.remove(); });
+	element.insertAdjacentHTML('beforeend', getResizeHandles());
 }
 
 function saveState() {
@@ -2791,37 +2916,90 @@ function redo() {
 function selectBlock(block) {
 	if (selectedBlock) selectedBlock.classList.remove('selected');
 	selectedBlock = block;
-	if (block) block.classList.add('selected');
+	if (block) {
+		block.classList.add('selected');
+		updateSelectionBox(block);
+		renderSelectedProperties(block);
+	} else if (typeof Vvveb !== 'undefined' && Vvveb.Builder) {
+		Vvveb.Builder.selectedEl = null;
+		if (Vvveb.Builder.selectNode) Vvveb.Builder.selectNode(false);
+	}
 }
 
 function dragMoveListener(event) {
 	const target = event.target;
-	const x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx;
-	const y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy;
-	target.style.transform = 'translate(' + x + 'px, ' + y + 'px)';
-	target.setAttribute('data-x', x);
-	target.setAttribute('data-y', y);
+	const canvas = getCanvas();
+	let left = (parseFloat(target.style.left) || 0) + event.dx;
+	let top = (parseFloat(target.style.top) || 0) + event.dy;
+	if (streamMode) {
+		left = clamp(left, 0, canvas.clientWidth - target.offsetWidth);
+		top = Math.max(0, top);
+	}
+	target.style.left = left + 'px';
+	target.style.top = top + 'px';
+	syncBlockDataset(target);
+	ensureCanvasHeight(top + target.offsetHeight);
+	updateSelectionBox(target);
 }
 
 function resizeMoveListener(event) {
 	const target = event.target;
-	let x = parseFloat(target.getAttribute('data-x')) || 0;
-	let y = parseFloat(target.getAttribute('data-y')) || 0;
-	target.style.width = event.rect.width + 'px';
-	target.style.height = event.rect.height + 'px';
-	x += event.deltaRect.left;
-	y += event.deltaRect.top;
-	target.style.transform = 'translate(' + x + 'px, ' + y + 'px)';
-	target.setAttribute('data-x', x);
-	target.setAttribute('data-y', y);
+	const canvas = getCanvas();
+	const edges = event.edges || {};
+	const start = target._resizeStart || {
+		width: target.offsetWidth,
+		height: target.offsetHeight,
+		left: parseFloat(target.style.left) || 0,
+		top: parseFloat(target.style.top) || 0
+	};
+	const cornerResize = (edges.left || edges.right) && (edges.top || edges.bottom);
+	let width = event.rect.width;
+	let height = event.rect.height;
+	let left = start.left + event.deltaRect.left;
+	let top = start.top + event.deltaRect.top;
+
+	if (cornerResize) {
+		const ratio = start.width / Math.max(start.height, 1);
+		if (Math.abs(width - start.width) >= Math.abs(height - start.height)) {
+			height = width / ratio;
+		} else {
+			width = height * ratio;
+		}
+		if (edges.left) left = start.left + (start.width - width);
+		if (edges.top) top = start.top + (start.height - height);
+	}
+
+	width = clamp(width, MIN_BLOCK_WIDTH, CANVAS_WIDTH);
+	height = Math.max(MIN_BLOCK_HEIGHT, height);
+
+	if (streamMode) {
+		left = clamp(left, 0, canvas.clientWidth - width);
+		top = Math.max(0, top);
+	}
+
+	target.style.width = width + 'px';
+	target.style.height = height + 'px';
+	target.style.left = left + 'px';
+	target.style.top = top + 'px';
+	syncBlockDataset(target);
+	ensureCanvasHeight(top + height);
+	updateSelectionBox(target);
 }
 
 function makeInteractable(element) {
+	if (typeof interact === 'undefined') {
+		console.warn('Interact.js is not loaded; canvas drag/resize is disabled.');
+		return;
+	}
+	ensureResizeHandles(element);
+	if (element._interactable) interact(element).unset();
+	element.addEventListener('mousedown', function(e) { e.stopPropagation(); });
+	element.addEventListener('touchstart', function(e) { e.stopPropagation(); }, { passive: true });
 	interact(element)
 		.draggable({
 			inertia: false,
-			modifiers: [interact.modifiers.restrictRect({ restriction: 'parent', endOnly: true })],
-			autoScroll: false,
+			modifiers: streamMode ? [interact.modifiers.restrictRect({ restriction: 'parent', endOnly: true })] : [],
+			autoScroll: { container: getCanvasWrapper(), margin: 48, speed: 420 },
 			listeners: {
 				start() { saveState(); selectBlock(element); },
 				move: dragMoveListener
@@ -2831,21 +3009,25 @@ function makeInteractable(element) {
 			edges: { top: true, left: true, bottom: true, right: true },
 			modifiers: [
 				interact.modifiers.restrictEdges({ outer: 'parent' }),
-				interact.modifiers.restrictSize({ min: { width: 50, height: 20 } })
+				interact.modifiers.restrictSize({ min: { width: MIN_BLOCK_WIDTH, height: MIN_BLOCK_HEIGHT }, max: { width: CANVAS_WIDTH } })
 			],
 			inertia: false,
 			listeners: {
-				start() { saveState(); },
-				move: resizeMoveListener
+				start(event) {
+					saveState();
+					selectBlock(element);
+					element._resizeStart = {
+						width: element.offsetWidth,
+						height: element.offsetHeight,
+						left: parseFloat(element.style.left) || 0,
+						top: parseFloat(element.style.top) || 0
+					};
+				},
+				move: resizeMoveListener,
+				end() { element._resizeStart = null; }
 			}
 		});
-
-	const handles = ['top-left', 'top-center', 'top-right', 'center-left', 'center-right', 'bottom-left', 'bottom-center', 'bottom-right'];
-	handles.forEach(function(cls) {
-		const handle = document.createElement('div');
-		handle.className = 'resize-handle ' + cls;
-		element.appendChild(handle);
-	});
+	element._interactable = true;
 }
 
 function addBlock(type) {
@@ -2854,20 +3036,7 @@ function addBlock(type) {
 	const canvas = document.getElementById('block-canvas');
 	if (!canvas) return;
 	saveState();
-	blockIdCounter++;
-	const block = document.createElement('div');
-	block.className = 'canvas-block';
-	block.id = 'block-' + blockIdCounter;
-	block.style.width = '375px';
-	block.style.left = '0px';
-	block.style.top = (canvas.children.length * 20 + 10) + 'px';
-	block.setAttribute('data-x', '0');
-	block.setAttribute('data-y', '0');
-	block.setAttribute('data-type', type);
-	block.innerHTML = template;
-	canvas.appendChild(block);
-	makeInteractable(block);
-	selectBlock(block);
+	createCanvasBlock(template, { type: type, width: CANVAS_WIDTH });
 }
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -2955,30 +3124,10 @@ setTimeout(function() {
   if (typeof Vvveb !== 'undefined' && Vvveb.Builder) {
     var _origInsert = Vvveb.Builder.addElement;
     Vvveb.Builder.addElement = function(html, options) {
-      var wrapper = document.createElement('div');
-      wrapper.className = 'canvas-block';
-      wrapper.id = 'block-' + (++blockIdCounter);
-      wrapper.style.width = '375px';
-      wrapper.innerHTML = html;
-      wrapper.style.left = '15px';
-      wrapper.setAttribute('data-x', '0');
-      wrapper.setAttribute('data-y', '0');
-      var canvas = document.getElementById('block-canvas');
-      var existing = canvas.querySelectorAll('.canvas-block');
-      var maxBottom = 0;
-      existing.forEach(function(b) {
-        var t = parseFloat(b.style.top) || 0;
-        var h = b.offsetHeight || 100;
-        if (t + h > maxBottom) maxBottom = t + h;
-      });
-      wrapper.style.top = (maxBottom + 20) + 'px';
-      canvas.appendChild(wrapper);
-      makeInteractable(wrapper);
-      selectBlock(wrapper);
       saveState();
-      return wrapper;
+      return createCanvasBlock(html, { width: CANVAS_WIDTH });
     };
-    console.log('Patched Vvveb.Builder.addElement → canvas');
+    console.log('Patched Vvveb.Builder.addElement -> canvas');
   }
 }, 1000);
 
@@ -2986,24 +3135,8 @@ setTimeout(function() {
 // Make VvvebJs left panel items insert into our canvas on click
 // ============================================================
 function insertHtmlIntoCanvas(html) {
-  var wrapper = document.createElement('div');
-  wrapper.className = 'canvas-block';
-  wrapper.id = 'block-' + (++blockCounter);
-  wrapper.innerHTML = html + getResizeHandles();
-  wrapper.style.left = '15px';
-  var canvas = document.getElementById('block-canvas');
-  var existing = canvas.querySelectorAll('.canvas-block');
-  var maxBottom = 0;
-  existing.forEach(function(b) {
-    var t = parseFloat(b.style.top) || 0;
-    var h = b.offsetHeight || 100;
-    if (t + h > maxBottom) maxBottom = t + h;
-  });
-  wrapper.style.top = (maxBottom + 20) + 'px';
-  canvas.appendChild(wrapper);
-  makeInteractable(wrapper);
-  selectBlock(wrapper);
   saveState();
+  return createCanvasBlock(html, { width: CANVAS_WIDTH });
 }
 
 // Make canvas a drop target for VvvebJs draggable items
@@ -3056,31 +3189,30 @@ document.getElementById('block-canvas').addEventListener('click', function(e) {
   var block = e.target.closest('.canvas-block');
   if (block) {
     selectBlock(block);
-    var highlight = document.getElementById('highlight-box');
-    if (highlight) {
-      var rect = block.getBoundingClientRect();
-      var canvasRect = document.getElementById('block-canvas').getBoundingClientRect();
-      var iframeLayer = document.getElementById('iframe-layer');
-      var layerRect = iframeLayer ? iframeLayer.getBoundingClientRect() : canvasRect;
-      highlight.style.display = 'block';
-      highlight.style.top = (rect.top - layerRect.top) + 'px';
-      highlight.style.left = (rect.left - layerRect.left) + 'px';
-      highlight.style.width = rect.width + 'px';
-      highlight.style.height = rect.height + 'px';
-    }
   }
 });
 
 // Patch VvvebJs property panel to work with our canvas blocks
-if (typeof Vvveb !== 'undefined') {
-  var _origGetSelected = Vvveb.Builder.getSelectedElement;
-  if (_origGetSelected) {
+setTimeout(function() {
+  if (typeof Vvveb !== 'undefined' && Vvveb.Builder) {
+    var _origSelectNode = Vvveb.Builder.selectNode;
     Vvveb.Builder.getSelectedElement = function() {
-      if (selectedBlock) return selectedBlock.querySelector('section');
-      return _origGetSelected();
+      return getBlockContentElement(selectedBlock) || Vvveb.Builder.selectedEl;
+    };
+    Vvveb.Builder.selectNode = function(node) {
+      if (node && node.closest) {
+        var block = node.closest('.canvas-block');
+        if (block) {
+          if (selectedBlock && selectedBlock !== block) selectedBlock.classList.remove('selected');
+          selectedBlock = block;
+          block.classList.add('selected');
+          updateSelectionBox(block);
+        }
+      }
+      return _origSelectNode.call(Vvveb.Builder, node);
     };
   }
-}
+}, 1000);
 
 // === VvvebJs toolbar function replicas ===
 
@@ -3107,20 +3239,54 @@ function togglePreview() {
 function toggleMode(btn) {
   if (btn) {
     var pressed = btn.getAttribute('aria-pressed') === 'true';
-    btn.setAttribute('aria-pressed', pressed ? 'false' : 'true');
-    btn.classList.toggle('active');
+    streamMode = pressed;
+    btn.setAttribute('aria-pressed', streamMode ? 'false' : 'true');
+    btn.classList.toggle('active', !streamMode);
+  } else {
+    streamMode = !streamMode;
   }
   var blocks = document.querySelectorAll('#block-canvas .canvas-block');
   blocks.forEach(function(b) {
-    if (b._interactable) {
-      interact(b).unset();
-      b._interactable = false;
-    } else {
-      makeInteractable(b);
-      b._interactable = true;
-    }
+    makeInteractable(b);
   });
+  ensureCanvasHeight();
 }
+
+function treeListRight() {
+  var treeList = document.getElementById('tree-list');
+  var btnIcon = document.querySelector("[data-vvveb-action='treeListRight'] i");
+  if (!treeList) return;
+  if (treeList.style.height) {
+    treeList.style.height = '';
+    treeList.style.right = '';
+    treeList.style.top = '';
+    treeList.style.left = '';
+    treeList.style.width = '';
+    if (btnIcon) btnIcon.className = 'icon-stop-outline';
+  } else {
+    treeList.style.height = 'calc(100vh - 35px)';
+    treeList.style.right = '0';
+    treeList.style.top = '35px';
+    treeList.style.left = 'auto';
+    treeList.style.width = '300px';
+    if (btnIcon) btnIcon.className = 'icon-remove-outline';
+  }
+}
+
+document.addEventListener('click', function(e) {
+  var actionBtn = e.target.closest('[data-vvveb-action]');
+  if (!actionBtn) return;
+  var action = actionBtn.getAttribute('data-vvveb-action');
+  if (action === 'treeListRight') {
+    e.preventDefault();
+    treeListRight();
+  } else if (action === 'toggleTreeList' && actionBtn.closest('#tree-list')) {
+    e.preventDefault();
+    togglePanel('tree-list');
+  } else if (action === 'setDesignerMode') {
+    ensureCanvasHeight();
+  }
+});
 
 function setViewport(width) {
   var canvas = document.getElementById('block-canvas');

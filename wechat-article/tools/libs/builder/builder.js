@@ -898,7 +898,11 @@ Vvveb.Builder = {
         self.documentFrame = document.querySelector("#iframe-wrapper > iframe");
         self.canvas = document.getElementById("canvas");
 
-		self._loadIframe(url + (url.indexOf('?') > -1 ? '&r=':'?r=') + Math.random());
+		if (self.documentFrame) {
+			self._loadIframe(url + (url.indexOf('?') > -1 ? '&r=':'?r=') + Math.random());
+		} else {
+			self._loadCanvasDocument();
+		}
 		
 		self._initDragdrop();
 		
@@ -950,7 +954,7 @@ Vvveb.Builder = {
 							<span>${component.name}</span>
 						</li>`)[0];
 
-						if (component.image) {
+						if (component.image && component.image != "undefined") {
 
 							item.style.backgroundImage = "url(" + Vvveb.imgBaseUrl + component.image + ")"; 			
 							item.style.backgroundRepeat = "no-repeat";
@@ -996,7 +1000,7 @@ Vvveb.Builder = {
 									<img class="preview" src="" loading="lazy">
 								</li>`)[0];
 
-						if (section.image) {
+						if (section.image && section.image != "undefined") {
 
 							let image = ((section.image.indexOf('/') == -1) ? Vvveb.imgBaseUrl:'') + section.image;
 							
@@ -1048,7 +1052,7 @@ Vvveb.Builder = {
 									<img class="preview" src="" loading="lazy">
 								</li>`)[0];
 
-						if (block.image) {
+						if (block.image && block.image != "undefined") {
 
 							let image = ((block.image.indexOf('/') == -1) ? Vvveb.imgBaseUrl:'') + block.image;
 							/*
@@ -1101,7 +1105,7 @@ Vvveb.Builder = {
 									<img class="preview" src="" loading="lazy">
 								</li>`)[0];
 
-						if (style.image) {
+						if (style.image && style.image != "undefined") {
 
 							let image = ((style.image.indexOf('/') == -1) ? Vvveb.imgBaseUrl:'') + style.image;
 							item.querySelector("img").setAttribute("src", image);
@@ -1119,6 +1123,10 @@ Vvveb.Builder = {
 		document.getElementById("select-box").style.display = "none";
 		
 		self.initCallback = callback;
+		if (!Vvveb.Builder.iframe) {
+			self._loadCanvasDocument();
+			return;
+		}
 		if (Vvveb.Builder.iframe.src != url) Vvveb.Builder.iframe.src = url;
 	},
 	
@@ -1190,6 +1198,46 @@ Vvveb.Builder = {
         });		
         
 	},	
+
+	_loadCanvasDocument : function() {
+		let self = this;
+		window.FrameWindow = window;
+		window.FrameDocument = document;
+
+		self.iframe = null;
+		self.frameDoc  = document;
+		self.frameHtml = document.documentElement;
+		self.frameBody = document.getElementById("block-canvas") || document.body;
+		self.frameHead = document.head;
+
+		let highlightBox = document.getElementById("highlight-box");
+		if (highlightBox) highlightBox.style.display = "none";
+
+		try {
+			Vvveb.WysiwygEditor.init(document);
+			Vvveb.StyleManager.init(document);
+			Vvveb.ColorPaletteManager.init(document);
+		} catch (err) {
+			console.warn("Vvveb canvas document initialization skipped optional manager setup", err);
+		}
+
+		if (self.initCallback) self.initCallback();
+		window.dispatchEvent(new CustomEvent("vvveb.iframe.loaded", {detail: self.frameDoc}));
+
+		let loadingMessage = document.querySelector(".loading-message");
+		if (loadingMessage) loadingMessage.classList.remove("active");
+
+		let setSaveButtonState = function () {
+			if (Vvveb.Undo.hasChanges()){
+				document.querySelectorAll("#top-panel .save-btn").forEach(e => e.removeAttribute("disabled"));
+			} else {
+				document.querySelectorAll("#top-panel .save-btn").forEach(e => e.setAttribute("disabled", "true"));
+			}
+		};
+
+		self.frameBody.addEventListener("vvveb.undo.add", setSaveButtonState);
+		self.frameBody.addEventListener("vvveb.undo.restore", setSaveButtonState);
+	},
     
     _frameLoaded : function() {
 		
@@ -3402,10 +3450,12 @@ function drawComponentsTree(tree) {
 			if (title) {
 				title = ` - <span class="text-secondary">${title}</span>`;
 			}
+
+			let imageStyle = (node.image && node.image != "undefined") ? ' style="background-image:url(' + Vvveb.imgBaseUrl + node.image + ')"' : "";
 			
 			if (tree[i].children.length > 0) {
 				li = generateElements('<li data-component="' + node.name + '">\
-								<label for="id' + id + '" style="background-image:url(' + Vvveb.imgBaseUrl + node.image + ')">\
+								<label for="id' + id + '"' + imageStyle + '>\
 									<span>' + node.name + '</span>' + title + '\
 								</label>\
 								<input type="checkbox" id="id' + id + '">\
@@ -3414,7 +3464,7 @@ function drawComponentsTree(tree) {
 			}
 			else {
 				li = generateElements('<li data-component="' + node.name + '" class="file">\
-							<label for="id' +  id + '" style="background-image:url(' + Vvveb.imgBaseUrl + node.image + ')">\
+							<label for="id' +  id + '"' + imageStyle + '>\
 								<span>' + node.name + '</span>' + title + '\
 							</label>\
 							<input type="checkbox" id="id' + id + '">\
