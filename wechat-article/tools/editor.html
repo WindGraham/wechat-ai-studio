@@ -2971,17 +2971,18 @@ function resizeMoveListener(event) {
 
 	width = clamp(width, MIN_BLOCK_WIDTH, CANVAS_WIDTH);
 	height = Math.max(MIN_BLOCK_HEIGHT, height);
-
-	if (streamMode) {
-		left = clamp(left, 0, canvas.clientWidth - width);
-		top = Math.max(0, top);
-	}
+	left = clamp(left, 0, CANVAS_WIDTH - width);
+	top = Math.max(0, top);
 
 	target.style.width = width + 'px';
 	target.style.height = height + 'px';
 	target.style.left = left + 'px';
 	target.style.top = top + 'px';
-	syncBlockDataset(target);
+	
+	// Sync inner section width
+	var inner = target.querySelector(':scope > section');
+	if (inner) inner.style.width = width + 'px';
+	
 	ensureCanvasHeight(top + height);
 	updateSelectionBox(target);
 }
@@ -3007,10 +3008,6 @@ function makeInteractable(element) {
 		})
 		.resizable({
 			edges: { top: true, left: true, bottom: true, right: true },
-			modifiers: [
-				interact.modifiers.restrictEdges({ outer: 'parent' }),
-				interact.modifiers.restrictSize({ min: { width: MIN_BLOCK_WIDTH, height: MIN_BLOCK_HEIGHT }, max: { width: CANVAS_WIDTH } })
-			],
 			inertia: false,
 			listeners: {
 				start(event) {
