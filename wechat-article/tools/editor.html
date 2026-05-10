@@ -29,6 +29,7 @@
 	#delete-file-btn { display: none !important; }
 	#toggle-file-manager-btn { display: none !important; }
 	#bottom-panel { display: none !important; }
+	#toggle-vvveb-components { display: none !important; }
 	.resize-handle.top-left { top: -4px; left: -4px; cursor: nw-resize; }
 	.resize-handle.top-center { top: -4px; left: 50%; margin-left: -4px; cursor: n-resize; }
 	.resize-handle.top-right { top: -4px; right: -4px; cursor: ne-resize; }
@@ -3188,8 +3189,29 @@ setTimeout(function() {
   }
   makeClickable();
   new MutationObserver(makeClickable).observe(document.body, { childList: true, subtree: true });
-  console.log('VvvebJs click-to-insert ready (component registry)');
-}, 2000);
+		console.log('VvvebJs click-to-insert ready (component registry)');
+
+		// Filter VvvebJs components to only WeChat-relevant ones
+		if (typeof Vvveb !== 'undefined') {
+			// Components: only heading/paragraph/image/quote/separator
+			if (Vvveb.ComponentsGroup) {
+				var keep = { '基础元素': ['html/heading', 'html/paragraph', 'html/image', 'html/quote', 'html/separator'] };
+				var all = Object.keys(Vvveb.ComponentsGroup);
+				all.forEach(function(k) { if (!keep[k]) delete Vvveb.ComponentsGroup[k]; else Vvveb.ComponentsGroup[k] = keep[k]; });
+			}
+			// Sections: keep only base layout sections
+			if (Vvveb.SectionsGroup) {
+				var keepSec = { '基础': ['base/1-column','base/2-columns','base/3-columns'] };
+				var allSec = Object.keys(Vvveb.SectionsGroup);
+				allSec.forEach(function(k) { if (!keepSec[k]) delete Vvveb.SectionsGroup[k]; else Vvveb.SectionsGroup[k] = keepSec[k]; });
+			}
+			// Blocks: keep only meaningful ones
+			if (Vvveb.BlocksGroup) {
+				Object.keys(Vvveb.BlocksGroup).forEach(function(k) { delete Vvveb.BlocksGroup[k]; });
+			}
+			console.log('VvvebJs components filtered to WeChat-relevant only');
+		}
+	}, 2000);
 
 // Wire VvvebJs highlight system to our canvas clicks
 document.getElementById('block-canvas').addEventListener('click', function(e) {
