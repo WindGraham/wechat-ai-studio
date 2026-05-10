@@ -23,7 +23,7 @@ let defaultSeparatorSvg = '<svg id="Layer_1" data-name="Layer 1" xmlns="http://w
 let section_sort = 1;
 
 let SectionContent = [{
-        name: "Label",
+        name: "标签",
         key: "label",
         sort: section_sort++,
         htmlAttr: "aria-label",
@@ -182,7 +182,7 @@ let SectionBackground = [{
 			return selected;
 		},            
     },{
-        name: "Image",
+        name: "图片",
         key: "src",
         sort: section_sort++,
         htmlAttr: "src",
@@ -191,7 +191,7 @@ let SectionBackground = [{
 		inline:true,
         inputtype: ImageInput
     },{
-        name: "Video",
+        name: "视频",
         child: "source",
         key: "src",
         sort: section_sort++,
@@ -279,7 +279,7 @@ let SectionOverlay = [{
 			}
 		}		
     },{
-        name: "Color",
+        name: "颜色",
         key: "background-color",
         sort: section_sort++,
         htmlAttr: "style",
@@ -287,7 +287,7 @@ let SectionOverlay = [{
 		group:"overlay",
         inputtype: ColorInput
    },{
-        name: "Opacity",
+        name: "透明度",
         key: "opacity",
         sort: section_sort++,
 		htmlAttr: "style",
@@ -355,7 +355,7 @@ function sectionSeparatorProperties(name, title) {
 			}
 		}		
     },{
-		name: "Icon",
+		name: "图标",
 		key: "icon",
 		sort: section_sort++,
 		inline:true,
@@ -388,7 +388,7 @@ function sectionSeparatorProperties(name, title) {
             }]
 		},
 	},{
-		name: "Width",
+		name: "宽度",
 		key: "width",
 		sort: section_sort++,
 		htmlAttr: "width",
@@ -401,7 +401,7 @@ function sectionSeparatorProperties(name, title) {
 			step:1
 		}
    },{
-		name: "Height",
+		name: "高度",
 		key: "height",
 		sort: section_sort++,
 		htmlAttr: "height",
@@ -446,7 +446,7 @@ function sectionSeparatorProperties(name, title) {
 		htmlAttr: "fill",
         inputtype: ColorInput,
    },{
-        name: "Color",
+        name: "颜色",
         key: "color",
         sort: section_sort++,
         col:12,
@@ -673,7 +673,7 @@ Vvveb.Components.extend("_base", "elements/section", {
 //Vvveb.Components.add("elements/header", {
 Vvveb.Components.extend("_base", "elements/header", {
     nodes: ["header"],
-    name: "Header",
+    name: "页头",
     image: "icons/section.svg",
     html: `<header>
 				<div class="container">
@@ -691,7 +691,7 @@ Vvveb.Components.extend("_base", "elements/header", {
 //Vvveb.Components.add("elements/footer", {
 Vvveb.Components.extend("_base", "elements/footer", {
     nodes: ["footer"],
-    name: "Footer",
+    name: "页脚",
     image: "icons/section.svg",
     html: `<footer>
 				<div class="container">

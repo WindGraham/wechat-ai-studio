@@ -20,7 +20,7 @@ Vvveb.ComponentsGroup['Server Components'] = ["components/products", "components
 
 
 Vvveb.Components.add("components/product", {
-    name: "Product",
+    name: "产品",
     attributes: ["data-component-product"],
 
     image: "icons/map.svg",
@@ -34,7 +34,7 @@ Vvveb.Components.add("components/product", {
         inputtype: TextInput
     },
 	{
-        name: "Select",
+        name: "下拉选择",
         key: "id",
         htmlAttr: "id",
         inputtype: SelectInput,
@@ -76,7 +76,7 @@ Vvveb.Components.add("components/product", {
 
 
 Vvveb.Components.add("components/products", {
-    name: "Products",
+    name: "产品",
     attributes: ["data-component-products"],
 
     image: "icons/products.svg",
@@ -111,7 +111,7 @@ Vvveb.Components.add("components/products", {
                 value: "automatic",
                 icon:"la la-cog",
                 text: "Configuration",
-                title: "Configuration",
+                title: "配置",
             }],
         },
 		onChange : function(element, value, input) {
@@ -125,7 +125,7 @@ Vvveb.Components.add("components/products", {
 			return node.dataset.type;
 		},            
     },{
-        name: "Products",
+        name: "产品",
         key: "products",
         group:"autocomplete",
         htmlAttr:"data-products",
@@ -191,7 +191,7 @@ Vvveb.Components.add("components/products", {
             }]
 		}
 	},{
-        name: "Category",
+        name: "分类",
         group:"automatic",
         key: "category",
 		htmlAttr:"data-category",
@@ -235,7 +235,7 @@ Vvveb.Components.add("components/manufacturers", {
         key: "category",
         inputtype: TextInput
 	},{
-        name: "Image",
+        name: "图片",
         key: "category",
         inputtype: TextInput
 	}
@@ -387,7 +387,7 @@ Vvveb.Components.add("components/filters", {
     }]
 });
 Vvveb.Components.add("components/product", {
-    name: "Product",
+    name: "产品",
     classes: ["component_product"],
     image: "icons/product.svg",
     html: '<div class="mb-3"><label>Your response:</label><textarea class="form-control"></textarea></div>',

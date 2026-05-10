@@ -20,7 +20,7 @@ https://github.com/givanz/VvvebJs
 Vvveb.ComponentsGroup['Embeds'] = ["embeds/embed"];
 
 Vvveb.Components.extend("_base", "embeds/embed", {
-    name: "Embed",
+    name: "嵌入",
     attributes: ["data-component-oembed"],
     image: "icons/code.svg",
     //dragHtml: '<img src="' + Vvveb.baseUrl + 'icons/maps.png">',
@@ -64,13 +64,13 @@ Vvveb.Components.extend("_base", "embeds/embed", {
 			return node;
 		},	
     },{
-        name: "Width",
+        name: "宽度",
         key: "width",
         child:"iframe",
         htmlAttr: "width",
         inputtype: CssUnitInput
     },{
-        name: "Height",
+        name: "高度",
         key: "height",
         child:"iframe",
         htmlAttr: "height",

@@ -27,7 +27,7 @@ Vvveb.Components.extend("_base", "html/container", {
     name: "容器",
     properties: [
      {
-        name: "Type",
+        name: "类型",
         key: "type",
         htmlAttr: "class",
         inputtype: SelectInput,
@@ -42,7 +42,7 @@ Vvveb.Components.extend("_base", "html/container", {
             }]
         }
     },{
-        name: "Background",
+        name: "背景",
         key: "background",
 		htmlAttr: "class",
         validValues: bgcolorClasses,
@@ -51,7 +51,7 @@ Vvveb.Components.extend("_base", "html/container", {
             options: bgcolorSelectOptions
         }
     },{
-        name: "Background Color",
+        name: "背景颜色",
         key: "background-color",
 		htmlAttr: "style",
         inputtype: ColorInput,
@@ -70,7 +70,7 @@ Vvveb.Components.extend("html/link", "html/btn", {
     image: "icons/button.svg",
     html: '<a class="btn btn-primary">Primary</a>',
     properties: [{
-        name: "Background",
+        name: "背景",
         key: "background",
         htmlAttr: "class",
         inputtype: SelectInput,
@@ -127,7 +127,7 @@ Vvveb.Components.extend("html/link", "html/btn", {
             }]
         }
     },{
-        name: "Size",
+        name: "尺寸",
         key: "size",
         htmlAttr: "class",
         inputtype: SelectInput,
@@ -152,7 +152,7 @@ Vvveb.Components.extend("html/link", "html/btn", {
 		inline:true,
         col:6,
    	},{
-        name: "Disabled",
+        name: "禁用",
         key: "disabled",
         htmlAttr: "class",
 		inline:true,
@@ -177,7 +177,7 @@ Vvveb.Components.extend("_base", "html/buttongroup", {
     image: "icons/button_group.svg",
     html: '<div class="btn-group" role="group" aria-label="Basic example"><button type="button" class="btn btn-secondary">Left</button><button type="button" class="btn btn-secondary">Middle</button> <button type="button" class="btn btn-secondary">Right</button></div>',
 	properties: [{
-	    name: "Size",
+	    name: "尺寸",
         key: "size",
         htmlAttr: "class",
         inputtype: SelectInput,
@@ -195,7 +195,7 @@ Vvveb.Components.extend("_base", "html/buttongroup", {
             }]
         }
     },{
-	    name: "Alignment",
+	    name: "对齐",
         key: "alignment",
         htmlAttr: "class",
         inputtype: SelectInput,
@@ -246,7 +246,7 @@ Vvveb.Components.extend("_base","html/alert", {
 		  <strong>Holy guacamole!</strong> You should check in on some of those fields below.\
 		</div>',
     properties: [{
-        name: "Type",
+        name: "类型",
         key: "type",
         htmlAttr: "class",
         validValues: ["alert-primary", "alert-secondary", "alert-success", "alert-danger", "alert-warning", "alert-info", "alert-light", "alert-dark"],
@@ -286,7 +286,7 @@ Vvveb.Components.extend("_base", "html/badge", {
     name: "徽章",
     html: '<span class="badge bg-primary">Primary badge</span>',
     properties: [{
-        name: "Color",
+        name: "颜色",
         key: "color",
         htmlAttr: "class",
         validValues:["bg-primary", "bg-secondary", "bg-success", "bg-danger", "bg-warning", "bg-info", "bg-body-secondary", "bg-dark"],
@@ -380,7 +380,7 @@ Vvveb.Components.extend("_base", "html/listitem", {
     classes: ["list-group-item"],
     html: '<li class="list-group-item"><span class="badge bg-primary">14</span> Cras justo odio</li>',
 	properties: [{
-        name: "Background",
+        name: "背景",
         key: "background",
         htmlAttr: "class",
         validValues:["list-group-item-primary", "list-group-item-secondary", "list-group-item-success", "list-group-item-danger", "list-group-item-warning", "list-group-item-info", "list-group-item-light", "list-group-item-dark"],
@@ -416,7 +416,7 @@ Vvveb.Components.extend("_base", "html/listitem", {
             }]
         }
      },	{
-        name: "Active",
+        name: "激活",
         key: "active",
         htmlAttr: "class",
         validValues: ["", "active"],
@@ -428,7 +428,7 @@ Vvveb.Components.extend("_base", "html/listitem", {
             off: ""
         }
     },{
-        name: "Disabled",
+        name: "禁用",
         key: "disabled",
         htmlAttr: "class",
         validValues: ["", "disabled"],
@@ -452,7 +452,7 @@ Vvveb.Components.extend("_base", "html/breadcrumbs", {
 			s<li class="breadcrumb-item active" aria-current="page"><a href="#">Book</a></li>
 		  </ol>`,
 	properties: [{
-		name: "Divider",
+		name: "分割线",
 		key: "--bs-breadcrumb-divider",
 		htmlAttr: "style",
 		inputtype: TextInput
@@ -464,7 +464,7 @@ Vvveb.Components.extend("_base", "html/breadcrumbitem", {
     name: "Breadcrumb Item",
     html: '<li class="breadcrumb-item"><a href="#">Library</a></li>',
     properties: [{
-        name: "Active",
+        name: "激活",
         key: "active",
         htmlAttr: "class",
         validValues: ["", "active"],
@@ -490,7 +490,7 @@ Vvveb.Components.extend("_base", "html/pagination", {
 	</nav>',
 
     properties: [{
-        name: "Size",
+        name: "尺寸",
         key: "size",
         htmlAttr: "class",
         inputtype: SelectInput,
@@ -508,7 +508,7 @@ Vvveb.Components.extend("_base", "html/pagination", {
             }]
         }
     },{
-        name: "Alignment",
+        name: "对齐",
         key: "alignment",
         htmlAttr: "class",
         inputtype: SelectInput,
@@ -538,7 +538,7 @@ Vvveb.Components.extend("_base", "html/pageitem", {
         child:".page-link",
         inputtype: LinkInput
     },{
-        name: "Active",
+        name: "激活",
         key: "active",
         htmlAttr: "class",
         validValues: ["active"],
@@ -548,7 +548,7 @@ Vvveb.Components.extend("_base", "html/pageitem", {
             off: ""
         }
     },{
-        name: "Disabled",
+        name: "禁用",
         key: "disabled",
         htmlAttr: "class",
         validValues: ["disabled"],
@@ -565,7 +565,7 @@ Vvveb.Components.extend("_base", "html/progress", {
     image: "icons/progressbar.svg",
     html: '<div class="progress"><div class="progress-bar w-25"></div></div>',
     properties: [{
-        name: "Background",
+        name: "背景",
         key: "background",
 		htmlAttr: "class",
         validValues: bgcolorClasses,
@@ -622,7 +622,7 @@ Vvveb.Components.extend("_base", "html/progress", {
             off: "",
         }
     },{
-        name: "Animated",
+        name: "动画",
         key: "animated",
         child:".progress-bar",
         htmlAttr: "class",
@@ -683,7 +683,7 @@ Vvveb.Components.extend("_base", "html/navbar", {
             }]
         }
     },{
-        name: "Background color",
+        name: "背景颜色",
         key: "background",
         htmlAttr: "class",
         validValues: bgcolorClasses,
@@ -728,7 +728,7 @@ Vvveb.Components.extend("_base", "html/gridcolumn", {
     classes: ["col"],
     html: '<div class="col-sm-4"><h3>col-sm-4</h3></div>',
     properties: [{
-        name: "Column",
+        name: "列",
         key: "column",
         inline:false,
         inputtype: GridInput,
@@ -761,7 +761,7 @@ Vvveb.Components.extend("_base", "html/gridcolumn", {
 });
 
 Vvveb.Components.extend("_base", "html/gridrow", {
-    name: "Grid Row",
+    name: "网格行",
     image: "icons/grid_row.svg",
     classes: ["row"],
     html: '<div class="row"><div class="col-sm-4"><h3>col-sm-4</h3></div><div class="col-sm-4 col-5"><h3>col-sm-4</h3></div><div class="col-sm-4"><h3>col-sm-4</h3></div></div>',
@@ -1001,11 +1001,11 @@ Vvveb.Components.extend("_base", "html/gridrow", {
             }],
         },
 	},{
-		name: "Column",
+		name: "列",
 		key: "column1",
 		inputtype: GridInput
 	},{
-		name: "Column",
+		name: "列",
 		key: "column1",
 		inline:true,
 		col:12,

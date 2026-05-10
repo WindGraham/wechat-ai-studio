@@ -83,25 +83,25 @@ Vvveb.Components.extend("_base","elements/figure", {
         htmlAttr: "src",
         inputtype: ImageInput
     },{
-        name: "Width",
+        name: "宽度",
         key: "width",
         child:"img",
         htmlAttr: "width",
         inputtype: CssUnitInput
     },{
-        name: "Height",
+        name: "高度",
         key: "height",
         child:"img",
         htmlAttr: "height",
         inputtype: CssUnitInput
     },{
-        name: "Alt",
+        name: "替代文字",
         key: "alt",
         child:"img",
         htmlAttr: "alt",
         inputtype: TextInput
     },{
-        name: "Caption",
+        name: "图注",
         key: "caption",
         child:"figcaption",
         htmlAttr: "innerHTML",
@@ -146,7 +146,7 @@ Vvveb.Components.extend("_base","elements/font-icon", {
             }]
 		},
 	},{
-        name: "Size",
+        name: "尺寸",
         key: "type",
         htmlAttr: "class",
         inputtype: SelectInput,
@@ -306,7 +306,7 @@ Vvveb.Components.extend("_base","elements/svg-image", {
 		}]
        },
    },{
-        name: "Width",
+        name: "宽度",
         key: "width",
         htmlAttr: "width",
         inputtype: RangeInput,
@@ -316,7 +316,7 @@ Vvveb.Components.extend("_base","elements/svg-image", {
 		step:1
         }
    },{
-        name: "Height",
+        name: "高度",
         key: "height",
         htmlAttr: "height",
         inputtype: RangeInput,
@@ -358,7 +358,7 @@ Vvveb.Components.extend("_base","elements/svg-image", {
         htmlAttr: "fill",
         inputtype: ColorInput,
    },{
-        name: "Color",
+        name: "颜色",
         key: "color",
         //sort: base_sort++,
         col:4,
@@ -394,7 +394,7 @@ Vvveb.Components.add("elements/svg-element", {
 		htmlAttr: "fill",
         inputtype: ColorInput,
    },{
-        name: "Color",
+        name: "颜色",
         key: "color",
         //sort: base_sort++,
         col:4,
@@ -643,7 +643,7 @@ Vvveb.Components.add("elements/gallery", {
 				return 'repeat(' + value + ', minmax(0, 1fr))';
 			}  			
 		},{		
-			name: "Images",
+			name: "图片",
 			key: "images",
 			inputtype: ListInput,
 			htmlAttr:"data-images",
@@ -662,19 +662,19 @@ Vvveb.Components.add("elements/gallery", {
 					</figure>
 				</div>`,
 				elementProperties:[{
-					name: "Caption",
+					name: "图注",
 					key: "caption",
 					child:"figcaption",
 					htmlAttr: "innerHTML",
 					inputtype: TextareaInput
 				},{
-					name: "Title",
+					name: "标题",
 					key: "title",
 					child:".title",
 					htmlAttr: "innerHTML",
 					inputtype: TextInput
 				},{
-					name: "Description",
+					name: "描述",
 					key: "description",
 					child:".description",
 					htmlAttr: "innerHTML",
@@ -735,7 +735,7 @@ Vvveb.Components.add("elements/gallery", {
 Vvveb.Components.add("elements/tab", {
 	//attributes: ["data-component-tabs"],
 	classes: ["tab-pane"],
-    name: "Tab",
+    name: "标签页",
     image: "icons/tabs.svg",
     html: ``,
     properties: [{
@@ -754,7 +754,7 @@ Vvveb.Components.add("elements/tab", {
 			inputtype: TextInput
 			
 		} , {
-        name: "Active",
+        name: "激活",
         key: "active",
         htmlAttr: "class",
         validValues: ["", "active"],
@@ -770,7 +770,7 @@ Vvveb.Components.add("elements/tab", {
 	
 Vvveb.Components.add("elements/tabs", {
     attributes: ["data-component-tabs"],
-    name: "Tabs",
+    name: "标签页",
     image: "icons/tabs.svg",
     html: `
 	<div data-component-tabs id="tabs-parentId">
@@ -859,7 +859,7 @@ Vvveb.Components.add("elements/tabs", {
 //Accordion
 Vvveb.Components.add("elements/accordion", {
     classes: ["accordion"],
-    name: "Accordeon",
+    name: "折叠面板",
     image: "icons/accordion.svg",
     html: `<div class="accordion" id="accordion-parentId">
 		  <div class="accordion-item">
@@ -1014,12 +1014,12 @@ Vvveb.Components.add("elements/flip-box", {
 		  </div>
 		</div>`,
 		properties: [{
-			name: "Width",
+			name: "宽度",
 			key: "width",
 			htmlAttr: "style",
 			inputtype: CssUnitInput
 		},{
-			name: "Height",
+			name: "高度",
 			key: "height",
 			htmlAttr: "style",
 			inputtype: CssUnitInput
@@ -1060,7 +1060,7 @@ Vvveb.Components.add("elements/flip-box", {
 
 Vvveb.Components.add("elements/counter", {
     nodes: [".counter"],
-    name: "Counter",
+    name: "计数器",
     image: "icons/stopwatch.svg",
     html: `<i class="font-icon la la-star"></i>`,
     properties: [
@@ -1153,7 +1153,7 @@ Vvveb.Components.add("elements/social-icons", {
 				return node;
 			},
 		},{
-			name: "Inline",
+			name: "行内",
 			key: "list-inline",
 			htmlAttr: "class",
 			validValues: ["list-inline"],
@@ -1238,7 +1238,7 @@ function carouselAfterDrop(node) {
 };
 
 Vvveb.Components.add("elements/carousel", {
-    name: "Carousel",
+    name: "轮播",
     image: "icons/carousel.svg",
     classes: ["swiper"],
     html: `
@@ -1336,7 +1336,7 @@ Vvveb.Components.add("elements/carousel", {
 		htmlAttr:"data-speed",
 		data: {step:100},
 	},{
-		name: "Delay",
+		name: "延迟",
         key: "delay",
         inputtype: NumberInput,
 		htmlAttr:"data-delay",
@@ -1354,14 +1354,14 @@ Vvveb.Components.add("elements/carousel", {
 		inline:true,
         col:6
     },{	
-		name: "Autoplay",
+		name: "自动播放",
         key: "autoplay",
 		htmlAttr:"data-autoplay",
 		inputtype: CheckboxInput,
 		inline:true,
         col:6
 	},{
-		name: "Auto height",
+		name: "自动高度",
         key: "autoHeight",
 		htmlAttr:"data-auto-height",
 		inputtype: CheckboxInput,
@@ -1380,7 +1380,7 @@ Vvveb.Components.add("elements/carousel", {
 		inputtype: CheckboxInput,
 		inline:true,
         col:6
-	},{	name: "Loop",
+	},{	name: "循环",
         key: "loop",
 		htmlAttr:"data-loop",
 		inputtype: CheckboxInput,
@@ -1393,7 +1393,7 @@ Vvveb.Components.add("elements/carousel", {
 		inline:true,
         col:6
 	},{	
-        name: "Pagination",
+        name: "分页",
         key: "pagination",
 		htmlAttr:"data-pagination",
 		inputtype: CheckboxInput,
@@ -1471,7 +1471,7 @@ Vvveb.Components.add("elements/icon-list", {
 
 Vvveb.Components.add("elements/divider", {
     nodes: [".counter"],
-    name: "Divider",
+    name: "分割线",
     image: "icons/stopwatch.svg",
     html: `<i class="font-icon la la-star"></i>`,
     properties: [
@@ -1507,7 +1507,7 @@ Vvveb.Components.add("elements/Icon box", {
 
 Vvveb.Components.add("elements/animated-headline", {
     nodes: [".counter"],
-    name: "Animated headline",
+    name: "动画标题",
     image: "icons/dots_three.svg",
     html: `<i class="font-icon la la-star"></i>`,
     properties: [
@@ -1547,7 +1547,7 @@ Vvveb.Components.add("elements/code", {
     image: "icons/code.svg",
     html: `<code>print "Hello world!"</code>`,
 	properties: [{
-		name: "Text",
+		name: "文字",
 		key: "text",
 		inline:false,
 		htmlAttr: "innerHTML",

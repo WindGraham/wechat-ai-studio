@@ -21,12 +21,12 @@ Vvveb.ComponentsGroup['Base'] =
 
 Vvveb.Components.extend("_base", "html/heading", {
     image: "icons/heading.svg",
-    name: "Heading",
+    name: "标题",
     nodes: ["h1", "h2","h3", "h4","h5","h6"],
     html: "<h1>Heading</h1>",
     
 	properties: [{
-        name: "Size",
+        name: "尺寸",
         key: "size",
         inputtype: SelectInput,
         
@@ -66,7 +66,7 @@ Vvveb.Components.extend("_base", "html/heading", {
             }]
 		}
    	},{
-		name: "Text",
+		name: "文字",
 		key: "innerHTML",
 		inline:false,
 		sort:3,
@@ -78,7 +78,7 @@ Vvveb.Components.extend("_base", "html/heading", {
 
 let linkComponentProperties = [
 /*	{
-		name: "Text",
+		name: "文字",
 		key: "text",
 		sort:1,
 		htmlAttr: "innerText",
@@ -97,13 +97,13 @@ let linkComponentProperties = [
 		htmlAttr: "rel",
 		inputtype: LinkInput
    	},{
-		name: "Text",
+		name: "文字",
 		key: "innerHTML",
 		sort:3,
 		htmlAttr: "innerHTML",
 		inputtype: TextareaInput
 	}, {
-		name: "Target",
+		name: "目标",
 		key: "target",
 		sort:4,
 		htmlAttr: "target",
@@ -127,7 +127,7 @@ let linkComponentProperties = [
 			}]
 	   },
 	}, {
-		name: "Download",
+		name: "下载",
 		sort:5,
 		key: "download",
 		htmlAttr: "download",
@@ -136,7 +136,7 @@ let linkComponentProperties = [
 
 Vvveb.Components.extend("_base", "html/link", {
     nodes: ["a"],
-    name: "Link",
+    name: "链接",
     html: '<a href="#" rel="noopener">Link Text</a>',
 	image: "icons/link.svg",
     properties: linkComponentProperties
@@ -144,33 +144,33 @@ Vvveb.Components.extend("_base", "html/link", {
 
 Vvveb.Components.extend("_base", "html/image", {
     nodes: ["img"],
-    name: "Image",
+    name: "图片",
     html: '<img src="' +  Vvveb.baseUrl + 'icons/image.svg" width="200" class="img-fluid align-center">',
     image: "icons/image.svg",
     resizable:true,//show select box resize handlers
     
     properties: [{
-        name: "Image",
+        name: "图片",
         key: "src",
         htmlAttr: "src",
         inputtype: ImageInput
     }, {
-        name: "Width",
+        name: "宽度",
         key: "width",
         htmlAttr: "width",
         inputtype: NumberInput
     }, {
-        name: "Height",
+        name: "高度",
         key: "height",
         htmlAttr: "height",
         inputtype: NumberInput
     }, {
-        name: "Alt",
+        name: "替代文字",
         key: "alt",
         htmlAttr: "alt",
         inputtype: TextInput
     }, {
-        name: "Align",
+        name: "对齐",
         key: "align",
         htmlAttr: "class",
         inline:false,
@@ -274,7 +274,7 @@ Vvveb.Components.extend("_base", "html/hr", {
     name: "Horizontal Rule",
     html: '<hr class="border-primary border-4 opacity-25">',
 	properties:[{
-        name: "Type",
+        name: "类型",
         key: "border-color",
 		htmlAttr: "class",
         validValues: ["border-primary", "border-secondary", "border-success", "border-danger", "border-warning", "border-info", "border-light", "border-dark", "border-white"],
@@ -313,7 +313,7 @@ Vvveb.Components.extend("_base", "html/hr", {
 			}]
         }
     },{
-        name: "Border",
+        name: "边框",
         key: "border-size",
 		htmlAttr: "class",
         validValues: ["border-1", "border-2", "border-3", "border-4", "border-5"],
@@ -340,7 +340,7 @@ Vvveb.Components.extend("_base", "html/hr", {
 			}]
         }
     },{
-        name: "Opacity",
+        name: "透明度",
         key: "opacity",
 		htmlAttr: "class",
         validValues: ["opacity-25", "opacity-50", "opacity-75", "opacity-100"],
@@ -367,7 +367,7 @@ Vvveb.Components.extend("_base", "html/hr", {
 });
 
 Vvveb.Components.extend("_base", "html/label", {
-    name: "Label",
+    name: "标签",
     nodes: ["label"],
     html: '<label for="">Label</label>',
     properties: [{
@@ -396,7 +396,7 @@ Vvveb.Components.extend("_base", "html/textinput", {
         htmlAttr: "value",
         inputtype: TextInput
     }, {
-        name: "Type",
+        name: "类型",
         key: "type",
         htmlAttr: "type",
 		inputtype: SelectInput,
@@ -478,7 +478,7 @@ Vvveb.Components.extend("_base", "html/textinput", {
         htmlAttr: "placeholder",
         inputtype: TextInput
     }, {
-        name: "Disabled",
+        name: "禁用",
         key: "disabled",
         htmlAttr: "disabled",
 		col:6,
@@ -550,7 +550,7 @@ Vvveb.Components.extend("_base", "html/selectinput", {
         htmlAttr: "name",
         inputtype: TextInput
     }, {
-        name: "Disabled",
+        name: "禁用",
         key: "disabled",
         htmlAttr: "disabled",
 		col:6,
@@ -619,7 +619,7 @@ Vvveb.Components.extend("_base", "html/textareainput", {
         htmlAttr: "rows",
         inputtype: NumberInput
     }, {
-        name: "Disabled",
+        name: "禁用",
         key: "disabled",
         htmlAttr: "disabled",
 		col:6,
@@ -675,7 +675,7 @@ Vvveb.Components.extend("_base", "html/radiobutton", {
         //inline:true,
         //col:6
 	},{
-        name: "Disabled",
+        name: "禁用",
         key: "disabled",
         htmlAttr: "disabled",
 		col:6,
@@ -692,7 +692,7 @@ Vvveb.Components.extend("_base", "html/radiobutton", {
 });
 
 Vvveb.Components.extend("_base", "html/checkbox", {
-    name: "Checkbox",
+    name: "复选框",
     attributes: {"type":"checkbox"},
     image: "icons/checkbox.svg",
     html: `<div class="form-check">
@@ -722,7 +722,7 @@ Vvveb.Components.extend("_base", "html/checkbox", {
         //inline:true,
         //col:6
 	},{
-        name: "Disabled",
+        name: "禁用",
         key: "disabled",
         htmlAttr: "disabled",
 		col:6,
@@ -740,7 +740,7 @@ Vvveb.Components.extend("_base", "html/checkbox", {
 
 /*
 Vvveb.Components.extend("_base", "html/fileinput", {
-    name: "Input group",
+    name: "输入组",
 	attributes: {"type":"file"},
     image: "icons/text_input.svg",
     html: '<input type="file" class="form-control">'
@@ -749,13 +749,13 @@ Vvveb.Components.extend("_base", "html/fileinput", {
 
 Vvveb.Components.extend("_base", "html/video", {
     nodes: ["video"],
-    name: "Video",
+    name: "视频",
     html: '<video width="320" height="240" playsinline loop autoplay muted src="../../media/demo/sample.webm" poster="../../media/sample.webp"><video>',
     dragHtml: '<img  width="320" height="240" src="' + Vvveb.baseUrl + 'icons/video.svg">',
 	image: "icons/video.svg",
     resizable:true,//show select box resize handlers
     properties: [{
-        name: "Video",
+        name: "视频",
         //child: "source",
         key: "src",
         htmlAttr: "src",
@@ -766,27 +766,27 @@ Vvveb.Components.extend("_base", "html/video", {
         htmlAttr: "poster",
         inputtype: ImageInput
     },{
-        name: "Width",
+        name: "宽度",
         key: "width",
         htmlAttr: "width",
         inputtype: TextInput
     }, {
-        name: "Height",
+        name: "高度",
         key: "height",
         htmlAttr: "height",
         inputtype: TextInput
     },{
-        name: "Muted",
+        name: "静音",
         key: "muted",
         htmlAttr: "muted",
         inputtype: CheckboxInput
     },{
-        name: "Loop",
+        name: "循环",
         key: "loop",
         htmlAttr: "loop",
         inputtype: CheckboxInput
     },{
-        name: "Autoplay",
+        name: "自动播放",
         key: "autoplay",
         htmlAttr: "autoplay",
         inputtype: CheckboxInput
@@ -796,7 +796,7 @@ Vvveb.Components.extend("_base", "html/video", {
         htmlAttr: "playsinline",
         inputtype: CheckboxInput
     },{
-        name: "Controls",
+        name: "控件",
         key: "controls",
         htmlAttr: "controls",
         inputtype: CheckboxInput
@@ -821,7 +821,7 @@ Vvveb.Components.extend("_base", "html/button", {
     image: "icons/button.svg",
     html: '<button>Button</button>',
     properties: [{
-        name: "Text",
+        name: "文字",
         key: "text",
         htmlAttr: "innerHTML",
         inputtype: TextInput
@@ -831,7 +831,7 @@ Vvveb.Components.extend("_base", "html/button", {
         htmlAttr: "name",
         inputtype: TextInput
     }, {
-        name: "Type",
+        name: "类型",
         key: "type",
 		htmlAttr: "type",
         inputtype: SelectInput,
@@ -855,7 +855,7 @@ Vvveb.Components.extend("_base", "html/button", {
 		inline:true,
         col:6,
    	},{
-		name: "Disabled",
+		name: "禁用",
         key: "disabled",
         htmlAttr: "disabled",
         inputtype: CheckboxInput,
@@ -866,11 +866,11 @@ Vvveb.Components.extend("_base", "html/button", {
 
 Vvveb.Components.extend("_base", "html/paragraph", {
     nodes: ["p"],
-    name: "Paragraph",
+    name: "段落",
     image: "icons/paragraph.svg",
     html: '<p>Lorem ipsum</p>',
     properties: [{
-        name: "Text align",
+        name: "文字对齐",
         key: "p-text-align",
         htmlAttr: "class",
         inline:false,
@@ -905,7 +905,7 @@ Vvveb.Components.extend("_base", "html/paragraph", {
             }],
         },
 	},{
-		name: "Text",
+		name: "文字",
 		key: "innerHTML",
 		sort:3,
 		inline:false,
@@ -916,7 +916,7 @@ Vvveb.Components.extend("_base", "html/paragraph", {
 
 Vvveb.Components.extend("_base", "html/blockquote", {
     nodes: ["blockquote"],
-    name: "Blockquote",
+    name: "引用块",
 	image: "icons/blockquote.svg",
 	html: `<blockquote cite="https://en.wikipedia.org/wiki/Marcus_Aurelius">
 				<p>Today I shall be meeting with interference, ingratitude, insolence, disloyalty, ill-will, and selfishness all of them due to the offenders' ignorance of what is good or evil.</p>
@@ -952,7 +952,7 @@ Vvveb.Components.extend("_base", "html/list", {
 				<li>Only super-efforts count.</li>
 			</ul>`,
 	properties: [{
-        name: "Type",
+        name: "类型",
         key: "type",
         inputtype: SelectInput,
         
@@ -1015,7 +1015,7 @@ ingratitude, insolence, disloyalty, ill-will, and
 selfishness all of them due to the offenders'
 ignorance of what is good or evil..</pre>`,
     properties: [{
-        name: "Text",
+        name: "文字",
         key: "text",
         inline:false,
         htmlAttr: "innerHTML",
@@ -1029,7 +1029,7 @@ ignorance of what is good or evil..</pre>`,
 Vvveb.Components.extend("_base", "html/form", {
     nodes: ["form"],
     image: "icons/form.svg",
-    name: "Form",
+    name: "表单",
     html: `<form action="" method="POST">
 	  <div class="mb-3">
 		<label for="exampleInputEmail1" class="form-label">Email address</label>
@@ -1047,7 +1047,7 @@ Vvveb.Components.extend("_base", "html/form", {
 	  <button type="submit" class="btn btn-primary">Submit</button>
 	</form>`,
     properties: [/*{
-        name: "Style",
+        name: "样式",
         key: "style",
         htmlAttr: "class",
         validValues: ["", "form-search", "form-inline", "form-horizontal"],
@@ -1068,7 +1068,7 @@ Vvveb.Components.extend("_base", "html/form", {
             }]
         }
     }, */{
-        name: "Action",
+        name: "操作",
         key: "action",
         htmlAttr: "action",
         inputtype: TextInput
@@ -1115,7 +1115,7 @@ Vvveb.Components.extend("_base", "html/tablerow", {
     name: "Table Row",
     html: "<tr><td>Cell 1</td><td>Cell 2</td><td>Cell 3</td></tr>",
     properties: [{
-        name: "Type",
+        name: "类型",
         key: "type",
         htmlAttr: "class",
         inputtype: SelectInput,
@@ -1174,7 +1174,7 @@ Vvveb.Components.extend("_base", "html/tablehead", {
     name: "Table Head",
     html: "<thead><tr><th>Head 1</th><th>Head 2</th><th>Head 3</th></tr></thead>",
     properties: [{
-        name: "Type",
+        name: "类型",
         key: "type",
         htmlAttr: "class",
         inputtype: SelectInput,
@@ -1235,7 +1235,7 @@ Vvveb.Components.extend("_base", "html/table", {
 			  </tbody>
 			</table>`,
     properties: [{
-        name: "Type",
+        name: "类型",
         key: "type",
 		htmlAttr: "class",
         validValues: ["table-primary", "table-secondary", "table-success", "table-danger", "table-warning", "table-info", "table-light", "table-dark", "table-white"],
@@ -1274,7 +1274,7 @@ Vvveb.Components.extend("_base", "html/table", {
 			}]
         }
     }, {
-        name: "Responsive",
+        name: "响应式",
         key: "responsive",
         htmlAttr: "class",
         validValues: ["table-responsive"],
@@ -1284,7 +1284,7 @@ Vvveb.Components.extend("_base", "html/table", {
             off: ""
         }
     }, {
-        name: "Small",
+        name: "小",
         key: "small",
         htmlAttr: "class",
         validValues: ["table-sm"],
@@ -1294,7 +1294,7 @@ Vvveb.Components.extend("_base", "html/table", {
             off: ""
         }
     }, {
-        name: "Hover",
+        name: "悬停",
         key: "hover",
         htmlAttr: "class",
         validValues: ["table-hover"],
@@ -1359,7 +1359,7 @@ Vvveb.Components.extend("_base", "html/table", {
 Vvveb.Components.extend("_base", "html/audio", {
     nodes: ["audio"],
     attributes: ["data-component-audio"],
-    name: "Audio",
+    name: "音频",
     image: "icons/audio.svg",
     html: `<figure data-component-audio><audio controls src="#"></audio></figure>`,
     properties: [{
@@ -1374,7 +1374,7 @@ Vvveb.Components.extend("_base", "html/audio", {
         name:false,
         data: {header:"Options"},
     }, {
-		name: "Autoplay",
+		name: "自动播放",
         key: "autoplay",
         htmlAttr: "autoplay",
         child:"audio",
@@ -1382,7 +1382,7 @@ Vvveb.Components.extend("_base", "html/audio", {
         inline:true,
         col:4,
 /*    }, {
-        name: "Controls",
+        name: "控件",
         key: "controls",
         htmlAttr: "controls",
         inputtype: CheckboxInput,
@@ -1390,7 +1390,7 @@ Vvveb.Components.extend("_base", "html/audio", {
         inline:true,
         col:4,
 */    }, {
-        name: "Loop",
+        name: "循环",
         key: "loop",
         htmlAttr: "loop",
         inputtype: CheckboxInput,
@@ -1417,7 +1417,7 @@ Vvveb.Components.extend("_base", "html/pdf", {
 Vvveb.Components.extend("_base", "html/embed", {
     attributes: ["data-component-embed"],
     image: "icons/embed.svg",
-    name: "Embed",
+    name: "嵌入",
     html: `<object data="" type="application/pdf" data-component-pdf></object>`,
     properties: [{
         name: "Data",
@@ -1433,7 +1433,7 @@ Vvveb.Components.extend("_base", "html/html", {
     image: "icons/posts.svg",
     html: `<html><body></body></html>`,
     properties: [{
-        name: "Title",
+        name: "标题",
         key: "title",
         htmlAttr: "innerHTML",
         inputtype: TextInput,
@@ -1471,13 +1471,13 @@ Vvveb.Components.extend("_base", "html/iframe", {
         child:"iframe",
         inputtype: TextInput
     }, {
-        name: "Width",
+        name: "宽度",
         key: "width",
         htmlAttr: "width",
         child:"iframe",
         inputtype: CssUnitInput
     }, {
-        name: "Height",
+        name: "高度",
         key: "height",
         htmlAttr: "height",
         child:"iframe",

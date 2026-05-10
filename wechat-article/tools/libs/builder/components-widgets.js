@@ -63,7 +63,7 @@ Vvveb.Components.extend("_base", "widgets/googlemaps", {
 	},
 
     properties: [{
-        name: "Address",
+        name: "地址",
         key: "q",
         inputtype: TextInput
     },{
@@ -80,7 +80,7 @@ Vvveb.Components.extend("_base", "widgets/googlemaps", {
             }]
        },
     },{
-        name: "Zoom",
+        name: "缩放",
         key: "z",
         inputtype: RangeInput,
         data:{
@@ -134,7 +134,7 @@ Vvveb.Components.extend("_base", "widgets/openstreetmap", {
 	},
 
     properties: [{
-        name: "Map",
+        name: "地图",
         key: "bbox",
         inputtype: TextInput
 /*    },{
@@ -265,7 +265,7 @@ Vvveb.Components.extend("_base", "widgets/embed-video", {
             }]
        },
 	 },{
-        name: "Video",
+        name: "视频",
         key: "video_id",
         inputtype: TextInput,
    		onChange: function(node, value, input, component) {
@@ -297,14 +297,14 @@ Vvveb.Components.extend("_base", "widgets/embed-video", {
         key: "url",
         inputtype: TextInput
     },{
-		name: "Width",
+		name: "宽度",
         key: "width",
         htmlAttr: "style",
         inline:false,
         col:6,
         inputtype: CssUnitInput
     },{
-        name: "Height",
+        name: "高度",
         key: "height",
         htmlAttr: "style",
         inline:false,
@@ -316,7 +316,7 @@ Vvveb.Components.extend("_base", "widgets/embed-video", {
         name:false,
         data: {header:"Options"},
     },{
-        name: "Auto play",
+        name: "自动播放",
         key: "autoplay",
         htmlAttr: "autoplay",
         inline:true,
@@ -330,21 +330,21 @@ Vvveb.Components.extend("_base", "widgets/embed-video", {
         col:4,
         inputtype: CheckboxInput
     },{
-        name: "Controls",
+        name: "控件",
         key: "controls",
         htmlAttr: "controls",
         inline:true,
         col:4,
         inputtype: CheckboxInput
     },{
-        name: "Loop",
+        name: "循环",
         key: "loop",
         htmlAttr: "loop",
         inline:true,
         col:4,
         inputtype: CheckboxInput
     },{
-        name: "Muted",
+        name: "静音",
         key: "muted",
         htmlAttr: "muted",
         inline:true,
@@ -385,7 +385,7 @@ Vvveb.Components.extend("_base", "widgets/facebookcomments", {
 			data-width="100%" \
 			></div></div>',
     properties: [{
-        name: "Href",
+        name: "链接",
         key: "business",
         htmlAttr: "data-href",
         child:".fb-comments",
@@ -436,7 +436,7 @@ Vvveb.Components.extend("_base", "widgets/instagram", {
 });
 */
 Vvveb.Components.extend("_base", "widgets/twitter", {
-    name: "Twitter",
+    name: "推特",
     attributes: ["data-component-twitter"],
     image: "icons/twitter.svg",
     dragHtml: '<img src="' + Vvveb.baseUrl + 'icons/twitter.svg">',
@@ -584,7 +584,7 @@ Vvveb.Components.extend("_base", "widgets/facebookpage", {
         child:".fb-page",
         inputtype: TextInput
     },{		
-        name: "Adapt container width",
+        name: "适应容器宽度",
         key: "adapt-container-width",
         htmlAttr: "data-adapt-container-width",
         child:".fb-page",
@@ -602,7 +602,7 @@ Vvveb.Components.extend("_base", "widgets/facebookpage", {
         child:".fb-page",
         inputtype: TextInput
     },{		
-        name: "App Id",
+        name: "应用ID",
         key: "appid",
         htmlAttr: "data-appId",
         child:".fb-page",
@@ -708,7 +708,7 @@ Vvveb.Components.extend("_base", "widgets/chartjs", {
 	},
     
     properties: [{
-        name: "Type",
+        name: "类型",
         key: "type",
         inputtype: SelectInput,
         data:{
@@ -823,13 +823,13 @@ Vvveb.Components.add("widgets/lottie", {
         inputtype: TextInput,
 		htmlAttr:"data-path",
 	},{
-		name: "Autoplay",
+		name: "自动播放",
         key: "autoplay",
 		htmlAttr:"data-autoplay",
 		inputtype: CheckboxInput,
 		inline:true,
         col:4
-	},{	name: "Loop",
+	},{	name: "循环",
         key: "loop",
 		htmlAttr:"data-loop",
 		inputtype: CheckboxInput,

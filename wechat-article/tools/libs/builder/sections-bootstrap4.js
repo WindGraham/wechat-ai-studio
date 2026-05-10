@@ -21,7 +21,7 @@ Vvveb.SectionsGroup['Bootstrap'] =
 
 
 Vvveb.Sections.add("bootstrap4/about-team", {
-    name: "About and Team Section",
+    name: "关于和团队",
 	dragHtml: '<img src="' + Vvveb.baseUrl + 'icons/image.svg">',        
     image: "https://assets.startbootstrap.com/img/screenshots/snippets/about-team.jpg",
     html:`

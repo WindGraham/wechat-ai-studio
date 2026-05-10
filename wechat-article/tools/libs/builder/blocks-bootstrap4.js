@@ -867,7 +867,7 @@ body{
 
 
 Vvveb.Blocks.add("bootstrap4/about-team", {
-    name: "About and Team Section",
+    name: "关于和团队",
     image: "https://assets.startbootstrap.com/img/screenshots/snippets/about-team.jpg",
     html:`
 <div class="container">
@@ -922,7 +922,7 @@ Vvveb.Blocks.add("bootstrap4/about-team", {
 
 
 Vvveb.Blocks.add("bootstrap4/pricing-1", {
-    name: "Pricing table",
+    name: "价格表",
     image: "https://d2d3qesrx8xj6s.cloudfront.net/img/screenshots/e92f797807bb4cd880bc3f161d9f9869854b6991.jpeg",
     html:`
 <div id="plans">
@@ -1079,7 +1079,7 @@ Vvveb.Blocks.add("bootstrap4/loading-circle", {
 
 
 Vvveb.Blocks.add("bootstrap4/block-quote", {
-    name: "Block quote",
+    name: "引用块",
     image: "https://d2d3qesrx8xj6s.cloudfront.net/img/screenshots/d9f382e143b77d5a630dd79a2a3860611a8a953c.jpg",
     html:`
 <div class="container">
