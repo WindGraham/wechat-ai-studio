@@ -77,7 +77,7 @@
 
 				<div class="btn-group me-3" role="group">
 					<button class="btn btn-light" title="自由拖拽模式" id="designer-mode-btn"
-						data-bs-toggle="button" aria-pressed="false" data-vvveb-action="setDesignerMode" onclick="toggleModeBtn(this)">
+						data-bs-toggle="button" aria-pressed="false" data-vvveb-action="setDesignerMode" onclick="toggleMode(this)">
 						<i class="la la-hand-rock"></i>
 					</button>
 
@@ -689,7 +689,7 @@
 
 
 		<div id="canvas">
-			<div id="iframe-wrapper" style="overflow-y:auto;height:100%;">
+			<div id="iframe-wrapper">
 				<div id="iframe-layer">
 
 					<div class="loading-message active">
@@ -2795,21 +2795,12 @@ function selectBlock(block) {
 }
 
 function dragMoveListener(event) {
-  var target = event.target;
-  var x = (parseFloat(target.style.left) || 0) + (streamMode ? 0 : event.dx);
-  var y = (parseFloat(target.style.top) || 0) + event.dy;
-  target.style.left = Math.max(0, x) + 'px';
-  target.style.top = Math.max(0, y) + 'px';
-  // Auto-extend canvas when dragging near bottom
-  var canvas = document.getElementById('block-canvas');
-  var blockBottom = y + target.offsetHeight;
-  var canvasHeight = parseInt(canvas.style.minHeight) || 800;
-  if (blockBottom > canvasHeight - 100) {
-    canvas.style.minHeight = (blockBottom + 400) + 'px';
-    // Scroll the iframe-wrapper to follow
-    var wrapper = document.getElementById('iframe-wrapper');
-    if (wrapper) wrapper.scrollTop = blockBottom - 300;
-  }
+	const target = event.target;
+	const x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx;
+	const y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy;
+	target.style.transform = 'translate(' + x + 'px, ' + y + 'px)';
+	target.setAttribute('data-x', x);
+	target.setAttribute('data-y', y);
 }
 
 function resizeMoveListener(event) {
@@ -3008,11 +2999,7 @@ function insertHtmlIntoCanvas(html) {
     var h = b.offsetHeight || 100;
     if (t + h > maxBottom) maxBottom = t + h;
   });
-  // If no blocks yet, start at top; otherwise add 20px below last block
-  wrapper.style.top = (existing.length === 0 ? 20 : maxBottom + 20) + 'px';
-  // Ensure canvas is tall enough
-  var needed = parseFloat(wrapper.style.top) + 200;
-  if (parseInt(canvas.style.minHeight) < needed) canvas.style.minHeight = (needed + 500) + 'px';
+  wrapper.style.top = (maxBottom + 20) + 'px';
   canvas.appendChild(wrapper);
   makeInteractable(wrapper);
   selectBlock(wrapper);
@@ -3117,8 +3104,6 @@ function togglePreview() {
   }
 }
 
-function toggleModeBtn(btn) { toggleMode(btn); }
-
 function toggleMode(btn) {
   if (btn) {
     var pressed = btn.getAttribute('aria-pressed') === 'true';
@@ -3177,155 +3162,6 @@ function newPage() {
     selectedBlock = null;
   }
 }
-
-// ============================================================
-// VvvebJs iframe features replicated on DOM canvas
-// ============================================================
-
-// 1. WYSIWYG editor - redirect to canvas blocks
-setTimeout(function() {
-  var editor = document.getElementById('wysiwyg-editor');
-  if (!editor) return;
-  editor.querySelectorAll('a').forEach(function(btn) {
-    btn.addEventListener('click', function(e) {
-      e.preventDefault();
-      if (!selectedBlock) return;
-      var p = selectedBlock.querySelector('p') || selectedBlock;
-      p.contentEditable = 'true'; p.focus();
-      var cmdMap = { 'bold-btn':'bold','italic-btn':'italic','underline-btn':'underline','strikethrough-btn':'strikeThrough',
-        'justifyleft-btn':'justifyLeft','justifycenter-btn':'justifyCenter','justifyright-btn':'justifyRight','justifyfull-btn':'justifyFull' };
-      var cmd = cmdMap[btn.id] || '';
-      if (cmd) { try { document.execCommand(cmd, false, null); } catch(ex) {} }
-      if (btn.id === 'link-btn') { var url = prompt('输入链接URL:'); if(url) document.execCommand('createLink',false,url); }
-      if (btn.id === 'unlink-btn') { document.execCommand('unlink',false,null); }
-      p.contentEditable = 'false';
-      saveState();
-    });
-  });
-}, 3000);
-
-// 2. Navigator tree - show canvas blocks
-setInterval(function() {
-  var tree = document.getElementById('tree-list');
-  if (!tree || tree.style.display === 'none') return;
-  var ol = tree.querySelector('ol');
-  if (!ol) return;
-  var blocks = document.querySelectorAll('#block-canvas .canvas-block');
-  if (blocks.length > 0) {
-    ol.innerHTML = '';
-    blocks.forEach(function(block, i) {
-      var li = document.createElement('li');
-      var type = block.getAttribute('data-type') || 'Block';
-      li.textContent = type + ' #' + (i+1);
-      li.style.cssText = 'padding:2px 8px;cursor:pointer;font-size:11px;';
-      li.onclick = function() { selectBlock(block); };
-      if (block === selectedBlock) li.style.background = 'var(--bs-primary,#0d6efd)';
-      ol.appendChild(li);
-    });
-  }
-}, 2000);
-
-// 3. Breadcrumb - update for canvas
-setInterval(function() {
-  var bc = document.querySelector('.breadcrumb');
-  if (!bc) return;
-  if (selectedBlock) {
-    var type = selectedBlock.getAttribute('data-type') || '组件';
-    bc.innerHTML = '<li class=\"breadcrumb-item\"><a href=\"#\">画布</a></li><li class=\"breadcrumb-item active\">' + type + '</li>';
-  } else {
-    bc.innerHTML = '<li class=\"breadcrumb-item active\">画布</li>';
-  }
-}, 1000);
-
-// 4. Add section button
-setTimeout(function() {
-  var btn = document.getElementById('add-section-btn');
-  if (btn) {
-    btn.addEventListener('click', function(e) { e.preventDefault(); addBlock('text'); });
-  }
-}, 3000);
-
-// 5. Property panel - trigger VvvebJs refresh on canvas selection
-var _origSelectBlock = selectBlock;
-selectBlock = function(block) {
-  _origSelectBlock(block);
-  if (block && typeof Vvveb !== 'undefined' && Vvveb.Builder) {
-    var section = block.querySelector('section');
-    if (section) {
-      try { Vvveb.Builder.selectedEl = section; } catch(e) {}
-      try { if (Vvveb.Builder.selectNode) Vvveb.Builder.selectNode(section); } catch(e) {}
-    }
-  }
-};
-
-// 6. Mock FrameDocument for VvvebJs (no iframe)
-setTimeout(function() {
-  if (document.getElementById('block-canvas')) {
-    window.FrameDocument = document;
-    if (Vvveb && Vvveb.Builder) {
-      Vvveb.Builder.frameDoc = document.documentElement;
-      Vvveb.Builder.frameBody = document.body;
-      Vvveb.Builder.frameHead = document.head;
-      Vvveb.Builder.frameHtml = document.documentElement;
-    }
-    // Disable Google Fonts loading
-    if (Vvveb && Vvveb.GoogleFonts) Vvveb.GoogleFonts = null;
-  }
-}, 5000);
-
-// 7. Auto-expand canvas when blocks overflow
-setInterval(function() {
-  var canvas = document.getElementById('block-canvas');
-  if (!canvas) return;
-  var blocks = canvas.querySelectorAll('.canvas-block');
-  var maxBottom = 0;
-  blocks.forEach(function(b) {
-    var t = parseFloat(b.style.top) || 0;
-    var h = b.offsetHeight || 50;
-    if (t + h > maxBottom) maxBottom = t + h;
-  });
-  if (maxBottom > parseInt(canvas.style.minHeight) - 200) {
-    canvas.style.minHeight = (maxBottom + 500) + 'px';
-  }
-}, 3000);
-
-// 8. Global handler for all VvvebJs data-vvveb-action buttons
-document.addEventListener('click', function(e) {
-  var btn = e.target.closest('[data-vvveb-action]');
-  if (!btn) return;
-  var action = btn.getAttribute('data-vvveb-action');
-  if (!action) return;
-  e.preventDefault(); e.stopPropagation();
-  
-  var handlers = {
-    'toggleTreeList': function() { togglePanel('tree-list'); },
-    'treeListRight': function() { togglePanel('tree-list'); },
-    'toggleFileManager': function() { togglePanel('filemanager'); },
-    'toggleLeftColumn': function() { togglePanel('add-section-box'); },
-    'toggleRightColumn': function() { togglePanel('right-panel'); },
-    'undo': function() { undo(); },
-    'redo': function() { redo(); },
-    'setDesignerMode': function() { toggleModeBtn(btn); },
-    'preview': function() { togglePreview(); },
-    'fullscreen': function() { document.documentElement.requestFullscreen(); },
-    'toggleHidden': function() { toggleHiddenElements(); },
-    'download': function() { downloadHTML(); },
-    'darkMode': function() { document.body.classList.toggle('dark'); },
-    'toggleSections': function() {},
-    'toggleEditor': function() {},
-    'newPage': function() { newPage(); },
-    'newSection': function() { addBlock('text'); },
-    'deletePage': function() { newPage(); },
-    'viewport': function() { var v = btn.getAttribute('data-view'); if(v) setViewport(v === 'sm' ? 375 : v === 'md' ? 768 : v === 'xl' ? 1024 : 1400); },
-    'search': function() {},
-    'expand': function() {},
-    'clearSearch': function() {},
-    'toggleEditorJsExecute': function() {},
-  };
-  var fn = handlers[action];
-  if (fn) fn();
-  else console.log('Unhandled vvveb-action:', action);
-}, true);
 </script>
 
 <div id="terminal-panel" style="display:none;height:280px;background:#1a1a2e;border-top:2px solid #333;">
