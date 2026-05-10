@@ -21,6 +21,14 @@
 	.canvas-block .resize-handle { position: absolute; background: var(--bs-primary, #0d6efd); border-radius: 2px; z-index: 20; opacity: 0; width: 8px; height: 8px; }
 	.canvas-block:hover .resize-handle { opacity: 0.3; }
 	.canvas-block.selected .resize-handle { opacity: 1; }
+	/* Hide VvvebJs features not needed for WeChat */
+	#filemanager { display: none !important; }
+	#new-file-btn { display: none !important; }
+	#new-section { display: none !important; }
+	#tree-list { display: none !important; }
+	#delete-file-btn { display: none !important; }
+	#toggle-file-manager-btn { display: none !important; }
+	#bottom-panel { display: none !important; }
 	.resize-handle.top-left { top: -4px; left: -4px; cursor: nw-resize; }
 	.resize-handle.top-center { top: -4px; left: 50%; margin-left: -4px; cursor: n-resize; }
 	.resize-handle.top-right { top: -4px; right: -4px; cursor: ne-resize; }
