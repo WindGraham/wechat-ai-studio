@@ -1,0 +1,1795 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Canvas Editor</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+  background: #1e1e1e;
+  color: #333;
+  -webkit-user-select: none;
+  user-select: none;
+}
+#editor-root {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* ===== TOOLBAR ===== */
+#toolbar {
+  display: flex;
+  align-items: center;
+  padding: 6px 16px;
+  background: #2c2c2c;
+  color: #e0e0e0;
+  gap: 10px;
+  flex-shrink: 0;
+  z-index: 100;
+  border-bottom: 1px solid #444;
+}
+#toolbar .title {
+  font-weight: 600;
+  font-size: 13px;
+  margin-right: 8px;
+  color: #fff;
+  letter-spacing: 0.5px;
+}
+.btn {
+  padding: 5px 12px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  font-family: inherit;
+  transition: background 0.15s;
+}
+.btn-primary {
+  background: #1a73e8;
+  color: #fff;
+}
+.btn-primary:hover { background: #1557b0; }
+.btn-outline {
+  background: transparent;
+  border: 1px solid #555;
+  color: #ddd;
+}
+.btn-outline:hover { background: rgba(255,255,255,0.08); }
+.btn-danger {
+  background: #c62828;
+  color: #fff;
+}
+.btn-danger:hover { background: #a51d1d; }
+
+/* Dropdown */
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+.dropdown-menu {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background: #fff;
+  color: #333;
+  border-radius: 6px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+  z-index: 300;
+  min-width: 150px;
+  padding: 6px 0;
+  max-height: 360px;
+  overflow-y: auto;
+}
+.dropdown-menu.show { display: block; }
+.dropdown-item {
+  padding: 8px 16px;
+  cursor: pointer;
+  font-size: 12px;
+  white-space: nowrap;
+}
+.dropdown-item:hover { background: #f0f4ff; }
+
+/* ===== MAIN AREA ===== */
+#main-area {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+/* ===== CANVAS CONTAINER ===== */
+#canvas-container {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  background: #d4d4d4;
+  padding: 30px 0;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+#canvas {
+  width: 375px;
+  min-height: 600px;
+  background: #fff;
+  position: relative;
+  box-shadow: 0 4px 30px rgba(0,0,0,0.2);
+  flex-shrink: 0;
+}
+
+/* ===== COMPONENT BLOCK ===== */
+.comp-block {
+  position: absolute;
+  border: 2px solid transparent;
+  cursor: grab;
+  transition: box-shadow 0.12s;
+  background: #fff;
+}
+.comp-block:hover {
+  box-shadow: 0 0 0 1px rgba(26,115,232,0.25);
+}
+.comp-block.selected {
+  border-color: #1a73e8;
+  box-shadow: 0 0 0 3px rgba(26,115,232,0.15);
+  z-index: 10 !important;
+}
+.comp-block.dragging {
+  opacity: 0.25;
+  cursor: grabbing;
+}
+.comp-header {
+  height: 22px;
+  display: flex;
+  align-items: center;
+  padding: 0 8px;
+  background: rgba(0,0,0,0.05);
+  font-size: 10px;
+  color: #888;
+  letter-spacing: 0.5px;
+  pointer-events: none;
+}
+.comp-header .type-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  margin-right: 6px;
+  flex-shrink: 0;
+}
+.comp-body {
+  overflow: hidden;
+  pointer-events: none;
+  position: relative;
+}
+.comp-resize-handle {
+  position: absolute;
+  bottom: -2px;
+  left: 20%;
+  right: 20%;
+  height: 8px;
+  cursor: ns-resize;
+  background: transparent;
+  z-index: 5;
+  border-radius: 0 0 4px 4px;
+}
+.comp-resize-handle:hover,
+.comp-block.selected .comp-resize-handle {
+  background: rgba(26,115,232,0.2);
+}
+.comp-resize-handle::after {
+  content: '';
+  position: absolute;
+  bottom: 2px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 24px;
+  height: 3px;
+  background: rgba(26,115,232,0.4);
+  border-radius: 2px;
+  display: none;
+}
+.comp-block.selected .comp-resize-handle::after {
+  display: block;
+}
+.comp-block.resizing {
+  cursor: ns-resize;
+  border-style: dashed;
+}
+
+/* Ghost during drag */
+.comp-ghost {
+  position: absolute;
+  pointer-events: none;
+  z-index: 1000;
+  opacity: 0.9;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.25);
+  border: 2px solid #1a73e8;
+  background: #fff;
+  cursor: grabbing;
+}
+
+/* Drop indicator */
+.drop-indicator {
+  position: absolute;
+  left: 4px;
+  right: 4px;
+  height: 3px;
+  background: #1a73e8;
+  z-index: 999;
+  pointer-events: none;
+  border-radius: 2px;
+}
+.drop-indicator::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: -5px;
+  width: 10px;
+  height: 10px;
+  background: #1a73e8;
+  border-radius: 50%;
+}
+
+/* ===== PROPERTY PANEL ===== */
+#property-panel {
+  width: 270px;
+  background: #fafafa;
+  border-left: 1px solid #e0e0e0;
+  overflow-y: auto;
+  padding: 14px;
+  flex-shrink: 0;
+  font-size: 12px;
+}
+#property-panel .panel-header {
+  font-weight: 600;
+  font-size: 13px;
+  color: #333;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #1a73e8;
+}
+#property-panel .panel-empty {
+  color: #aaa;
+  text-align: center;
+  padding: 40px 10px;
+  font-size: 12px;
+}
+.prop-group {
+  margin-bottom: 12px;
+}
+.prop-group label {
+  display: block;
+  font-size: 11px;
+  color: #888;
+  margin-bottom: 3px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.prop-group input,
+.prop-group select {
+  width: 100%;
+  padding: 5px 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 12px;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.15s;
+}
+.prop-group input:focus {
+  border-color: #1a73e8;
+}
+.prop-row {
+  display: flex;
+  gap: 8px;
+}
+.prop-row .prop-group {
+  flex: 1;
+}
+.prop-color-row {
+  display: flex;
+  gap: 8px;
+  align-items: end;
+}
+.prop-color-row input[type="color"] {
+  width: 32px;
+  height: 28px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 2px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.prop-color-row input[type="text"] {
+  flex: 1;
+  padding: 5px 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 12px;
+  font-family: inherit;
+}
+
+/* Import overlay */
+#import-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 500;
+  background: rgba(0,0,0,0.5);
+  justify-content: center;
+  align-items: center;
+}
+#import-overlay.show { display: flex; }
+#import-overlay .modal {
+  background: #fff;
+  border-radius: 10px;
+  padding: 24px;
+  min-width: 400px;
+  max-width: 640px;
+  width: 90vw;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+}
+#import-overlay .modal h3 {
+  margin: 0 0 12px;
+  font-size: 15px;
+}
+#import-overlay .modal .import-tabs {
+  display: flex;
+  gap: 0;
+  margin-bottom: 12px;
+  border-bottom: 2px solid #e0e0e0;
+}
+#import-overlay .modal .import-tab {
+  padding: 6px 14px;
+  font-size: 13px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: #888;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+}
+#import-overlay .modal .import-tab.active {
+  color: #1a73e8;
+  border-bottom-color: #1a73e8;
+  font-weight: 600;
+}
+#import-overlay textarea {
+  width: 100%;
+  height: 360px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  padding: 12px;
+  font-family: "SF Mono", Monaco, monospace;
+  font-size: 11px;
+  resize: vertical;
+  outline: none;
+  flex-shrink: 1;
+}
+#import-overlay .drop-zone {
+  border: 2px dashed #ccc;
+  border-radius: 8px;
+  padding: 40px 20px;
+  text-align: center;
+  color: #999;
+  font-size: 13px;
+  cursor: pointer;
+  transition: border-color 0.2s;
+  flex-shrink: 1;
+}
+#import-overlay .drop-zone:hover { border-color: #1a73e8; color: #1a73e8; }
+#import-overlay .drop-zone.dragover { border-color: #1a73e8; background: #e8f0fe; }
+#import-overlay .modal-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  margin-top: 12px;
+}
+</style>
+</head>
+<body>
+
+<div id="editor-root">
+  <div id="toolbar">
+    <span class="title">Canvas Editor</span>
+    <button class="btn btn-outline" id="btn-import">导入HTML</button>
+    <button class="btn btn-primary" id="btn-export">导出HTML</button>
+    <div class="dropdown" id="dropdown-add">
+      <button class="btn btn-outline dropdown-toggle">添加组件 ▾</button>
+      <div class="dropdown-menu"></div>
+    </div>
+    <button class="btn btn-danger" id="btn-clear" style="margin-left:auto;">清空</button>
+  </div>
+  <div id="main-area">
+    <div id="canvas-container">
+      <div id="canvas"></div>
+    </div>
+    <div id="property-panel">
+      <div class="panel-empty">选择组件以编辑属性</div>
+    </div>
+  </div>
+</div>
+
+<div id="import-overlay">
+  <div class="modal">
+    <h3>导入 HTML</h3>
+    <div class="import-tabs">
+      <button class="import-tab active" data-tab="file">📁 文件</button>
+      <button class="import-tab" data-tab="paste">📋 粘贴</button>
+    </div>
+    <div id="import-tab-file">
+      <label class="drop-zone" id="drop-zone">
+        <div style="font-size:28px;margin-bottom:8px;">📂</div>
+        <div>拖拽 .html 文件到此处</div>
+        <div style="font-size:11px;margin-top:4px;">或点击选择文件</div>
+        <input type="file" id="import-file" accept=".html,.htm,.txt" style="display:none;">
+      </label>
+    </div>
+    <div id="import-tab-paste" style="display:none;">
+      <textarea id="import-textarea" placeholder="在此粘贴 WeChat 文章 HTML（Ctrl+V）"></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" id="btn-import-cancel">取消</button>
+      <button class="btn btn-primary" id="btn-import-ok">导入</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function() {
+  "use strict";
+
+  // ============================================================
+  // CONSTANTS
+  // ============================================================
+  var TYPE_LABELS = {
+    hero:      '标题区',
+    card:      '卡片',
+    image:     '图片块',
+    row:       '行容器',
+    text:      '文字区',
+    overlay:   '叠加组',
+    divider:   '分割线',
+    decor:     '装饰元素',
+    svg:       'SVG块',
+    spacer:    '留白'
+  };
+
+  var TYPE_COLORS = {
+    hero:      '#e94560',
+    card:      '#533483',
+    image:     '#0f3460',
+    row:       '#e67e22',
+    text:      '#27ae60',
+    overlay:   '#8e44ad',
+    divider:   '#7f8c8d',
+    decor:     '#f39c12',
+    svg:       '#3498db',
+    spacer:    '#bdc3c7'
+  };
+
+  var TYPE_DEFAULTS = {
+    hero: {
+      html: '<section style="text-align:center;padding:28px 20px;"><h2 style="margin:0;font-size:20px;color:#333;">标题文字</h2><p style="margin:8px 0 0;font-size:12px;color:#999;">副标题 / 说明</p></section>',
+      style: { marginTop: '0', marginBottom: '0', backgroundColor: '#ffffff', borderRadius: '8px' },
+      width: 345, height: 110
+    },
+    card: {
+      html: '<section style="padding:18px;"><p style="margin:0;font-size:14px;color:#333;">卡片内容文字，支持长文本换行。</p></section>',
+      style: { marginTop: '0', marginBottom: '0', backgroundColor: 'rgb(240,253,244)', borderRadius: '12px' },
+      width: 345, height: 140
+    },
+    image: {
+      html: '<img src="" alt="图片" style="display:block;width:100%;"/>',
+      style: { marginTop: '0', marginBottom: '0', borderRadius: '0px' },
+      width: 345, height: 200
+    },
+    row: {
+      html: '<section style="display:flex;gap:8px;padding:6px 0;"><section style="flex:1;background:#f5f5f5;padding:14px 8px;text-align:center;font-size:12px;">栏目1</section><section style="flex:1;background:#f5f5f5;padding:14px 8px;text-align:center;font-size:12px;">栏目2</section><section style="flex:1;background:#f5f5f5;padding:14px 8px;text-align:center;font-size:12px;">栏目3</section></section>',
+      style: { marginTop: '0', marginBottom: '0', gap: '8' },
+      width: 345, height: 70
+    },
+    text: {
+      html: '<p style="margin:0;text-indent:2em;font-size:15px;color:#3e3e3e;line-height:1.8;">文字段落内容，这是默认占位文字。支持调整字号、颜色和缩进。</p>',
+      style: { marginTop: '0', marginBottom: '0', fontSize: '15', color: '#3e3e3e', textIndent: '2em' },
+      width: 345, height: 80
+    },
+    overlay: {
+      html: '<section style="position:relative;padding:12px;"><section style="background:#f0f0f0;padding:16px;border-radius:6px;"><p style="margin:0;font-size:13px;">底层内容</p></section><section style="position:absolute;top:2px;right:8px;background:#e94560;color:#fff;padding:3px 10px;border-radius:10px;font-size:10px;">标签</section></section>',
+      style: { marginTop: '0', marginBottom: '0', backgroundColor: 'transparent', borderRadius: '0px' },
+      width: 345, height: 100
+    },
+    divider: {
+      html: '<hr style="margin:0;border:none;height:2px;background:#e5e5e5;"/>',
+      style: { marginTop: '0', marginBottom: '0', height: '2', color: '#e5e5e5' },
+      width: 345, height: 24
+    },
+    decor: {
+      html: '<section style="text-align:center;padding:8px;font-size:28px;">✦</section>',
+      style: { marginTop: '0', marginBottom: '0' },
+      width: 345, height: 60
+    },
+    svg: {
+      html: '<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="80" style="display:block;"><rect width="100%" height="100%" fill="#f0f0f0"/><circle cx="50%" cy="50%" r="20" fill="#ccc"/></svg>',
+      style: { marginTop: '0', marginBottom: '0' },
+      width: 345, height: 80
+    },
+    spacer: {
+      html: '<section style="height:20px;"></section>',
+      style: { marginTop: '0', marginBottom: '0' },
+      width: 345, height: 30
+    }
+  };
+
+  var CANVAS_PADDING = 10;
+  var COMPONENT_GAP = 6;
+
+  // ============================================================
+  // WECHAT HTML PARSER
+  // ============================================================
+  var WeChatParser = (function() {
+    function getTextLength(el) {
+      return (el.textContent || '').trim().length;
+    }
+
+    var TYPES = [
+      { key: 'divider', name: '分割线',
+        match: function(el) {
+          var h = parseFloat(el.style.height);
+          return el.style.height && h <= 4 && !!el.style.backgroundColor;
+        }
+      },
+      { key: 'decor', name: '装饰元素',
+        match: function(el) {
+          var w = parseFloat(el.style.width);
+          var h = parseFloat(el.style.height);
+          return !!el.style.transform || (w <= 20 && h <= 20 && el.style.width && el.style.height);
+        }
+      },
+      { key: 'svg', name: 'SVG块',
+        match: function(el) { return !!el.querySelector('svg'); }
+      },
+      { key: 'image', name: '图片块',
+        match: function(el) { return !!el.querySelector('img') && !el.style.backgroundColor; }
+      },
+      { key: 'row', name: '行容器',
+        match: function(el) {
+          return el.querySelectorAll('section[style*="inline-block"]').length >= 2;
+        }
+      },
+      { key: 'card', name: '卡片',
+        match: function(el) {
+          return !!el.style.backgroundColor && !!el.style.borderRadius && !!el.style.padding;
+        }
+      },
+      { key: 'hero', name: '标题区',
+        match: function(el) {
+          return !!el.style.backgroundImage ||
+            (!!el.style.backgroundColor && !!el.querySelector('p') && getTextLength(el) < 100);
+        }
+      },
+      { key: 'text', name: '文字区',
+        match: function(el) {
+          return !!el.querySelector('p') && getTextLength(el) > 100 &&
+            !el.style.backgroundColor && !el.style.borderRadius;
+        }
+      },
+      { key: 'overlay', name: '叠加组',
+        match: function(el) {
+          return !!el.style.marginTop && parseFloat(el.style.marginTop) < 0;
+        }
+      },
+      { key: 'spacer', name: '留白',
+        match: function(el) {
+          var h = parseFloat(el.style.height);
+          return el.style.height && h > 4 &&
+            !el.querySelector('p') && !el.querySelector('img') && !el.style.backgroundColor;
+        }
+      }
+    ];
+
+    function matchType(el) {
+      for (var i = 0; i < TYPES.length; i++) {
+        try { if (TYPES[i].match(el)) return TYPES[i]; } catch(_) {}
+      }
+      return null;
+    }
+
+    function parseStyle(el) {
+      var style = {};
+      var attr = el.getAttribute('style') || '';
+      if (!attr) return style;
+      var decls = attr.split(';');
+      for (var i = 0; i < decls.length; i++) {
+        var ci = decls[i].indexOf(':');
+        if (ci === -1) continue;
+        var prop = decls[i].substring(0, ci).trim();
+        var val = decls[i].substring(ci + 1).trim();
+        if (prop && val) {
+          var camel = prop.replace(/-([a-z])/g, function(_, c) { return c.toUpperCase(); });
+          style[camel] = val;
+        }
+      }
+      return style;
+    }
+
+    function getMargins(el) {
+      var style = parseStyle(el);
+      return {
+        top: parseFloat(style.marginTop) || 0,
+        bottom: parseFloat(style.marginBottom) || 0
+      };
+    }
+
+    function walkChildren(el, parentWidth, offsetY, parentId, state, depth) {
+      if (depth > 50) return offsetY;
+      var cumulativeY = offsetY;
+      for (var i = 0; i < el.children.length; i++) {
+        var child = el.children[i];
+        if (child.nodeType !== 1) continue;
+        var matched = matchType(child);
+        if (matched) {
+          var m = getMargins(child);
+          var comp = createComponent(child, matched, parentWidth, cumulativeY + m.top, parentId, state);
+          state.components.push(comp);
+          cumulativeY += m.top + comp.bounds.height + m.bottom;
+          if (matched.key === 'row') walkRowChildren(child, comp, state);
+        } else if (child.children.length > 0) {
+          var m2 = getMargins(child);
+          cumulativeY += m2.top;
+          cumulativeY = walkChildren(child, parentWidth, cumulativeY, parentId, state, depth + 1);
+          cumulativeY += m2.bottom;
+        }
+      }
+      return cumulativeY;
+    }
+
+    function walkRowChildren(rowEl, rowComp, state) {
+      var inlineChildren = [];
+      for (var i = 0; i < rowEl.children.length; i++) {
+        var child = rowEl.children[i];
+        if (child.tagName.toLowerCase() === 'section') {
+          var s = child.getAttribute('style') || '';
+          if (s.indexOf('inline-block') !== -1) inlineChildren.push(child);
+        }
+      }
+      var childX = 0;
+      for (var j = 0; j < inlineChildren.length; j++) {
+        var child = inlineChildren[j];
+        var matched = matchType(child);
+        var cs = parseStyle(child);
+        var w = parseFloat(cs.width);
+        var cw = w || (rowComp.bounds.width / inlineChildren.length);
+        var ch = parseFloat(cs.height) || rowComp.bounds.height;
+        var childComp = {
+          id: 'comp-' + (state.idCounter++),
+          type: matched ? matched.key : 'unknown',
+          typeName: matched ? matched.name : '未知',
+          bounds: { x: childX, y: parseFloat(cs.marginTop) || 0, width: cw, height: ch },
+          html: child.outerHTML,
+          style: cs,
+          children: [],
+          textContent: (child.textContent || '').trim().substring(0, 200),
+          parentId: rowComp.id
+        };
+        rowComp.children.push(childComp.id);
+        state.components.push(childComp);
+        var ml = parseFloat(cs.marginLeft) || 0;
+        var mr = parseFloat(cs.marginRight) || 0;
+        childX += cw + ml + mr;
+      }
+    }
+
+    function createComponent(el, typeDef, parentWidth, offsetY, parentId, state) {
+      var id = 'comp-' + (state.idCounter++);
+      var style = parseStyle(el);
+      var width = parseFloat(style.width) || (parentWidth - ((parseFloat(style.marginLeft)||0) + (parseFloat(style.marginRight)||0) + (parseFloat(style.paddingLeft)||0) + (parseFloat(style.paddingRight)||0)));
+      if (!width || width <= 0) width = parentWidth * 0.9;
+
+      var height = parseFloat(style.height) || 0;
+      if (!height) {
+        var pt = parseFloat(style.paddingTop) || 0;
+        var pb = parseFloat(style.paddingBottom) || 0;
+        var hasImg = !!el.querySelector('img');
+        var hasBgImg = !!style.backgroundImage;
+        var textLen = (el.textContent || '').trim().length;
+
+        if (hasImg) {
+          // estimate from image aspect ratio hints or generous default
+          height = 200 + pt + pb;
+          var imgs = el.querySelectorAll('img');
+          for (var _j = 0; _j < imgs.length; _j++) {
+            var ih = parseFloat(imgs[_j].style.height) || parseFloat(imgs[_j].getAttribute('height')) || 0;
+            if (ih > height) height = ih + pt + pb;
+          }
+        } else if (hasBgImg) {
+          height = 160 + pt + pb;
+        } else if (textLen > 0) {
+          var fontSize = parseFloat(style.fontSize) || 16;
+          var lineH = parseFloat(style.lineHeight) || 1.6;
+          var pl = parseFloat(style.paddingLeft) || 0;
+          var pr = parseFloat(style.paddingRight) || 0;
+          var efW = Math.max(1, width - pl - pr - 10);
+          var cpl = Math.max(1, Math.floor(efW / (fontSize * 0.6)));
+          var lines = Math.ceil(textLen / cpl);
+          height = Math.max(60, pt + pb + (lines * fontSize * lineH));
+        } else {
+          height = 60 + pt + pb;
+        }
+      }
+
+      var x = (parentWidth - width) / 2;
+      if (style.marginLeft === 'auto' || style.marginRight === 'auto') x = (parentWidth - width) / 2;
+      else if (style.marginLeft) x = parseFloat(style.marginLeft);
+
+      return {
+        id: id, type: typeDef.key, typeName: typeDef.name,
+        bounds: { x: Math.max(0, x), y: Math.max(0, offsetY), width: Math.max(0, width), height: Math.max(0, height) },
+        html: el.outerHTML, style: style, children: [],
+        textContent: (el.textContent || '').trim().substring(0, 500)
+      };
+    }
+
+    function parse(htmlString) {
+      var parser = new DOMParser();
+      var doc = parser.parseFromString(htmlString, 'text/html');
+      var root = doc.body.firstElementChild;
+      if (!root) return { rootWidth: 375, components: [] };
+      var rootWidth = 375;
+      if (root.tagName.toLowerCase() === 'section') {
+        var rw = parseFloat(root.style.width);
+        if (rw > 0) rootWidth = rw;
+      }
+      var state = { components: [], idCounter: 0 };
+      walkChildren(root, rootWidth, 0, null, state, 0);
+      return { rootWidth: rootWidth, components: state.components };
+    }
+
+    return { parse: parse, TYPES: TYPES };
+  })();
+
+  // ============================================================
+  // HTML COMPILER
+  // ============================================================
+  function compileToHTML(components) {
+    function toRGB(color) {
+      if (!color) return color;
+      return String(color).replace(/rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*(?:,\s*[\d.]+)?\s*\)/g, 'rgb($1, $2, $3)');
+    }
+    function escF(s) {
+      return String(s != null ? s : '')
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    function compile(comp) {
+      var s = comp.style || {};
+      var text = comp.textContent || (comp.html || '').replace(/<[^>]*>/g, '').trim().substring(0, 200);
+      var children = comp.children || [];
+
+      switch (comp.type) {
+        case 'hero':
+          var bg = toRGB(s.backgroundColor) || 'rgb(0,168,84)';
+          var color = s.color || '#fff';
+          var fs = s.fontSize || '28px';
+          return '<section style="background-color:' + bg + '; padding: 36px 22px 32px;">\n  <p style="font-size: ' + fs + '; color: ' + color + '; text-align: center;">' + escF(text) + '</p>\n</section>';
+
+        case 'card':
+          var cardBg = toRGB(s.backgroundColor) || 'rgb(255,255,255)';
+          var br = s.borderRadius != null ? s.borderRadius : 14;
+          return '<section style="background-color:' + cardBg + '; border-radius: ' + br + 'px; padding: 24px 16px;">\n' + (comp.html || escF(text)) + '\n</section>';
+
+        case 'image':
+          var src = comp.src || s.src || (comp.html.match(/src="([^"]+)"/) || [, ''])[1] || '';
+          var styleParts = ['line-height:0'];
+          if (s.borderRadius) styleParts.push('border-radius:' + s.borderRadius + 'px');
+          styleParts.push('overflow:hidden');
+          return '<section style="' + styleParts.join(';') + ';">\n  <img src="' + escF(src) + '" style="width:100%; max-width:100%; display:block; margin:0 auto;">\n</section>';
+
+        case 'row':
+          if (children.length === 0) return '';
+          var colW = Math.floor(90 / children.length);
+          var gap = s.gap != null ? s.gap : 4;
+          var parts = children.map(function(col, i) {
+            var colStyle = 'display:inline-block; width:' + colW + '%; vertical-align:top;' + (i > 0 ? ' padding-left:' + gap + '%;' : '');
+            return '<section style="' + colStyle + '">' + (typeof col === 'string' ? col : compile(col)) + '</section>';
+          });
+          return '<section style="text-align: center;">\n  ' + parts.join('<!--\n  -->') + '\n</section>';
+
+        case 'text':
+          var tfs = s.fontSize || '16px';
+          var tc = toRGB(s.color) || 'rgb(62,62,62)';
+          return '<section style="margin:0 16px;">\n  <p style="font-size:' + tfs + '; color:' + tc + '; text-align:justify; line-height:1.8;">' + escF(text) + '</p>\n</section>';
+
+        case 'overlay':
+          if (children.length === 0) return '';
+          var fg = compile(children[0]);
+          var bgContent = children.slice(1).map(compile).join('\n');
+          return '<section>' + fg + '</section>\n<section style="margin-top:-80px; padding-top:100px; background:' + (toRGB(s.backgroundColor) || '#fff') + ';">' + bgContent + '</section>';
+
+        case 'divider':
+          return '<section style="width:100%; height:2px; background-color:' + (toRGB(s.backgroundColor) || 'rgb(200,200,200)') + '; margin:20px 0;"></section>';
+
+        case 'decor':
+          return '<section style="display:inline-block; width:10px; height:10px; transform:rotate(45deg); background:' + (toRGB(s.backgroundColor) || 'rgb(100,100,100)') + ';"></section>';
+
+        case 'svg':
+          return '<section>' + (comp.html || text) + '</section>';
+
+        case 'spacer':
+          return '<section style="height:' + (s.height || 40) + 'px;"></section>';
+
+        default:
+          return comp.html || '<section><p>' + escF(text) + '</p></section>';
+      }
+    }
+
+    var body = components.map(compile).join('\n');
+    return '<section style="width:100%; max-width:375px; margin-left:auto; margin-right:auto; text-align:center;">\n' + body + '\n</section>';
+  }
+
+  // ============================================================
+  // STATE
+  // ============================================================
+  var _components = [];
+  var _selectedId = null;
+  var _dragState = null;
+  var _resizeState = null;
+  var _counter = 0;
+  var _listeners = {};
+
+  // ============================================================
+  // DOM REFS
+  // ============================================================
+  var elRoot, elToolbar, elCanvas, elCanvasContainer, elPropertyPanel;
+  var elBtnImport, elBtnExport, elBtnClear;
+  var elDropdownMenu, elImportOverlay, elImportTextarea;
+
+  // ============================================================
+  // HELPERS
+  // ============================================================
+  function uid() {
+    return 'c' + (++_counter) + '_' + Date.now().toString(36);
+  }
+
+  function emit(ev, data) {
+    (_listeners[ev] || []).forEach(function(fn) { fn(data); });
+  }
+
+  function clamp(v, min, max) {
+    return Math.max(min, Math.min(max, v));
+  }
+
+  function parsePx(v) {
+    if (v == null) return 0;
+    return parseInt(String(v).replace('px', '').trim()) || 0;
+  }
+
+  // ============================================================
+  // COMPONENT CREATION
+  // ============================================================
+  function createComponent(type, overrides) {
+    var def = TYPE_DEFAULTS[type] || TYPE_DEFAULTS.text;
+    overrides = overrides || {};
+    return {
+      id: uid(),
+      type: type,
+      bounds: {
+        x: overrides.x != null ? overrides.x : Math.round((375 - def.width) / 2),
+        y: 0,
+        width: overrides.width || def.width,
+        height: overrides.height || def.height
+      },
+      html: overrides.html || def.html,
+      style: JSON.parse(JSON.stringify(overrides.style || def.style))
+    };
+  }
+
+  // ============================================================
+  // COMPUTED Y POSITIONS
+  // ============================================================
+  function computeYPositions() {
+    var y = CANVAS_PADDING;
+    for (var i = 0; i < _components.length; i++) {
+      var c = _components[i];
+      y += parsePx(c.style.marginTop);
+      c._computedY = y;
+      y += c.bounds.height + parsePx(c.style.marginBottom) + COMPONENT_GAP;
+    }
+    // Remove trailing COMPONENT_GAP; total height = last component bottom + its marginBottom
+    if (_components.length > 0) { y -= COMPONENT_GAP; }
+    return y;
+  }
+
+  function getCanvasHeight() {
+    var bottom = 0;
+    for (var i = 0; i < _components.length; i++) {
+      var c = _components[i];
+      var b = (c._computedY || 0) + c.bounds.height + parsePx(c.style.marginBottom);
+      if (b > bottom) bottom = b;
+    }
+    return Math.max(600, bottom + CANVAS_PADDING);
+  }
+
+  // ============================================================
+  // RENDER CANVAS
+  // ============================================================
+  function render() {
+    computeYPositions();
+    var canvasHeight = getCanvasHeight();
+    elCanvas.style.minHeight = canvasHeight + 'px';
+
+    // Clear and rebuild
+    elCanvas.innerHTML = '';
+
+    for (var i = 0; i < _components.length; i++) {
+      var comp = _components[i];
+      var y = comp._computedY;
+      var block = document.createElement('div');
+      block.className = 'comp-block';
+      block.setAttribute('data-id', comp.id);
+      if (comp.id === _selectedId) block.classList.add('selected');
+      block.style.left = comp.bounds.x + 'px';
+      block.style.top = y + 'px';
+      block.style.width = comp.bounds.width + 'px';
+      block.style.height = comp.bounds.height + 'px';
+
+      // Header
+      var header = document.createElement('div');
+      header.className = 'comp-header';
+      var dot = document.createElement('span');
+      dot.className = 'type-dot';
+      dot.style.backgroundColor = TYPE_COLORS[comp.type] || '#999';
+      header.appendChild(dot);
+      header.appendChild(document.createTextNode(TYPE_LABELS[comp.type] || comp.type));
+      block.appendChild(header);
+
+      // Body (preview)
+      var body = document.createElement('div');
+      body.className = 'comp-body';
+      body.style.height = (comp.bounds.height - 22) + 'px';
+
+      // Apply style to body wrapper
+      var styleWrap = document.createElement('div');
+      styleWrap.style.width = '100%';
+      styleWrap.style.height = '100%';
+      styleWrap.style.overflow = 'hidden';
+
+      if (comp.style.backgroundColor) {
+        styleWrap.style.backgroundColor = comp.style.backgroundColor;
+      }
+      if (comp.style.borderRadius) {
+        styleWrap.style.borderRadius = comp.style.borderRadius;
+      }
+
+      // For text: apply font styles
+      if (comp.type === 'text') {
+        if (comp.style.fontSize) styleWrap.style.fontSize = comp.style.fontSize + 'px';
+        if (comp.style.color) styleWrap.style.color = comp.style.color;
+      }
+
+      // For divider: show colored line
+      if (comp.type === 'divider') {
+        styleWrap.innerHTML = '';
+        styleWrap.style.display = 'flex';
+        styleWrap.style.alignItems = 'center';
+        styleWrap.style.justifyContent = 'center';
+        var lineH = parsePx(comp.style.height) || 2;
+        var lineColor = comp.style.color || '#e5e5e5';
+        var line = document.createElement('div');
+        line.style.width = '100%';
+        line.style.height = lineH + 'px';
+        line.style.background = lineColor;
+        styleWrap.appendChild(line);
+      } else if (comp.type === 'spacer') {
+        styleWrap.innerHTML = '';
+        styleWrap.style.background = 'repeating-linear-gradient(45deg, transparent, transparent 4px, rgba(0,0,0,0.03) 4px, rgba(0,0,0,0.03) 8px)';
+      } else if (comp.type === 'image') {
+        var imgSrc = comp.style.src || '';
+        if (imgSrc) {
+          styleWrap.innerHTML = '<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;overflow:hidden;">' +
+            '<img src="' + imgSrc + '" style="max-width:100%;max-height:100%;display:block;"/>' +
+            '</div>';
+        } else {
+          styleWrap.innerHTML = '<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:#f5f5f5;color:#bbb;font-size:24px;">🖼</div>';
+        }
+        if (comp.style.borderRadius && comp.style.borderRadius !== '0px') {
+          styleWrap.style.borderRadius = comp.style.borderRadius;
+          styleWrap.style.overflow = 'hidden';
+        }
+      } else if (comp.type === 'svg') {
+        styleWrap.innerHTML = comp.html;
+        var svg = styleWrap.querySelector('svg');
+        if (svg) {
+          svg.style.width = '100%';
+          svg.style.height = '100%';
+        }
+      } else {
+        styleWrap.innerHTML = comp.html;
+      }
+
+      body.appendChild(styleWrap);
+      block.appendChild(body);
+
+      // Resize handle
+      var handle = document.createElement('div');
+      handle.className = 'comp-resize-handle';
+      handle.setAttribute('data-action', 'resize');
+      block.appendChild(handle);
+
+      elCanvas.appendChild(block);
+    }
+
+    renderPropertyPanel();
+  }
+
+  // ============================================================
+  // PROPERTY PANEL
+  // ============================================================
+  function renderPropertyPanel() {
+    if (!_selectedId) {
+      elPropertyPanel.innerHTML = '<div class="panel-empty">选择组件以编辑属性</div>';
+      return;
+    }
+
+    var comp = findComp(_selectedId);
+    if (!comp) {
+      elPropertyPanel.innerHTML = '<div class="panel-empty">选择组件以编辑属性</div>';
+      return;
+    }
+
+    var html = '';
+    html += '<div class="panel-header">' + TYPE_LABELS[comp.type] + ' <span style="font-weight:400;color:#999;font-size:10px;">' + comp.id + '</span></div>';
+
+    // Margin (all types)
+    html += '<div class="prop-row">';
+    html += propNumber('上边距', 'marginTop', comp.style.marginTop || '0', 'px');
+    html += propNumber('下边距', 'marginBottom', comp.style.marginBottom || '0', 'px');
+    html += '</div>';
+
+    // Type-specific properties
+    if (comp.type === 'hero' || comp.type === 'card') {
+      html += propColor('背景色', 'backgroundColor', comp.style.backgroundColor || '#ffffff');
+      html += propText('圆角', 'borderRadius', comp.style.borderRadius || '0px', '例: 12px');
+    }
+
+    if (comp.type === 'text') {
+      html += propNumber('字号', 'fontSize', comp.style.fontSize || '16', 'px');
+      html += propColor('文字颜色', 'color', comp.style.color || '#333333');
+      html += propText('缩进', 'textIndent', comp.style.textIndent || '0em', '例: 2em');
+    }
+
+    if (comp.type === 'image') {
+      html += propText('图片URL', 'src', comp.style.src || '', 'https://...');
+      html += propText('圆角', 'borderRadius', comp.style.borderRadius || '0px', '例: 12px');
+    }
+
+    if (comp.type === 'divider') {
+      html += propNumber('线高', 'height', comp.style.height || '2', 'px');
+      html += propColor('线条颜色', 'color', comp.style.color || '#e5e5e5');
+    }
+
+    if (comp.type === 'row') {
+      html += propNumber('间距', 'gap', comp.style.gap || '8', 'px');
+    }
+
+    // Width / Height display
+    html += '<div class="prop-row">';
+    html += propNumber('宽度', '_width', comp.bounds.width, 'px', true);
+    html += propNumber('高度', '_height', comp.bounds.height, 'px', true);
+    html += '</div>';
+
+    elPropertyPanel.innerHTML = html;
+
+    // Attach event listeners
+    bindPropertyEvents(comp);
+  }
+
+  function propNumber(label, key, value, suffix, readonly) {
+    var ro = readonly ? ' readonly' : '';
+    return '<div class="prop-group"><label>' + label + '</label><input type="number" data-key="' + key + '" value="' + parseInt(value) + '"' + ro + ' step="1" style="background:' + (readonly ? '#f5f5f5' : '#fff') + '"/><span style="font-size:9px;color:#aaa;">' + (suffix || '') + '</span></div>';
+  }
+
+  function propText(label, key, value, placeholder) {
+    return '<div class="prop-group"><label>' + label + '</label><input type="text" data-key="' + key + '" value="' + escapeAttr(value || '') + '" placeholder="' + (placeholder || '') + '"/></div>';
+  }
+
+  function propColor(label, key, value) {
+    return '<div class="prop-group"><label>' + label + '</label><div class="prop-color-row"><input type="color" data-key="' + key + '_color" value="' + (value || '#ffffff') + '"/><input type="text" data-key="' + key + '" value="' + escapeAttr(value || '') + '" placeholder="#ffffff"/></div></div>';
+  }
+
+  function escapeAttr(s) {
+    return String(s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+
+  function bindPropertyEvents(comp) {
+    var inputs = elPropertyPanel.querySelectorAll('input[data-key]');
+    for (var i = 0; i < inputs.length; i++) {
+      (function(inp) {
+        inp.addEventListener('input', function() {
+          var key = inp.getAttribute('data-key');
+          var val = inp.value;
+
+          if (key === '_width') {
+            var w = clamp(parseInt(val) || 100, 60, 375);
+            comp.bounds.x = Math.max(0, Math.round((375 - w) / 2));
+            comp.bounds.width = w;
+          } else if (key === '_height') {
+            comp.bounds.height = clamp(parseInt(val) || 40, 20, 2000);
+          } else if (key.endsWith('_color')) {
+            // Color picker → update the text input too
+            var baseKey = key.replace('_color', '');
+            comp.style[baseKey] = val;
+            var textInput = elPropertyPanel.querySelector('input[data-key="' + baseKey + '"]');
+            if (textInput) textInput.value = val;
+          } else {
+            comp.style[key] = val;
+            // Sync color picker
+            var colorInput = elPropertyPanel.querySelector('input[data-key="' + key + '_color"]');
+            if (colorInput && /^#[0-9a-fA-F]{3,6}$/.test(val)) {
+              colorInput.value = val;
+            }
+          }
+
+          render();
+          emit('change', { components: _components });
+        });
+
+        inp.addEventListener('keydown', function(e) {
+          e.stopPropagation();
+        });
+      })(inputs[i]);
+    }
+
+    // Also bind color pickers
+    var colorPickers = elPropertyPanel.querySelectorAll('input[type="color"]');
+    for (var j = 0; j < colorPickers.length; j++) {
+      (function(cp) {
+        cp.addEventListener('input', function() {
+          var key = cp.getAttribute('data-key');
+          var baseKey = key.replace('_color', '');
+          comp.style[baseKey] = cp.value;
+          var textInput = elPropertyPanel.querySelector('input[data-key="' + baseKey + '"]');
+          if (textInput) textInput.value = cp.value;
+          render();
+          emit('change', { components: _components });
+        });
+      })(colorPickers[j]);
+    }
+  }
+
+  // ============================================================
+  // FIND COMPONENT
+  // ============================================================
+  function findComp(id) {
+    for (var i = 0; i < _components.length; i++) {
+      if (_components[i].id === id) return _components[i];
+    }
+    return null;
+  }
+
+  function findCompIndex(id) {
+    for (var i = 0; i < _components.length; i++) {
+      if (_components[i].id === id) return i;
+    }
+    return -1;
+  }
+
+  // ============================================================
+  // MOUSE EVENT HANDLERS
+  // ============================================================
+  function getCanvasRelativeY(clientY) {
+    var rect = elCanvas.getBoundingClientRect();
+    var scrollTop = elCanvasContainer.scrollTop;
+    return clientY - rect.top;
+  }
+
+  function onCanvasMouseDown(e) {
+    // Check if click is on resize handle
+    var handle = e.target.closest('[data-action="resize"]');
+    if (handle) {
+      var block = handle.closest('.comp-block');
+      if (!block) return;
+      var id = block.getAttribute('data-id');
+      selectComponent(id);
+      startResize(id, e);
+      return;
+    }
+
+    // Check if click is on a component
+    var block = e.target.closest('.comp-block');
+    if (block) {
+      var id = block.getAttribute('data-id');
+      selectComponent(id);
+      startDrag(id, e);
+      return;
+    }
+
+    // Click on canvas background
+    selectComponent(null);
+  }
+
+  function selectComponent(id) {
+    _selectedId = id;
+    var blocks = elCanvas.querySelectorAll('.comp-block');
+    for (var i = 0; i < blocks.length; i++) {
+      var bid = blocks[i].getAttribute('data-id');
+      if (bid === id) {
+        blocks[i].classList.add('selected');
+      } else {
+        blocks[i].classList.remove('selected');
+      }
+    }
+    renderPropertyPanel();
+    emit('select', { id: id, component: id ? findComp(id) : null });
+  }
+
+  // ============================================================
+  // DRAG TO REORDER
+  // ============================================================
+  function startDrag(compId, e) {
+    var comp = findComp(compId);
+    if (!comp) return;
+    var idx = findCompIndex(compId);
+
+    _dragState = {
+      id: compId,
+      startClientY: e.clientY,
+      startIndex: idx,
+      offsetY: e.clientY - (comp._computedY || 0),
+      moved: false,
+      ghost: null,
+      indicator: null,
+      currentDropIdx: idx
+    };
+
+    e.preventDefault();
+    e.stopPropagation();
+  }
+
+  function onMouseMove(e) {
+    handleResizeMove(e);
+    handleDragMove(e);
+  }
+
+  function handleDragMove(e) {
+    if (!_dragState) return;
+
+    var dy = e.clientY - _dragState.startClientY;
+
+    // Start dragging after 4px threshold
+    if (!_dragState.moved && Math.abs(dy) < 4) return;
+    _dragState.moved = true;
+
+    var comp = findComp(_dragState.id);
+    if (!comp) return;
+
+    // Mark original block as dragging
+    var block = elCanvas.querySelector('.comp-block[data-id="' + _dragState.id + '"]');
+    if (block) block.classList.add('dragging');
+
+    // Create ghost if needed
+    if (!_dragState.ghost) {
+      _dragState.ghost = document.createElement('div');
+      _dragState.ghost.className = 'comp-ghost';
+      _dragState.ghost.style.width = comp.bounds.width + 'px';
+      _dragState.ghost.style.height = comp.bounds.height + 'px';
+      _dragState.ghost.innerHTML = '<div class="comp-header"><span class="type-dot" style="background:' + (TYPE_COLORS[comp.type] || '#999') + ';"></span>' + (TYPE_LABELS[comp.type] || comp.type) + '</div>' +
+        '<div style="display:flex;align-items:center;justify-content:center;height:' + (comp.bounds.height - 22) + 'px;color:#999;font-size:12px;">拖动中...</div>';
+      elCanvas.appendChild(_dragState.ghost);
+
+      // Create indicator
+      _dragState.indicator = document.createElement('div');
+      _dragState.indicator.className = 'drop-indicator';
+      elCanvas.appendChild(_dragState.indicator);
+
+      document.body.style.cursor = 'grabbing';
+    }
+
+    // Position ghost
+    var mouseY = getCanvasRelativeY(e.clientY);
+    var ghostY = mouseY - comp.bounds.height / 2;
+    ghostY = clamp(ghostY, -comp.bounds.height / 2, elCanvas.offsetHeight - comp.bounds.height / 2);
+    _dragState.ghost.style.left = comp.bounds.x + 'px';
+    _dragState.ghost.style.top = ghostY + 'px';
+
+    // Calculate drop index (among non-dragged components)
+    var dropIdx = getDropIndex(mouseY, _dragState.id);
+    _dragState.currentDropIdx = dropIdx;
+
+    // Position indicator
+    var indicatorY = getIndicatorY(dropIdx, _dragState.id);
+    _dragState.indicator.style.top = indicatorY + 'px';
+
+    // Auto-scroll
+    var containerRect = elCanvasContainer.getBoundingClientRect();
+    var edgeTop = containerRect.top + 40;
+    var edgeBottom = containerRect.bottom - 40;
+    if (e.clientY < edgeTop) {
+      elCanvasContainer.scrollTop -= 6;
+    } else if (e.clientY > edgeBottom) {
+      elCanvasContainer.scrollTop += 6;
+    }
+  }
+
+  function getDropIndex(mouseY, dragId) {
+    var resultIdx = 0;
+    var y = CANVAS_PADDING;
+
+    for (var i = 0; i < _components.length; i++) {
+      if (_components[i].id === dragId) continue;
+      var c = _components[i];
+      var mt = parsePx(c.style.marginTop);
+      y += mt;
+      var midY = y + c.bounds.height / 2;
+      if (mouseY < midY) return resultIdx;
+      y += c.bounds.height + parsePx(c.style.marginBottom) + COMPONENT_GAP;
+      resultIdx++;
+    }
+    return resultIdx;
+  }
+
+  function getIndicatorY(dropIdx, dragId) {
+    var y = CANVAS_PADDING;
+    var count = 0;
+    for (var i = 0; i < _components.length; i++) {
+      if (_components[i].id === dragId) continue;
+      if (count === dropIdx) {
+        var mt = parsePx(_components[i].style.marginTop);
+        return y + mt;
+      }
+      var c = _components[i];
+      y += parsePx(c.style.marginTop) + c.bounds.height + parsePx(c.style.marginBottom) + COMPONENT_GAP;
+      count++;
+    }
+    return y;
+  }
+
+  function endDrag() {
+    if (!_dragState) return;
+
+    if (_dragState.ghost) {
+      _dragState.ghost.remove();
+    }
+    if (_dragState.indicator) {
+      _dragState.indicator.remove();
+    }
+
+    document.body.style.cursor = '';
+
+    if (_dragState.moved) {
+      var fromIdx = findCompIndex(_dragState.id);
+      if (fromIdx < 0) { _dragState = null; render(); return; }
+
+      var comp = _components.splice(fromIdx, 1)[0];
+      var toIdx = clamp(_dragState.currentDropIdx, 0, _components.length);
+      _components.splice(toIdx, 0, comp);
+    }
+
+    _dragState = null;
+    render();
+    emit('change', { components: _components });
+  }
+
+  // ============================================================
+  // RESIZE
+  // ============================================================
+  function startResize(compId, e) {
+    var comp = findComp(compId);
+    if (!comp) return;
+
+    _resizeState = {
+      id: compId,
+      startClientY: e.clientY,
+      startHeight: comp.bounds.height,
+      moved: false
+    };
+
+    // Add resizing class
+    var block = elCanvas.querySelector('.comp-block[data-id="' + compId + '"]');
+    if (block) block.classList.add('resizing');
+
+    e.preventDefault();
+    e.stopPropagation();
+    document.body.style.cursor = 'ns-resize';
+  }
+
+  function handleResizeMove(e) {
+    if (!_resizeState) return;
+
+    var dy = e.clientY - _resizeState.startClientY;
+    _resizeState.moved = true;
+
+    var comp = findComp(_resizeState.id);
+    if (!comp) return;
+
+    var minH = comp.type === 'divider' ? 16 : comp.type === 'spacer' ? 10 : 30;
+    comp.bounds.height = Math.max(minH, _resizeState.startHeight + dy);
+
+    // Re-render on resize move for live preview
+    computeYPositions();
+    var canvasHeight = getCanvasHeight();
+    elCanvas.style.minHeight = canvasHeight + 'px';
+
+    var block = elCanvas.querySelector('.comp-block[data-id="' + _resizeState.id + '"]');
+    if (block) {
+      block.style.height = comp.bounds.height + 'px';
+      block.style.top = comp._computedY + 'px';
+      var body = block.querySelector('.comp-body');
+      if (body) body.style.height = (comp.bounds.height - 22) + 'px';
+    }
+
+    // Shift subsequent components
+    var found = false;
+    var blocks = elCanvas.querySelectorAll('.comp-block');
+    for (var i = 0; i < blocks.length; i++) {
+      var bid = blocks[i].getAttribute('data-id');
+      if (bid === _resizeState.id) { found = true; continue; }
+      if (found) {
+        var c = findComp(bid);
+        if (c && c._computedY != null) {
+          blocks[i].style.top = c._computedY + 'px';
+        }
+      }
+    }
+  }
+
+  function endResize() {
+    if (!_resizeState) return;
+    document.body.style.cursor = '';
+
+    var block = elCanvas.querySelector('.comp-block[data-id="' + _resizeState.id + '"]');
+    if (block) block.classList.remove('resizing');
+
+    _resizeState = null;
+    render();
+    emit('change', { components: _components });
+  }
+
+  function onMouseUp(e) {
+    if (_dragState) {
+      endDrag();
+    }
+    if (_resizeState) {
+      endResize();
+    }
+  }
+
+  // ============================================================
+  // KEYBOARD
+  // ============================================================
+  function onKeyDown(e) {
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.isContentEditable) return;
+
+    if ((e.key === 'Delete' || e.key === 'Backspace') && _selectedId) {
+      e.preventDefault();
+      deleteComponent(_selectedId);
+    }
+
+    if (e.key === 'Escape') {
+      selectComponent(null);
+    }
+
+    // Arrow keys to navigate selection
+    if (_selectedId && (e.key === 'ArrowUp' || e.key === 'ArrowDown')) {
+      e.preventDefault();
+      var idx = findCompIndex(_selectedId);
+      if (e.key === 'ArrowUp' && idx > 0) {
+        selectComponent(_components[idx - 1].id);
+      } else if (e.key === 'ArrowDown' && idx < _components.length - 1) {
+        selectComponent(_components[idx + 1].id);
+      }
+    }
+  }
+
+  function deleteComponent(id) {
+    var idx = findCompIndex(id);
+    if (idx < 0) return;
+    _components.splice(idx, 1);
+    if (_selectedId === id) _selectedId = null;
+    render();
+    emit('change', { components: _components });
+  }
+
+  // ============================================================
+  // IMPORT / EXPORT
+  // ============================================================
+  function showImportOverlay() {
+    elImportOverlay.classList.add('show');
+    elImportTextarea.value = '';
+    elImportTextarea.focus();
+  }
+
+  function hideImportOverlay() {
+    elImportOverlay.classList.remove('show');
+  }
+
+  function doImport() {
+    var html = elImportTextarea.value.trim();
+    if (!html) return;
+
+    var result = WeChatParser.parse(html);
+    var comps = result.components;
+
+    if (comps.length > 0) {
+      _components = comps;
+      _counter += comps.length;
+      _selectedId = null;
+      render();
+      emit('change', { components: _components });
+      // auto-scroll to top of canvas
+      setTimeout(function() {
+        elCanvasContainer.scrollTop = 0;
+      }, 100);
+    }
+
+    hideImportOverlay();
+  }
+
+  function doExport() {
+    var html = compileToHTML(_components);
+
+    // Download
+    var blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = 'wechat-article-' + new Date().toISOString().slice(0, 10) + '.html';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+
+  // ============================================================
+  // ADD COMPONENT DROPDOWN
+  // ============================================================
+  // ADD COMPONENT DROPDOWN
+  // ============================================================
+  function buildDropdownMenu() {
+    elDropdownMenu.innerHTML = '';
+    var types = ['hero', 'card', 'image', 'row', 'text', 'overlay', 'divider', 'decor', 'svg', 'spacer'];
+    for (var i = 0; i < types.length; i++) {
+      (function(t) {
+        var item = document.createElement('div');
+        item.className = 'dropdown-item';
+        var dot = document.createElement('span');
+        dot.style.cssText = 'display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:8px;background:' + (TYPE_COLORS[t] || '#999') + ';';
+        item.appendChild(dot);
+        item.appendChild(document.createTextNode(TYPE_LABELS[t]));
+        item.addEventListener('click', function() {
+          addComponent(t);
+          elDropdownMenu.classList.remove('show');
+        });
+        elDropdownMenu.appendChild(item);
+      })(types[i]);
+    }
+  }
+
+  function addComponent(type) {
+    var comp = createComponent(type);
+    _components.push(comp);
+    render();
+    emit('change', { components: _components });
+  }
+
+  var _initialized = false;
+
+  // ============================================================
+  // INITIALIZATION
+  // ============================================================
+  function init() {
+    if (_initialized) return window.CanvasEditor;
+    _initialized = true;
+    elRoot = document.getElementById('editor-root');
+    elCanvas = document.getElementById('canvas');
+    elCanvasContainer = document.getElementById('canvas-container');
+    elPropertyPanel = document.getElementById('property-panel');
+    elToolbar = document.getElementById('toolbar');
+
+    elBtnImport = document.getElementById('btn-import');
+    elBtnExport = document.getElementById('btn-export');
+    elBtnClear = document.getElementById('btn-clear');
+    elDropdownMenu = document.querySelector('#dropdown-add .dropdown-menu');
+    elImportOverlay = document.getElementById('import-overlay');
+    elImportTextarea = document.getElementById('import-textarea');
+
+    // Build dropdown
+    buildDropdownMenu();
+
+    // Toolbar events
+    elBtnImport.addEventListener('click', showImportOverlay);
+    elBtnExport.addEventListener('click', doExport);
+    elBtnClear.addEventListener('click', function() {
+      if (_components.length === 0 || confirm('确定清空所有组件？')) {
+        _components = [];
+        _selectedId = null;
+        render();
+        emit('change', { components: _components });
+      }
+    });
+
+    // Dropdown toggle
+    var dropdownToggle = document.querySelector('#dropdown-add .dropdown-toggle');
+    dropdownToggle.addEventListener('click', function(e) {
+      e.stopPropagation();
+      elDropdownMenu.classList.toggle('show');
+    });
+    document.addEventListener('click', function() {
+      elDropdownMenu.classList.remove('show');
+    });
+
+    // Import overlay
+    document.getElementById('btn-import-cancel').addEventListener('click', hideImportOverlay);
+    document.getElementById('btn-import-ok').addEventListener('click', doImport);
+    document.getElementById('import-file').addEventListener('change', function(e) {
+      var file = e.target.files[0];
+      if (!file) return;
+      var reader = new FileReader();
+      reader.onload = function(ev) {
+        elImportTextarea.value = ev.target.result;
+      };
+      reader.readAsText(file);
+    });
+
+    // Tab switching
+    var importTabs = document.querySelectorAll('.import-tab');
+    for (var ti = 0; ti < importTabs.length; ti++) {
+      importTabs[ti].addEventListener('click', function() {
+        var tab = this.getAttribute('data-tab');
+        importTabs.forEach(function(t) { t.classList.remove('active'); });
+        this.classList.add('active');
+        document.getElementById('import-tab-file').style.display = tab === 'file' ? '' : 'none';
+        document.getElementById('import-tab-paste').style.display = tab === 'paste' ? '' : 'none';
+      });
+    }
+
+    // Drop zone
+    var dropZone = document.getElementById('drop-zone');
+    dropZone.addEventListener('click', function() {
+      document.getElementById('import-file').click();
+    });
+    dropZone.addEventListener('dragover', function(e) {
+      e.preventDefault();
+      dropZone.classList.add('dragover');
+    });
+    dropZone.addEventListener('dragleave', function() {
+      dropZone.classList.remove('dragover');
+    });
+    dropZone.addEventListener('drop', function(e) {
+      e.preventDefault();
+      dropZone.classList.remove('dragover');
+      var file = e.dataTransfer.files[0];
+      if (!file) return;
+      var reader = new FileReader();
+      reader.onload = function(ev) {
+        elImportTextarea.value = ev.target.result;
+      };
+      reader.readAsText(file);
+    });
+    elImportOverlay.addEventListener('click', function(e) {
+      if (e.target === elImportOverlay) hideImportOverlay();
+    });
+
+    // Canvas mouse events
+    elCanvas.addEventListener('mousedown', onCanvasMouseDown);
+    document.addEventListener('mousemove', onMouseMove);
+    document.addEventListener('mouseup', onMouseUp);
+    document.addEventListener('keydown', onKeyDown);
+
+    // Prevent default drag behaviors on canvas
+    elCanvas.addEventListener('dragstart', function(e) { e.preventDefault(); });
+
+    // Initial render
+    render();
+
+    return window.CanvasEditor;
+  }
+
+  // ============================================================
+  // PUBLIC API
+  // ============================================================
+  window.CanvasEditor = {
+    init: function() {
+      return init();
+    },
+
+    loadComponents: function(arr) {
+      _components = [];
+      _selectedId = null;
+      _counter = 0;
+      if (arr && arr.length) {
+        for (var i = 0; i < arr.length; i++) {
+          var c = arr[i];
+          c.id = c.id || uid();
+          c.bounds = c.bounds || { x: 10, y: 0, width: 345, height: 100 };
+          c.style = c.style || {};
+          c.html = c.html || '<p>Empty</p>';
+          _counter = Math.max(_counter, parseInt((c.id.match(/\d+/) || ['0'])[0]));
+          _components.push(c);
+        }
+      }
+      render();
+    },
+
+    getComponents: function() {
+      // Return components with computed Y positions
+      computeYPositions();
+      return _components.map(function(c) {
+        return {
+          id: c.id,
+          type: c.type,
+          bounds: {
+            x: c.bounds.x,
+            y: c._computedY || 0,
+            width: c.bounds.width,
+            height: c.bounds.height
+          },
+          html: c.html,
+          style: JSON.parse(JSON.stringify(c.style))
+        };
+      });
+    },
+
+    addComponent: function(type, overrides) {
+      var comp = createComponent(type, overrides || {});
+      _components.push(comp);
+      render();
+      emit('change', { components: _components });
+      return comp.id;
+    },
+
+    removeComponent: function(id) {
+      deleteComponent(id);
+    },
+
+    selectComponent: function(id) {
+      selectComponent(id);
+    },
+
+    getSelected: function() {
+      return _selectedId ? findComp(_selectedId) : null;
+    },
+
+    clear: function() {
+      _components = [];
+      _selectedId = null;
+      render();
+      emit('change', { components: _components });
+    },
+
+    on: function(ev, fn) {
+      if (!_listeners[ev]) _listeners[ev] = [];
+      _listeners[ev].push(fn);
+    },
+
+    off: function(ev, fn) {
+      if (!_listeners[ev]) return;
+      _listeners[ev] = _listeners[ev].filter(function(f) { return f !== fn; });
+    },
+
+    destroy: function() {
+      document.removeEventListener('mousemove', onMouseMove);
+      document.removeEventListener('mouseup', onMouseUp);
+      document.removeEventListener('keydown', onKeyDown);
+      if (elRoot) elRoot.innerHTML = '';
+      _listeners = {};
+    }
+  };
+
+  // Auto-init when DOM is ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script>
+
+</body>
+</html>
