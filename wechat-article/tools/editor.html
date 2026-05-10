@@ -42,19 +42,19 @@
 				</a>
 
 				<button class="btn btn-light px-1" title="文件管理" id="toggle-file-manager-btn"
-					data-vvveb-action="toggleFileManager" data-bs-toggle="button" aria-pressed="false">
+					data-vvveb-action="toggleFileManager" data-bs-toggle="button" aria-pressed="false" onclick="togglePanel('filemanager')">
 					<img src="libs/builder/icons/file-manager-layout.svg" width="18" height="18" alt=""
 						role="presentation">
 				</button>
 
 				<button class="btn btn-light px-1" title="左侧面板" id="toggle-left-column-btn"
-					data-vvveb-action="toggleLeftColumn" data-bs-toggle="button" aria-pressed="false">
+					data-vvveb-action="toggleLeftColumn" data-bs-toggle="button" aria-pressed="false" onclick="togglePanel('add-section-box')">
 					<img src="libs/builder/icons/left-column-layout.svg" width="18" height="18" alt=""
 						role="presentation">
 				</button>
 
 				<button class="btn btn-light px-1" title="右侧面板" id="toggle-right-column-btn"
-					data-vvveb-action="toggleRightColumn" data-bs-toggle="button" aria-pressed="false">
+					data-vvveb-action="toggleRightColumn" data-bs-toggle="button" aria-pressed="false" onclick="togglePanel('right-panel')">
 					<img src="libs/builder/icons/right-column-layout.svg" width="18" height="18" alt=""
 						role="presentation">
 				</button>
@@ -64,12 +64,12 @@
 			<div>
 				<div class="btn-group me-3" role="group">
 					<button class="btn btn-light" title="撤销" id="undo-btn" data-vvveb-action="undo"
-						data-vvveb-shortcut="ctrl+z">
+						data-vvveb-shortcut="ctrl+z" onclick="undo()">
 						<i class="la la-undo"></i>
 					</button>
 
 					<button class="btn btn-light" title="重做" id="redo-btn"
-						data-vvveb-action="redo" data-vvveb-shortcut="ctrl+shift+z">
+						data-vvveb-action="redo" data-vvveb-shortcut="ctrl+shift+z" onclick="redo()">
 						<i class="la la-undo la-flip-horizontal"></i>
 					</button>
 				</div>
@@ -77,33 +77,33 @@
 
 				<div class="btn-group me-3" role="group">
 					<button class="btn btn-light" title="自由拖拽模式" id="designer-mode-btn"
-						data-bs-toggle="button" aria-pressed="false" data-vvveb-action="setDesignerMode">
+						data-bs-toggle="button" aria-pressed="false" data-vvveb-action="setDesignerMode" onclick="toggleMode(this)">
 						<i class="la la-hand-rock"></i>
 					</button>
 
 					<button class="btn btn-light" title="预览" id="preview-btn" type="button" data-bs-toggle="button"
-						aria-pressed="false" data-vvveb-action="preview">
+						aria-pressed="false" data-vvveb-action="preview" onclick="togglePreview()">
 						<i class="icon-eye-outline"></i>
 					</button>
 
 					<button class="btn btn-light" title="全屏" id="fullscreen-btn" data-bs-toggle="button"
-						aria-pressed="false" data-vvveb-action="fullscreen">
+						aria-pressed="false" data-vvveb-action="fullscreen" onclick="document.documentElement.requestFullscreen()">
 						<i class="icon-expand-outline"></i>
 					</button>
 
 					<button class="btn btn-light" title="显示隐藏元素" id="toggle-hidden"
-						data-bs-toggle="button" data-vvveb-action="toggleHidden" aria-pressed="false">
+						data-bs-toggle="button" data-vvveb-action="toggleHidden" aria-pressed="false" onclick="toggleHiddenElements()">
 						<i class="icon-scan-outline"></i>
 					</button>
 
 					<button class="btn btn-light active" title="导航面板"
 						id="toggle-tree-list" data-bs-toggle="button" data-vvveb-action="toggleTreeList"
-						aria-pressed="true">
+						aria-pressed="true" onclick="togglePanel('tree-list')">
 						<i class="icon-layers-outline"></i>
 					</button>
 
 						<button class="btn btn-light" title="下载" id="download-btn" data-vvveb-action="download"
-							data-v-download="index.html">
+							data-v-download="index.html" onclick="downloadHTML()">
 							<i class="la la-download"></i>
 						</button>
 						<button class="btn btn-success px-2" onclick="exportWechatHTML()" title="导出微信HTML">
@@ -125,7 +125,7 @@
 						<i class="la la-sun fs-6"></i>
 					</button>
 
-					<a href="#" class="btn btn-light px-1 btn-preview-url" target="_blank" title="查看页面">
+					<a href="#" class="btn btn-light px-1 btn-preview-url" target="_blank" title="查看页面" onclick="openPreview(); return false;">
 						<i class="la la-external-link-alt fs-6"></i>
 					</a>
 
@@ -139,31 +139,31 @@
 						<div class="dropdown-menu">
 
 							<button id="mobile-view" data-view="sm" class="btn btn-light w-100" title="手机视图"
-								data-vvveb-action="viewport">
+								data-vvveb-action="viewport" onclick="setViewport(375)">
 								<i class="la la-mobile"></i>
 								<span>Mobile view</span>
 							</button>
 
 							<button id="tablet-view" data-view="md" class="btn btn-light w-100" title="平板视图"
-								data-vvveb-action="viewport">
+								data-vvveb-action="viewport" onclick="setViewport(768)">
 								<i class="la la-tablet la-rotate-90"></i>
 								<span>Tablet view</span>
 							</button>
 
 							<button id="tablet-landscape-view" data-view="lg" class="btn btn-light w-100"
-								title="平板横屏" data-vvveb-action="viewport">
+								title="平板横屏" data-vvveb-action="viewport" onclick="setViewport(1024)">
 								<i class="la la-tablet"></i>
 								<span>Tablet landscape view</span>
 							</button>
 
 							<button id="laptop-view" data-view="xl" class="btn btn-light w-100" title="笔记本视图"
-								data-vvveb-action="viewport">
+								data-vvveb-action="viewport" onclick="setViewport(1280)">
 								<i class="la la-laptop"></i>
 								<span>Laptop view</span>
 							</button>
 
 							<button id="desktop-view" data-view="xxl" class="btn btn-light w-100" title="桌面视图"
-								data-vvveb-action="viewport">
+								data-vvveb-action="viewport" onclick="setViewport(1440)">
 								<i class="la la-desktop"></i>
 								<span>Desktop view</span>
 							</button>
@@ -184,7 +184,7 @@
 					<div class="btn-group">
 						<button class="btn btn-primary btn-icon btn-sm save-btn" title="保存 (Ctrl+S)"
 							data-vvveb-action="saveAjax" data-vvveb-url="save.php" data-v-vvveb-shortcut="ctrl+s"
-							disabled>
+							disabled onclick="downloadHTML()">
 							<span class="loading d-none">
 
 								<!-- i class="la la-save"></i -->
@@ -221,14 +221,14 @@
 
 							<button class="btn btn-outline-primary btn-sm btn-icon btn-add"
 								title="新建页面" id="new-file-btn" data-vvveb-action="newPage"
-								data-vvveb-shortcut="">
+								data-vvveb-shortcut="" onclick="newPage()">
 								<span>新建页</span>
 								<i class="icon-add"></i>
 							</button>
 
 							<button class="btn btn-primary btn-sm btn-icon btn-add"
 								title="新建段落" id="new-section" data-vvveb-action="newSection"
-								data-vvveb-shortcut="">
+								data-vvveb-shortcut="" onclick="addBlock('text')">
 
 								<i class="icon-add"></i>
 							</button>
@@ -2751,6 +2751,18 @@ let blockIdCounter = 0;
 let undoStack = [];
 let redoStack = [];
 const MAX_UNDO = 50;
+let blockCounter = 0;
+
+function getResizeHandles() {
+  return '<div class="resize-handle top" style="position:absolute;width:100%;height:4px;top:-2px;left:0;background:var(--bs-primary,#0d6efd);cursor:n-resize;z-index:20;border-radius:2px;opacity:0;"></div>' +
+    '<div class="resize-handle bottom" style="position:absolute;width:100%;height:4px;bottom:-2px;left:0;background:var(--bs-primary,#0d6efd);cursor:s-resize;z-index:20;border-radius:2px;opacity:0;"></div>' +
+    '<div class="resize-handle left" style="position:absolute;width:4px;height:100%;top:0;left:-2px;background:var(--bs-primary,#0d6efd);cursor:w-resize;z-index:20;border-radius:2px;opacity:0;"></div>' +
+    '<div class="resize-handle right" style="position:absolute;width:4px;height:100%;top:0;right:-2px;background:var(--bs-primary,#0d6efd);cursor:e-resize;z-index:20;border-radius:2px;opacity:0;"></div>' +
+    '<div class="resize-handle top-left" style="position:absolute;width:10px;height:10px;top:-5px;left:-5px;background:var(--bs-primary,#0d6efd);cursor:nw-resize;z-index:20;border-radius:2px;opacity:0;"></div>' +
+    '<div class="resize-handle top-right" style="position:absolute;width:10px;height:10px;top:-5px;right:-5px;background:var(--bs-primary,#0d6efd);cursor:ne-resize;z-index:20;border-radius:2px;opacity:0;"></div>' +
+    '<div class="resize-handle bottom-left" style="position:absolute;width:10px;height:10px;bottom:-5px;left:-5px;background:var(--bs-primary,#0d6efd);cursor:sw-resize;z-index:20;border-radius:2px;opacity:0;"></div>' +
+    '<div class="resize-handle bottom-right" style="position:absolute;width:10px;height:10px;bottom:-5px;right:-5px;background:var(--bs-primary,#0d6efd);cursor:se-resize;z-index:20;border-radius:2px;opacity:0;"></div>';
+}
 
 function saveState() {
 	const canvas = document.getElementById('block-canvas');
@@ -2970,6 +2982,75 @@ setTimeout(function() {
   }
 }, 1000);
 
+// ============================================================
+// Make VvvebJs left panel items insert into our canvas on click
+// ============================================================
+function insertHtmlIntoCanvas(html) {
+  var wrapper = document.createElement('div');
+  wrapper.className = 'canvas-block';
+  wrapper.id = 'block-' + (++blockCounter);
+  wrapper.innerHTML = html + getResizeHandles();
+  wrapper.style.left = '15px';
+  var canvas = document.getElementById('block-canvas');
+  var existing = canvas.querySelectorAll('.canvas-block');
+  var maxBottom = 0;
+  existing.forEach(function(b) {
+    var t = parseFloat(b.style.top) || 0;
+    var h = b.offsetHeight || 100;
+    if (t + h > maxBottom) maxBottom = t + h;
+  });
+  wrapper.style.top = (maxBottom + 20) + 'px';
+  canvas.appendChild(wrapper);
+  makeInteractable(wrapper);
+  selectBlock(wrapper);
+  saveState();
+}
+
+// Make canvas a drop target for VvvebJs draggable items
+var blockCanvas = document.getElementById('block-canvas');
+blockCanvas.addEventListener('dragover', function(e) { e.preventDefault(); e.dataTransfer.dropEffect = 'copy'; });
+blockCanvas.addEventListener('drop', function(e) {
+  e.preventDefault();
+  // VvvebJs stores the HTML snippet on the drag item during dragstart
+  var html = e.dataTransfer.getData('text/html');
+  if (html) {
+    insertHtmlIntoCanvas(html);
+  }
+});
+
+// Make VvvebJs panel items clickable - get HTML from VvvebJs component registry
+setTimeout(function() {
+  function makeClickable() {
+    var panels = document.querySelectorAll('#box-components, #box-blocks, #box-sections, .drag-elements-sidepane');
+    panels.forEach(function(panel) {
+      var items = panel.querySelectorAll('[data-drag-type]');
+      items.forEach(function(item) {
+        if (item._clickable) return;
+        item._clickable = true;
+        item.style.cursor = 'pointer';
+        item.addEventListener('click', function(e) {
+          e.stopPropagation();
+          var dataType = item.getAttribute('data-type');
+          if (dataType && typeof Vvveb !== 'undefined' && Vvveb.Components) {
+            var comp = Vvveb.Components._components[dataType];
+            if (comp && comp.html) {
+              insertHtmlIntoCanvas(comp.html);
+              return;
+            }
+          }
+          // Fallback: try Vvveb.Builder.addElement
+          if (typeof Vvveb !== 'undefined' && Vvveb.Builder && Vvveb.Builder.addElement) {
+            Vvveb.Builder.addElement(item.innerHTML);
+          }
+        });
+      });
+    });
+  }
+  makeClickable();
+  new MutationObserver(makeClickable).observe(document.body, { childList: true, subtree: true });
+  console.log('VvvebJs click-to-insert ready (component registry)');
+}, 2000);
+
 // Wire VvvebJs highlight system to our canvas clicks
 document.getElementById('block-canvas').addEventListener('click', function(e) {
   var block = e.target.closest('.canvas-block');
@@ -2998,6 +3079,87 @@ if (typeof Vvveb !== 'undefined') {
       if (selectedBlock) return selectedBlock.querySelector('section');
       return _origGetSelected();
     };
+  }
+}
+
+// === VvvebJs toolbar function replicas ===
+
+function togglePanel(panelId) {
+  var el = document.getElementById(panelId);
+  if (el) el.style.display = el.style.display === 'none' ? '' : 'none';
+}
+
+function togglePreview() {
+  var panels = ['add-section-box', 'right-panel', 'top-panel', 'tree-list', 'bottom-panel', 'wechat-status'];
+  var canvas = document.getElementById('block-canvas');
+  if (canvas._previewMode) {
+    panels.forEach(function(id) { var el = document.getElementById(id); if (el) el.style.display = ''; });
+    canvas.style.width = '375px';
+    canvas._previewMode = false;
+  } else {
+    panels.forEach(function(id) { var el = document.getElementById(id); if (el) el.style.display = 'none'; });
+    canvas.style.width = '100%';
+    canvas.style.maxWidth = '100%';
+    canvas._previewMode = true;
+  }
+}
+
+function toggleMode(btn) {
+  if (btn) {
+    var pressed = btn.getAttribute('aria-pressed') === 'true';
+    btn.setAttribute('aria-pressed', pressed ? 'false' : 'true');
+    btn.classList.toggle('active');
+  }
+  var blocks = document.querySelectorAll('#block-canvas .canvas-block');
+  blocks.forEach(function(b) {
+    if (b._interactable) {
+      interact(b).unset();
+      b._interactable = false;
+    } else {
+      makeInteractable(b);
+      b._interactable = true;
+    }
+  });
+}
+
+function setViewport(width) {
+  var canvas = document.getElementById('block-canvas');
+  if (canvas) canvas.style.width = width + 'px';
+}
+
+function downloadHTML() {
+  exportWechatHTML();
+  setTimeout(function() {
+    var ta = document.getElementById('export-ta');
+    if (ta) {
+      var blob = new Blob([ta.value], {type:'text/html'});
+      var a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'article.html';
+      a.click();
+    }
+  }, 500);
+}
+
+function openPreview() {
+  var w = window.open('', '_blank');
+  exportWechatHTML();
+  setTimeout(function() {
+    var ta = document.getElementById('export-ta');
+    if (ta && w) { w.document.write(ta.value); w.document.close(); }
+  }, 500);
+}
+
+function toggleHiddenElements() {
+  document.body.classList.toggle('show-hidden-elements');
+}
+
+function newPage() {
+  var canvas = document.getElementById('block-canvas');
+  if (canvas) {
+    saveState();
+    canvas.innerHTML = '';
+    selectedBlock = null;
   }
 }
 </script>

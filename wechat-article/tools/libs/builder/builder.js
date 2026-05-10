@@ -1554,6 +1554,19 @@ Vvveb.Builder = {
 						}
 					}
 					
+					var blockCanvas = document.getElementById('block-canvas');
+					if (blockCanvas && self.dragMoveMutation === false) {
+						if (!self.dragElement.parentNode) {
+							var wrapper = document.createElement('div');
+							wrapper.className = 'canvas-block';
+							wrapper.style.position = 'absolute';
+							wrapper.innerHTML = self.dragElement.outerHTML || self.dragElement.innerHTML;
+							blockCanvas.appendChild(wrapper);
+							self._canvasWrapper = wrapper;
+							self._canvasDrop = true;
+						}
+						prepend = true;
+					} else {
 					try {
 							if ((pos.top  < (y - halfHeight)) || (pos.left  < (x - halfWidth))) {
 								if (noChildren[parentTagName] || isBlock || isVattribute) { 
@@ -1587,6 +1600,7 @@ Vvveb.Builder = {
 					} catch(err) {
 						console.log(err);
 						return false;
+					}
 					}
 					
 					if (!self.designerMode && self.iconDrag) {
@@ -1636,7 +1650,22 @@ Vvveb.Builder = {
 				if (self.iconDrag) self.iconDrag.remove();
 				document.getElementById("component-clone")?.remove();
 
-				if (self.dragMoveMutation === false) {				
+				if (self._canvasDrop && self._canvasWrapper) {
+					var blockCanvas = document.getElementById('block-canvas');
+					if (blockCanvas) {
+						if (self.component && (self.component.dragHtml || Vvveb.dragHtml)) {
+							var html = self.component.html.replace('RANDOM_ID', Math.floor(Math.random() * 1000));
+							self._canvasWrapper.innerHTML = '';
+							self._canvasWrapper.appendChild(generateElements(html)[0]);
+						}
+						if (self.component && self.component.afterDrop) {
+							var firstChild = self._canvasWrapper.firstElementChild;
+							if (firstChild) self.dragElement = self.component.afterDrop(firstChild);
+						}
+					}
+					self._canvasDrop = false;
+					self._canvasWrapper = null;
+				} else if (self.dragMoveMutation === false) {				
 					if (self.component.dragHtml || Vvveb.dragHtml) { //if dragHtml is set for dragging then set real component html
 						if (self.component) {
 							let html = self.component.html.replace('RANDOM_ID', Math.floor(Math.random() * 1000));
@@ -1653,6 +1682,7 @@ Vvveb.Builder = {
 					self.dragElement = self.selectedEl;
 				}
 
+				if (self._canvasDrop === false && self._canvasWrapper === null) {
 				const node = self.dragElement;
 				self.selectNode(node);
 				Vvveb.TreeList.loadComponents();
@@ -1674,6 +1704,7 @@ Vvveb.Builder = {
 					
 					Vvveb.Undo.addMutation(self.dragMoveMutation);
 					self.dragMoveMutation = false;
+				}
 				}
 			}
 		};
@@ -2111,7 +2142,22 @@ Vvveb.Builder = {
 				document.getElementById("component-clone")?.remove();
 				document.querySelectorAll("#section-actions, #highlight-name, #select-box").forEach(el => el.style.display = "");
 				self.iconDrag.remove();
-				if(self.dragElement){
+				if (self._canvasDrop && self._canvasWrapper) {
+					var blockCanvas = document.getElementById('block-canvas');
+					if (blockCanvas) {
+						if (self.component && (self.component.dragHtml || Vvveb.dragHtml)) {
+							var html = self.component.html.replace('RANDOM_ID', Math.floor(Math.random() * 1000));
+							self._canvasWrapper.innerHTML = '';
+							self._canvasWrapper.appendChild(generateElements(html)[0]);
+						}
+						if (self.component && self.component.afterDrop) {
+							var firstChild = self._canvasWrapper.firstElementChild;
+							if (firstChild) self.component.afterDrop(firstChild);
+						}
+					}
+					self._canvasDrop = false;
+					self._canvasWrapper = null;
+				} else if(self.dragElement){
 					self.dragElement.remove();
 				}
 			}
