@@ -77,7 +77,7 @@ Vvveb.Components.extend("_base","elements/figure", {
     resizable:true,//show select box resize handlers
     
     properties: [{
-        name: "Image",
+        name: "图片",
         key: "src",
         child:"img",
         htmlAttr: "src",
@@ -119,7 +119,7 @@ Vvveb.Components.extend("_base","elements/font-icon", {
     html: `<i class="la la-star la-2x"></i>`,
     properties: [
 {
-		name: "Icon",
+		name: "图标",
 		key: "icon",
 		inline:true,
 		inputtype: HtmlListSelectInput,
@@ -192,7 +192,7 @@ Vvveb.Components.extend("_base","elements/svg-image", {
         htmlAttr: "innerHTML",
         inputtype: SvgInput
     }, {
-	name: "Icon",
+	name: "图标",
 	key: "icon",
 	inline:true,
 	inputtype: HtmlListSelectInput,
@@ -427,7 +427,7 @@ Vvveb.Components.add("elements/svg-element", {
 //Gallery
 Vvveb.Components.add("elements/gallery", {
     attributes: ["data-component-gallery"],
-    name: "Gallery",
+    name: "图片集",
     image: "icons/images.svg",
     html: `<div class="gallery masonry has-shadow" data-component-gallery  id="gallery-RANDOM_ID">
 				<div class="item">
@@ -801,7 +801,7 @@ Vvveb.Components.add("elements/tabs", {
 		return node;
 	},	
     properties: [{
-			//name: "List",
+			//name: "列表",
 			key: "list",
 			component: "elements/tab",
 			children :[{
@@ -909,7 +909,7 @@ Vvveb.Components.add("elements/accordion", {
 		return node;
 	},
     properties: [{
-			//name: "List",
+			//name: "列表",
 			key: "list",
 			component: "elements/tab",
 			inline:false,
@@ -1113,7 +1113,7 @@ Vvveb.Components.add("elements/social-icons", {
 				</li>
 			</ul>`,
 		properties: [{
-			//name: "List",
+			//name: "列表",
 			key: "list",
 			//component: "elements/tab",
 			inline:false,
@@ -1480,7 +1480,7 @@ Vvveb.Components.add("elements/divider", {
 
 Vvveb.Components.add("elements/separator", {
     nodes: [".counter"],
-    name: "Separator",
+    name: "分隔符",
     image: "icons/separator.svg",
     html: `<i class="font-icon la la-star"></i>`,
     properties: [

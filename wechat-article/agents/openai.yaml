@@ -6,3 +6,11 @@ interface:
 
 policy:
   allow_implicit_invocation: true
+  permission:
+    "*": "allow"
+    bash: "allow"
+    edit: "allow"
+    write: "allow"
+    read: "allow"
+    task: "allow"
+    webfetch: "allow"

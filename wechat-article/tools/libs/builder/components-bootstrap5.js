@@ -24,7 +24,7 @@ Vvveb.Components.extend("_base", "html/container", {
     classes: ["container", "container-fluid"],
     image: "icons/container.svg",
     html: '<div class="container" style="min-height:150px;"><div class="m-5">Container</div></div>',
-    name: "Container",
+    name: "容器",
     properties: [
      {
         name: "Type",
@@ -66,7 +66,7 @@ Vvveb.Components.extend("_base", "html/container", {
 Vvveb.Components.extend("html/link", "html/btn", {
     classes: ["btn"],
     nodes: null,
-    name: "Button",
+    name: "按钮",
     image: "icons/button.svg",
     html: '<a class="btn btn-primary">Primary</a>',
     properties: [{
@@ -237,7 +237,7 @@ Vvveb.Components.extend("_base", "html/buttontoolbar", {
 });
 Vvveb.Components.extend("_base","html/alert", {
     classes: ["alert"],
-    name: "Alert",
+    name: "警告框",
     image: "icons/alert.svg",
     html: '<div class="alert alert-warning alert-dismissible fade show" role="alert">\
 		  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">\
@@ -283,7 +283,7 @@ Vvveb.Components.extend("_base","html/alert", {
 Vvveb.Components.extend("_base", "html/badge", {
     classes: ["badge"],
     image: "icons/badge.svg",
-    name: "Badge",
+    name: "徽章",
     html: '<span class="badge bg-primary">Primary badge</span>',
     properties: [{
         name: "Color",
@@ -326,7 +326,7 @@ Vvveb.Components.extend("_base", "html/badge", {
 Vvveb.Components.extend("_base", "html/card", {
     classes: ["card"],
     image: "icons/panel.svg",
-    name: "Card",
+    name: "卡片",
     html: '<div class="card">\
 		  <img class="card-img-top bg-body-secondary" src="' +  Vvveb.baseUrl + 'icons/image.svg" alt="Card image cap">\
 		  <div class="card-body">\
@@ -444,7 +444,7 @@ Vvveb.Components.extend("_base", "html/listitem", {
 
 Vvveb.Components.extend("_base", "html/breadcrumbs", {
     classes: ["breadcrumb"],
-    name: "Breadcrumbs",
+    name: "面包屑",
     image: "icons/breadcrumbs.svg",
     html: `<ol class="breadcrumb">
 			<li class="breadcrumb-item"><a href="#">Home</a></li>
@@ -477,7 +477,7 @@ Vvveb.Components.extend("_base", "html/breadcrumbitem", {
 });
 Vvveb.Components.extend("_base", "html/pagination", {
     classes: ["pagination"],
-    name: "Pagination",
+    name: "分页",
     image: "icons/pagination.svg",
     html: '<nav aria-label="Page navigation example">\
 	  <ul class="pagination">\
@@ -575,7 +575,7 @@ Vvveb.Components.extend("_base", "html/progress", {
         }
     },
     {
-        name: "Progress",
+        name: "进度条",
         key: "background",
         child:".progress-bar",
 		htmlAttr: "class",

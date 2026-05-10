@@ -1,5 +1,5 @@
 Vvveb.Sections.add("hero/hero-1", {
-    name: "Hero 1",
+    name: "首页横幅1",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/hero/hero-1-thumb.webp",
     html: `<header class="hero-1" aria-label="hero-1">
 
@@ -51,7 +51,7 @@ Vvveb.Sections.add("hero/hero-1", {
 
 </header>`
 });Vvveb.Sections.add("hero/hero-2", {
-    name: "Hero 2",
+    name: "首页横幅2",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/hero/hero-2-thumb.webp",
     html: `<header class="hero-2" aria-label="hero-2">
 
@@ -102,7 +102,7 @@ Vvveb.Sections.add("hero/hero-1", {
   </div>
 </header>`
 });Vvveb.Sections.add("hero/hero-3-full", {
-    name: "Hero 3 full",
+    name: "首页横幅3全屏",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/hero/hero-3-full-thumb.webp",
     html: `<header class="hero-3" aria-label="hero-3">
 
@@ -153,7 +153,7 @@ Vvveb.Sections.add("hero/hero-1", {
 
 </header>`
 });Vvveb.Sections.add("hero/hero-3", {
-    name: "Hero 3",
+    name: "首页横幅3",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/hero/hero-3-thumb.webp",
     html: `<header class="hero-3" aria-label="hero-3">
 
@@ -204,7 +204,7 @@ Vvveb.Sections.add("hero/hero-1", {
 
 </header>`
 });Vvveb.Sections.add("hero/hero-4", {
-    name: "Hero 4",
+    name: "首页横幅4",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/hero/hero-4-thumb.webp",
     html: `<header class="hero-4" aria-label="hero-4">
 
@@ -254,7 +254,7 @@ Vvveb.Sections.add("hero/hero-1", {
   </div>
 </header>`
 });Vvveb.Sections.add("hero/hero-5", {
-    name: "Hero 5",
+    name: "首页横幅5",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/hero/hero-5-thumb.webp",
     html: `<header class="hero-5" aria-label="hero-5">
 
@@ -314,7 +314,7 @@ Vvveb.Sections.add("hero/hero-1", {
 
 </header>`
 });Vvveb.Sections.add("hero/hero-6", {
-    name: "Hero 6",
+    name: "首页横幅6",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/hero/hero-6-thumb.webp",
     html: `<header class="hero-6" aria-label="hero-6">
 
@@ -362,7 +362,7 @@ Vvveb.Sections.add("hero/hero-1", {
   </div>
 </header>`
 });Vvveb.Sections.add("hero/hero-7", {
-    name: "Hero 7",
+    name: "首页横幅7",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/hero/hero-7-thumb.webp",
     html: `<header class="hero-7" aria-label="hero-7">
 
@@ -417,7 +417,7 @@ Vvveb.Sections.add("hero/hero-1", {
   </div>
 </header>`
 });Vvveb.Sections.add("hero/hero-8", {
-    name: "Hero 8",
+    name: "首页横幅8",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/hero/hero-8-thumb.webp",
     html: `<header class="hero-8 pt-5" aria-label="hero-8">
 
@@ -485,7 +485,7 @@ Vvveb.Sections.add("hero/hero-1", {
   </div>
 </header>`
 });Vvveb.Sections.add("hero/hero-9", {
-    name: "Hero 9",
+    name: "首页横幅9",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/hero/hero-9-thumb.webp",
     html: `<header class="hero-9 pt-5" aria-label="hero-9">
 
@@ -528,7 +528,7 @@ Vvveb.Sections.add("hero/hero-1", {
   </div>
 </header>`
 });Vvveb.Sections.add("hero/hero-10", {
-    name: "Hero 10",
+    name: "首页横幅10",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/hero/hero-10-thumb.webp",
     html: `<header class="hero-10 pt-5" aria-label="hero-10">
 
@@ -574,7 +574,7 @@ Vvveb.Sections.add("hero/hero-1", {
 
 </header>`
 });Vvveb.Sections.add("hero/hero-11", {
-    name: "Hero 11",
+    name: "首页横幅11",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/hero/hero-11-thumb.webp",
     html: `<header class="hero-11 py-5" aria-label="hero-11">
   <div class="container-fluid pt-5">
@@ -625,7 +625,7 @@ Vvveb.Sections.add("hero/hero-1", {
   </div>
 </header>`
 });Vvveb.Sections.add("hero/hero-12", {
-    name: "Hero 12",
+    name: "首页横幅12",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/hero/hero-12-thumb.webp",
     html: `<header class="hero-12 py-5" aria-label="hero-12">
 
@@ -658,7 +658,7 @@ Vvveb.Sections.add("hero/hero-1", {
 
 </header>`
 });Vvveb.Sections.add("hero/hero-13", {
-    name: "Hero 13",
+    name: "首页横幅13",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/hero/hero-13-thumb.webp",
     html: `<header class="hero-13 py-5" aria-label="hero-13">
 
@@ -692,7 +692,7 @@ Vvveb.Sections.add("hero/hero-1", {
 
 </header>`
 });Vvveb.Sections.add("hero/hero-14", {
-    name: "Hero 14",
+    name: "首页横幅14",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/hero/hero-14-thumb.webp",
     html: `<header class="hero-14 py-5" aria-label="hero-14">
   <div class="container">
@@ -825,7 +825,7 @@ Vvveb.Sections.add("hero/hero-1", {
   </div>
   </section>`
 });Vvveb.Sections.add("hero/hero-slider", {
-    name: "Hero slider",
+    name: "首页横幅轮播",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/hero/hero-slider-thumb.webp",
     html: `<header class="hero-slider" aria-label="hero-slider">
 
@@ -993,7 +993,7 @@ initSwiper();
 });
 	Vvveb.SectionsGroup["Hero"] = ["hero/hero-1","hero/hero-2","hero/hero-3-full","hero/hero-3","hero/hero-4","hero/hero-5","hero/hero-6","hero/hero-7","hero/hero-8","hero/hero-9","hero/hero-10","hero/hero-11","hero/hero-12","hero/hero-13","hero/hero-14","hero/hero-slider"];
 Vvveb.Sections.add("features/features-1", {
-    name: "Features 1",
+    name: "特性1",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/features/features-1-thumb.webp",
     html: `<section class="features-1 bg-alternate my-5" aria-label="features-1">
   <div class="container">
@@ -1041,7 +1041,7 @@ Vvveb.Sections.add("features/features-1", {
   </div>
 </section>`
 });Vvveb.Sections.add("features/features-2", {
-    name: "Features 2",
+    name: "特性2",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/features/features-2-thumb.webp",
     html: `<section class="features-2 py-5 bg-alternate" aria-label="features-2">
 
@@ -1079,7 +1079,7 @@ Vvveb.Sections.add("features/features-1", {
   </div>
 </section>`
 });Vvveb.Sections.add("features/features-3", {
-    name: "Features 3",
+    name: "特性3",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/features/features-3-thumb.webp",
     html: `<section class="features-3 py-5 bg-alternate" aria-label="features-3">
   <div class="container">
@@ -1154,7 +1154,7 @@ Vvveb.Sections.add("features/features-1", {
   </div>
 </section>`
 });Vvveb.Sections.add("features/features-4", {
-    name: "Features 4",
+    name: "特性4",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/features/features-4-thumb.webp",
     html: `<section class="features-4 py-5 bg-primary bg-gradient text-white" aria-label="features-4">
 
@@ -1223,7 +1223,7 @@ Vvveb.Sections.add("features/features-1", {
 
 </section>`
 });Vvveb.Sections.add("features/features-5", {
-    name: "Features 5",
+    name: "特性5",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/features/features-5-thumb.webp",
     html: `<section class="features-5 py-5 bg-alternate" aria-label="features-5">
 
@@ -1270,7 +1270,7 @@ Vvveb.Sections.add("features/features-1", {
 
 </section>`
 });Vvveb.Sections.add("features/features-6", {
-    name: "Features 6",
+    name: "特性6",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/features/features-6-thumb.webp",
     html: `<section class="features-6 py-5 bg-alternate" aria-label="features-6">
   <div class="container">
@@ -1313,7 +1313,7 @@ Vvveb.Sections.add("features/features-1", {
   </div>
 </section>`
 });Vvveb.Sections.add("features/features-7", {
-    name: "Features 7",
+    name: "特性7",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/features/features-7-thumb.webp",
     html: `<section class="features-7 py-5 bg-alternate" aria-label="features-7">
   <div class="container">
@@ -1366,7 +1366,7 @@ Vvveb.Sections.add("features/features-1", {
   </div>
 </section>`
 });Vvveb.Sections.add("features/features-8", {
-    name: "Features 8",
+    name: "特性8",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/features/features-8-thumb.webp",
     html: `<section class="features-8 py-5 bg-alternate" aria-label="features-8">
   <div class="container">
@@ -1459,7 +1459,7 @@ Vvveb.Sections.add("features/features-1", {
   </div>
 </section>`
 });Vvveb.Sections.add("features/features-9", {
-    name: "Features 9",
+    name: "特性9",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/features/features-9-thumb.webp",
     html: `<section class="features-9 py-5 bg-alternate" aria-label="features-9">
   <div class="container">
@@ -1573,7 +1573,7 @@ Vvveb.Sections.add("features/features-1", {
   </div>
 </section>`
 });Vvveb.Sections.add("features/features-10", {
-    name: "Features 10",
+    name: "特性10",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/features/features-10-thumb.webp",
     html: `<section class="features-10 py-5 bg-alternate" aria-label="features-10">
   <div class="container">
@@ -1624,7 +1624,7 @@ Vvveb.Sections.add("features/features-1", {
   </div>
 </section>`
 });Vvveb.Sections.add("features/features-11", {
-    name: "Features 11",
+    name: "特性11",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/features/features-11-thumb.webp",
     html: `<section class="features-11 py-5 bg-alternate" aria-label="features-11">
   <div class="container">
@@ -1662,7 +1662,7 @@ Vvveb.Sections.add("features/features-1", {
   </div>
 </section>`
 });Vvveb.Sections.add("features/features-12", {
-    name: "Features 12",
+    name: "特性12",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/features/features-12-thumb.webp",
     html: `<section class="features-1 bg-alternate" aria-label="features-12">
   <div class="container-fluid g-0">
@@ -1710,7 +1710,7 @@ Vvveb.Sections.add("features/features-1", {
   </div>
 </section>`
 });Vvveb.Sections.add("features/features-13", {
-    name: "Features 13",
+    name: "特性13",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/features/features-13-thumb.webp",
     html: `<section class="features-1 bg-alternate" aria-label="features-13">
   <div class="container">
@@ -1739,7 +1739,7 @@ Vvveb.Sections.add("features/features-1", {
   </div>
 </section>`
 });Vvveb.Sections.add("features/features-14", {
-    name: "Features 14",
+    name: "特性14",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/features/features-14-thumb.webp",
     html: `<section class="features-1 bg-alternate" aria-label="features-14">
   <div class="container">
@@ -1765,7 +1765,7 @@ Vvveb.Sections.add("features/features-1", {
   </div>
 </section>`
 });Vvveb.Sections.add("features/features-15", {
-    name: "Features 15",
+    name: "特性15",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/features/features-15-thumb.webp",
     html: ` <section aria-label="features-15">
    <div class="container py-6">
@@ -2190,7 +2190,7 @@ Vvveb.Sections.add("features/features-1", {
    </div>
  </section>`
 });Vvveb.Sections.add("features/features-16", {
-    name: "Features 16",
+    name: "特性16",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/features/features-16-thumb.webp",
     html: `<section aria-label="features-16">
   <div class="container py-4 py-lg-6">
@@ -2266,7 +2266,7 @@ Vvveb.Sections.add("features/features-1", {
   </div>
 </section>`
 });Vvveb.Sections.add("features/features-17", {
-    name: "Features 17",
+    name: "特性17",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/features/features-17-thumb.webp",
     html: `<section aria-label="features-17">
   <div class="container py-4 py-md-6">
@@ -2362,7 +2362,7 @@ Vvveb.Sections.add("features/features-1", {
 
 </section>`
 });Vvveb.Sections.add("features/features-18", {
-    name: "Features 18",
+    name: "特性18",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/features/features-18-thumb.webp",
     html: `<section aria-label="features-18">
   <div class="container">
@@ -2431,7 +2431,7 @@ Vvveb.Sections.add("features/features-1", {
   </div>
 </section>`
 });Vvveb.Sections.add("features/features-19", {
-    name: "Features 19",
+    name: "特性19",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/features/features-19-thumb.webp",
     html: `<section aria-label="features-19">
   <div class="container py-5">
@@ -2472,7 +2472,7 @@ Vvveb.Sections.add("features/features-1", {
 });
 	Vvveb.SectionsGroup["Features"] = ["features/features-1","features/features-2","features/features-3","features/features-4","features/features-5","features/features-6","features/features-7","features/features-8","features/features-9","features/features-10","features/features-11","features/features-12","features/features-13","features/features-14","features/features-15","features/features-16","features/features-17","features/features-18","features/features-19"];
 Vvveb.Sections.add("services/services-1", {
-    name: "Services 1",
+    name: "服务1",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/services/services-1-thumb.webp",
     html: `<section class="py-5 services-1" aria-label="services-1">
   <div class="container">
@@ -2552,7 +2552,7 @@ Vvveb.Sections.add("services/services-1", {
   </div>
 </section>`
 });Vvveb.Sections.add("services/services-2", {
-    name: "Services 2",
+    name: "服务2",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/services/services-2-thumb.webp",
     html: `<section class="py-5 services-2" aria-label="services-2">
   <div class="container">
@@ -2699,7 +2699,7 @@ Vvveb.Sections.add("services/services-1", {
   </div>
 </section>`
 });Vvveb.Sections.add("services/services-3", {
-    name: "Services 3",
+    name: "服务3",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/services/services-3-thumb.webp",
     html: `<section class="py-5 services-3" aria-label="services-3">
   <div class="container">
@@ -2772,7 +2772,7 @@ Vvveb.Sections.add("services/services-1", {
   </div>
 </section>`
 });Vvveb.Sections.add("services/services-4", {
-    name: "Services 4",
+    name: "服务4",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/services/services-4-thumb.webp",
     html: `<section class="py-5 services-4" aria-label="services-4">
   <div class="container">
@@ -2861,7 +2861,7 @@ Vvveb.Sections.add("services/services-1", {
   </div>
 </section>`
 });Vvveb.Sections.add("services/services-5", {
-    name: "Services 5",
+    name: "服务5",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/services/services-5-thumb.webp",
     html: `<section class="py-5 services-5" aria-label="services-5">
   <div class="container">
@@ -2941,7 +2941,7 @@ Vvveb.Sections.add("services/services-1", {
   </div>
 </section>`
 });Vvveb.Sections.add("services/services-6", {
-    name: "Services 6",
+    name: "服务6",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/services/services-6-thumb.webp",
     html: `<section class="py-5 services-6" aria-label="services-6">
   <div class="container">
@@ -2984,7 +2984,7 @@ Vvveb.Sections.add("services/services-1", {
   </div>
 </section>`
 });Vvveb.Sections.add("services/services-7", {
-    name: "Services 7",
+    name: "服务7",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/services/services-7-thumb.webp",
     html: `<section class="py-5 services-7" aria-label="services-7">
   <div class="container">
@@ -3054,7 +3054,7 @@ Vvveb.Sections.add("services/services-1", {
 });
 	Vvveb.SectionsGroup["Services"] = ["services/services-1","services/services-2","services/services-3","services/services-4","services/services-5","services/services-6","services/services-7"];
 Vvveb.Sections.add("base/1-column", {
-    name: "1 column",
+    name: "1列",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/base/1-column-thumb.webp",
     html: `<section title="one column" class="py-4">
   <div class="container">
@@ -3064,7 +3064,7 @@ Vvveb.Sections.add("base/1-column", {
   </div>
 </section>`
 });Vvveb.Sections.add("base/2-columns-ratio", {
-    name: "2 columns ratio",
+    name: "2列等比",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/base/2-columns-ratio-thumb.webp",
     html: `<section title="two columns ratio" class="py-4">
   <div class="container">
@@ -3075,7 +3075,7 @@ Vvveb.Sections.add("base/1-column", {
   </div>
 </section>`
 });Vvveb.Sections.add("base/2-columns", {
-    name: "2 columns",
+    name: "2列",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/base/2-columns-thumb.webp",
     html: `<section title="two columns" class="py-4">
   <div class="container">
@@ -3086,7 +3086,7 @@ Vvveb.Sections.add("base/1-column", {
   </div>
 </section>`
 });Vvveb.Sections.add("base/3-columns-ratio", {
-    name: "3 columns ratio",
+    name: "3列等比",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/base/3-columns-ratio-thumb.webp",
     html: `<section title="two columns ratio" class="py-4">
   <div class="container">
@@ -3098,7 +3098,7 @@ Vvveb.Sections.add("base/1-column", {
   </div>
 </section>`
 });Vvveb.Sections.add("base/3-columns", {
-    name: "3 columns",
+    name: "3列",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/base/3-columns-thumb.webp",
     html: `<section title="three columns" class="py-4">
   <div class="container">
@@ -3110,7 +3110,7 @@ Vvveb.Sections.add("base/1-column", {
   </div>
 </section>`
 });Vvveb.Sections.add("base/3-grid-left", {
-    name: "3 grid left",
+    name: "3网格左",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/base/3-grid-left-thumb.webp",
     html: `<section title="three grid left" class="py-4">
   <div class="container">
@@ -3126,7 +3126,7 @@ Vvveb.Sections.add("base/1-column", {
   </div>
 </section>`
 });Vvveb.Sections.add("base/3-grid", {
-    name: "3 grid",
+    name: "3网格",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/base/3-grid-thumb.webp",
     html: `<section title="three grid" class="py-4">
   <div class="container">
@@ -3140,7 +3140,7 @@ Vvveb.Sections.add("base/1-column", {
   </div>
 </section>`
 });Vvveb.Sections.add("base/4-columns", {
-    name: "4 columns",
+    name: "4列",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/base/4-columns-thumb.webp",
     html: `<section title="four columns" class="py-4">
   <div class="container">
@@ -3153,7 +3153,7 @@ Vvveb.Sections.add("base/1-column", {
   </div>
 </section>`
 });Vvveb.Sections.add("base/4-grid-masonry", {
-    name: "4 grid masonry",
+    name: "4网格瀑布流",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/base/4-grid-masonry-thumb.webp",
     html: `<section title="four grid masonry" class="py-4">
   <div class="container">
@@ -3168,7 +3168,7 @@ Vvveb.Sections.add("base/1-column", {
   </div>
 </section>`
 });Vvveb.Sections.add("base/4-grid", {
-    name: "4 grid",
+    name: "4网格",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/base/4-grid-thumb.webp",
     html: `<section title="four grid" class="py-4">
   <div class="container">
@@ -3183,7 +3183,7 @@ Vvveb.Sections.add("base/1-column", {
   </div>
 </section>`
 });Vvveb.Sections.add("base/6-columns", {
-    name: "6 columns",
+    name: "6列",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/base/6-columns-thumb.webp",
     html: `<section title="six columns" class="py-4">
   <div class="container">
@@ -3198,7 +3198,7 @@ Vvveb.Sections.add("base/1-column", {
   </div>
 </section>`
 });Vvveb.Sections.add("base/6-grid", {
-    name: "6 grid",
+    name: "6网格",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/base/6-grid-thumb.webp",
     html: `<section title="six grid" class="py-4">
   <div class="container">
@@ -3215,7 +3215,7 @@ Vvveb.Sections.add("base/1-column", {
   </div>
 </section>`
 });Vvveb.Sections.add("base/8-columns", {
-    name: "8 columns",
+    name: "8列",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/base/8-columns-thumb.webp",
     html: `<section title="eight columns" class="py-4">
   <div class="container">
@@ -3232,7 +3232,7 @@ Vvveb.Sections.add("base/1-column", {
   </div>
 </section>`
 });Vvveb.Sections.add("base/12-columns", {
-    name: "12 columns",
+    name: "12列",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/base/12-columns-thumb.webp",
     html: `<section title="twelve columns" class="py-4">
   <div class="container">
@@ -3263,7 +3263,7 @@ Vvveb.Sections.add("base/1-column", {
 });
 	Vvveb.SectionsGroup["Base"] = ["base/1-column","base/2-columns-ratio","base/2-columns","base/3-columns-ratio","base/3-columns","base/3-grid-left","base/3-grid","base/4-columns","base/4-grid-masonry","base/4-grid","base/6-columns","base/6-grid","base/8-columns","base/12-columns","base/blank"];
 Vvveb.Sections.add("clients/clients-1", {
-    name: "Clients 1",
+    name: "客户1",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/clients/clients-1-thumb.webp",
     html: `<section class="py-3 py-md-5 py-xl-8" aria-label="clients-1">
   <div class="container">
@@ -3324,7 +3324,7 @@ Vvveb.Sections.add("clients/clients-1", {
 });
 	Vvveb.SectionsGroup["Clients"] = ["clients/clients-1"];
 Vvveb.Sections.add("contact-form/contact-form-1", {
-    name: "Contact form 1",
+    name: "联系表单1",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/contact-form/contact-form-1-thumb.webp",
     html: `<section class="contact-form-9" aria-label="contact-form-9">
   <div class="container py-5 my-5">
@@ -3451,7 +3451,7 @@ Vvveb.Sections.add("contact-form/contact-form-1", {
   </div>
 </section>`
 });Vvveb.Sections.add("contact-form/contact-form-2", {
-    name: "Contact form 2",
+    name: "联系表单2",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/contact-form/contact-form-2-thumb.webp",
     html: `<section class="contact-form-11 pt-0" aria-label="contact-form-11">
   <div class="container-fluid p-0 pb-5">
@@ -3577,7 +3577,7 @@ Vvveb.Sections.add("contact-form/contact-form-1", {
   </div>
 </section>`
 });Vvveb.Sections.add("contact-form/contact-form-3", {
-    name: "Contact form 3",
+    name: "联系表单3",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/contact-form/contact-form-3-thumb.webp",
     html: `<section class="contact-form-12 py-0" aria-label="contact-form-12">
   <div class="container py-5">
@@ -3703,7 +3703,7 @@ Vvveb.Sections.add("contact-form/contact-form-1", {
   </div>
 </section>`
 });Vvveb.Sections.add("contact-form/contact-form-4", {
-    name: "Contact form 4",
+    name: "联系表单4",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/contact-form/contact-form-4-thumb.webp",
     html: `<section class="contact-form-13" aria-label="contact-form-13">
   <div class="container">
@@ -3831,7 +3831,7 @@ Vvveb.Sections.add("contact-form/contact-form-1", {
   </div>
 </section>`
 });Vvveb.Sections.add("contact-form/contact-form-5", {
-    name: "Contact form 5",
+    name: "联系表单5",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/contact-form/contact-form-5-thumb.webp",
     html: `<section class="contact-form-2 container-fluid px-5 my-5" aria-label="contact-form-2">
   <div class="row justify-content-center">
@@ -3959,7 +3959,7 @@ Vvveb.Sections.add("contact-form/contact-form-1", {
   </div>
 </section>`
 });Vvveb.Sections.add("contact-form/contact-form-6", {
-    name: "Contact form 6",
+    name: "联系表单6",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/contact-form/contact-form-6-thumb.webp",
     html: `<section title="contact-form-6" class="contact-form-6">
   <div class="container-fluid g-0">
@@ -4129,7 +4129,7 @@ Vvveb.Sections.add("contact-form/contact-form-1", {
   </div>
 </section>`
 });Vvveb.Sections.add("contact-form/contact-form-7", {
-    name: "Contact form 7",
+    name: "联系表单7",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/contact-form/contact-form-7-thumb.webp",
     html: `<section class="contact-form-8" aria-label="contact-form-8">
   <div class="container">
@@ -4250,7 +4250,7 @@ Vvveb.Sections.add("contact-form/contact-form-1", {
   </div>
 </section>`
 });Vvveb.Sections.add("contact-form/contact-form-8", {
-    name: "Contact form 8",
+    name: "联系表单8",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/contact-form/contact-form-8-thumb.webp",
     html: `<section class="contact-form-8 pt-0" aria-label="contact-form-8">
   <div class="container-fluid p-0 pb-3">
@@ -4417,7 +4417,7 @@ Vvveb.Sections.add("contact-form/contact-form-1", {
   </div>
 </section>`
 });Vvveb.Sections.add("contact-form/contact-form-9", {
-    name: "Contact form 9",
+    name: "联系表单9",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/contact-form/contact-form-9-thumb.webp",
     html: `<section class="contact-form-3 py-5" aria-label="contact-form-3">
   <div class="row no-gutters">
@@ -4585,7 +4585,7 @@ Vvveb.Sections.add("contact-form/contact-form-1", {
   </div>
 </section>`
 });Vvveb.Sections.add("contact-form/contact-form-10", {
-    name: "Contact form 10",
+    name: "联系表单10",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/contact-form/contact-form-10-thumb.webp",
     html: `<section title="contact-form-10" class="contact-form-10 border-top">
   <div class="container">
@@ -4751,7 +4751,7 @@ Vvveb.Sections.add("contact-form/contact-form-1", {
 });
 	Vvveb.SectionsGroup["Contact form"] = ["contact-form/contact-form-1","contact-form/contact-form-2","contact-form/contact-form-3","contact-form/contact-form-4","contact-form/contact-form-5","contact-form/contact-form-6","contact-form/contact-form-7","contact-form/contact-form-8","contact-form/contact-form-9","contact-form/contact-form-10"];
 Vvveb.Sections.add("counter/counter-1", {
-    name: "Counter 1",
+    name: "计数器1",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/counter/counter-1-thumb.webp",
     html: `<section class="py-5" aria-label="counter-1">
   <div class="container">
@@ -4814,7 +4814,7 @@ Vvveb.Sections.add("counter/counter-1", {
   </div>
 </section>`
 });Vvveb.Sections.add("counter/counter-2", {
-    name: "Counter 2",
+    name: "计数器2",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/counter/counter-2-thumb.webp",
     html: `<section class="py-5" aria-label="counter-2">
   <div class="container">
@@ -5810,7 +5810,7 @@ Vvveb.Sections.add("faq/faq-1", {
 });
 	Vvveb.SectionsGroup["Faq"] = ["faq/faq-1","faq/faq-2","faq/faq-3","faq/faq-4","faq/faq-5","faq/faq-6","faq/faq-7"];
 Vvveb.Sections.add("footer/footer-1", {
-    name: "Footer 1",
+    name: "页脚1",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/footer/footer-1-thumb.webp",
     html: `<footer class="footer-1" title="footer-1" data-v-save-global="index.html,.footer-1">
   <div class="container" data-v-component-menu="footer" data-v-slug="main-footer">
@@ -5934,7 +5934,7 @@ Vvveb.Sections.add("footer/footer-1", {
 
 </footer>`
 });Vvveb.Sections.add("footer/footer-2", {
-    name: "Footer 2",
+    name: "页脚2",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/footer/footer-2-thumb.webp",
     html: `<footer class="footer-2" title="footer-2" data-v-save-global="index.html,.footer-2">
 
@@ -6027,7 +6027,7 @@ Vvveb.Sections.add("footer/footer-1", {
   </div>
 </footer>`
 });Vvveb.Sections.add("footer/footer-3", {
-    name: "Footer 3",
+    name: "页脚3",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/footer/footer-3-thumb.webp",
     html: `<footer class="footer-3 bg-dark text-white" title="footer-3" data-v-save-global="index.html,.footer-3" data-bs-theme="dark">
   <div class="container" data-v-component-menu="footer" data-v-slug="main-footer">
@@ -6152,7 +6152,7 @@ Vvveb.Sections.add("footer/footer-1", {
 
 </footer>`
 });Vvveb.Sections.add("footer/footer-4", {
-    name: "Footer 4",
+    name: "页脚4",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/footer/footer-4-thumb.webp",
     html: `<footer class="py-4 py-md-5 bg-dark text-white footer-4" aria-label="footer-4" data-v-save-global="index.html,.footer-4" data-bs-theme="dark">
 
@@ -6353,7 +6353,7 @@ Vvveb.Sections.add("footer/footer-1", {
 
 </footer>`
 });Vvveb.Sections.add("footer/footer-5", {
-    name: "Footer 5",
+    name: "页脚5",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/footer/footer-5-thumb.webp",
     html: `<footer class="py-4 py-md-5 bg-dark text-white footer-5" aria-label="footer-5" data-v-save-global="index.html,.footer-5" data-bs-theme="dark">
 
@@ -6531,7 +6531,7 @@ Vvveb.Sections.add("footer/footer-1", {
 
 </footer>`
 });Vvveb.Sections.add("footer/footer-6", {
-    name: "Footer 6",
+    name: "页脚6",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/footer/footer-6-thumb.webp",
     html: `<footer class="py-4 py-md-5 bg-dark text-white footer-6" aria-label="footer-6" data-v-save-global="index.html,.footer-6" data-bs-theme="dark">
 
@@ -6859,7 +6859,7 @@ Vvveb.Sections.add("footer/footer-1", {
 
 </footer>`
 });Vvveb.Sections.add("footer/footer-7", {
-    name: "Footer 7",
+    name: "页脚7",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/footer/footer-7-thumb.webp",
     html: `<footer class="py-4 py-md-5 bg-dark text-white footer-7" aria-label="footer-7" data-v-save-global="index.html,.footer-7" data-bs-theme="dark">
   <div>
@@ -7078,7 +7078,7 @@ Vvveb.Sections.add("footer/footer-1", {
 
 </footer>`
 });Vvveb.Sections.add("footer/footer-8", {
-    name: "Footer 8",
+    name: "页脚8",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/footer/footer-8-thumb.webp",
     html: `<footer class="py-4 py-md-5 bg-dark text-white footer-8" aria-label="footer-8" data-v-save-global="index.html,.footer-8" data-bs-theme="dark">
   <div>
@@ -7302,7 +7302,7 @@ Vvveb.Sections.add("footer/footer-1", {
 
 </footer>`
 });Vvveb.Sections.add("footer/footer-9", {
-    name: "Footer 9",
+    name: "页脚9",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/footer/footer-9-thumb.webp",
     html: `<footer class="py-4 py-md-5 bg-dark text-white footer-9" aria-label="footer-9" data-v-save-global="index.html,.footer-9" data-bs-theme="dark">
   <div class="py-6 py-md-8 py-xl-10">
@@ -7392,7 +7392,7 @@ Vvveb.Sections.add("footer/footer-1", {
   </div>
 </footer>`
 });Vvveb.Sections.add("footer/footer-10", {
-    name: "Footer 10",
+    name: "页脚10",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/footer/footer-10-thumb.webp",
     html: `<footer class="py-4 py-md-5 bg-dark text-white footer-10" aria-label="footer-10" data-v-save-global="index.html,.footer-10" data-bs-theme="dark">
 
@@ -7685,7 +7685,7 @@ Vvveb.Sections.add("footer/footer-1", {
 
 </footer>`
 });Vvveb.Sections.add("footer/footer-11", {
-    name: "Footer 11",
+    name: "页脚11",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/footer/footer-11-thumb.webp",
     html: `<footer class="py-4 py-md-5 bg-dark text-white footer-11" aria-label="footer-11" data-v-save-global="index.html,.footer-11" data-bs-theme="dark">
 
@@ -8059,7 +8059,7 @@ Vvveb.Sections.add("footer/footer-1", {
 
 </footer>`
 });Vvveb.Sections.add("footer/footer-12", {
-    name: "Footer 12",
+    name: "页脚12",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/footer/footer-12-thumb.webp",
     html: `<footer class="py-4 py-md-5 footer-12" aria-label="footer-12" data-v-save-global="index.html,.footer-12">
 
@@ -8267,7 +8267,7 @@ Vvveb.Sections.add("footer/footer-1", {
 
 </footer>`
 });Vvveb.Sections.add("footer/footer-13", {
-    name: "Footer 13",
+    name: "页脚13",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/footer/footer-13-thumb.webp",
     html: `<footer class="py-4 py-md-5 bg-dark text-white footer-13" aria-label="footer-13" data-v-save-global="index.html,.footer-13" data-bs-theme="dark">
 
@@ -8468,7 +8468,7 @@ Vvveb.Sections.add("footer/footer-1", {
 
 </footer>`
 });Vvveb.Sections.add("footer/footer-14", {
-    name: "Footer 14",
+    name: "页脚14",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/footer/footer-14-thumb.webp",
     html: `<footer class="py-4 py-md-5 bg-dark text-white footer-14" aria-label="footer-14" data-v-save-global="index.html,.footer-14" data-bs-theme="dark">
 
@@ -8669,7 +8669,7 @@ Vvveb.Sections.add("footer/footer-1", {
 
 </footer>`
 });Vvveb.Sections.add("footer/footer-15", {
-    name: "Footer 15",
+    name: "页脚15",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/footer/footer-15-thumb.webp",
     html: `<footer class="py-4 py-md-5 bg-dark text-white footer-15" aria-label="footer-15" data-v-save-global="index.html,.footer-15" data-bs-theme="dark">
 
@@ -8872,7 +8872,7 @@ Vvveb.Sections.add("footer/footer-1", {
 });
 	Vvveb.SectionsGroup["Footer"] = ["footer/footer-1","footer/footer-2","footer/footer-3","footer/footer-4","footer/footer-5","footer/footer-6","footer/footer-7","footer/footer-8","footer/footer-9","footer/footer-10","footer/footer-11","footer/footer-12","footer/footer-13","footer/footer-14","footer/footer-15"];
 Vvveb.Sections.add("how-it-works/how-it-works-1", {
-    name: "How it works 1",
+    name: "如何运作1",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/how-it-works/how-it-works-1-thumb.webp",
     html: `<section class="py-5" aria-label="how-it-works-1">
   <div class="container">
@@ -8964,7 +8964,7 @@ Vvveb.Sections.add("how-it-works/how-it-works-1", {
   </div>
 </section>`
 });Vvveb.Sections.add("how-it-works/how-it-works-2", {
-    name: "How it works 2",
+    name: "如何运作2",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/how-it-works/how-it-works-2-thumb.webp",
     html: `<section class="py-5" aria-label="how-it-works-2">
   <div class="container">
@@ -9056,7 +9056,7 @@ Vvveb.Sections.add("how-it-works/how-it-works-1", {
   </div>
 </section>`
 });Vvveb.Sections.add("how-it-works/how-it-works-3", {
-    name: "How it works 3",
+    name: "如何运作3",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/how-it-works/how-it-works-3-thumb.webp",
     html: `<section class="py-5" aria-label="how-it-works-3">
   <div class="container">
@@ -9103,7 +9103,7 @@ Vvveb.Sections.add("how-it-works/how-it-works-1", {
   </div>
 </section>`
 });Vvveb.Sections.add("how-it-works/how-it-works-4", {
-    name: "How it works 4",
+    name: "如何运作4",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/how-it-works/how-it-works-4-thumb.webp",
     html: `<section class="py-5" aria-label="how-it-works-4">
   <div class="container">
@@ -9148,7 +9148,7 @@ Vvveb.Sections.add("how-it-works/how-it-works-1", {
   </div>
 </section>`
 });Vvveb.Sections.add("how-it-works/how-it-works-5", {
-    name: "How it works 5",
+    name: "如何运作5",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/how-it-works/how-it-works-5-thumb.webp",
     html: `<section class="py-5" aria-label="how-it-works-5">
   <div class="container">
@@ -9216,7 +9216,7 @@ Vvveb.Sections.add("how-it-works/how-it-works-1", {
 });
 	Vvveb.SectionsGroup["How it works"] = ["how-it-works/how-it-works-1","how-it-works/how-it-works-2","how-it-works/how-it-works-3","how-it-works/how-it-works-4","how-it-works/how-it-works-5"];
 Vvveb.Sections.add("navigation/navigation-1", {
-    name: "Navigation 1",
+    name: "导航1",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/navigation/navigation-1-thumb.webp",
     html: `<nav class="navigation-1 clearfix" data-v-save-global="blank.html,.navigation-1">
   <div class="navbar navbar-expand-md">
@@ -9694,7 +9694,7 @@ Vvveb.Sections.add("navigation/navigation-1", {
   </div>
 </nav>`
 });Vvveb.Sections.add("navigation/navigation-2", {
-    name: "Navigation 2",
+    name: "导航2",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/navigation/navigation-2-thumb.webp",
     html: `<nav class="navigation-2 clearfix fixed-top transparent" title="navigation-2" data-v-save-global="index.html,.navigation-2">
 
@@ -10175,7 +10175,7 @@ Vvveb.Sections.add("navigation/navigation-1", {
 
 </nav>`
 });Vvveb.Sections.add("navigation/navigation-3", {
-    name: "Navigation 3",
+    name: "导航3",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/navigation/navigation-3-thumb.webp",
     html: `<nav class="navigation-3 clearfix fixed-top transparent" title="navigation-3" data-v-save-global="index.html,.navigation-3">
   <div class="navbar navbar-expand-md navbar-dark">
@@ -10688,7 +10688,7 @@ Vvveb.Sections.add("navigation/navigation-1", {
 
 </nav>`
 });Vvveb.Sections.add("navigation/navigation-4", {
-    name: "Navigation 4",
+    name: "导航4",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/navigation/navigation-4-thumb.webp",
     html: `<nav class="navigation-4 clearfix" data-v-save-global="index.html,.navigation-4">
 
@@ -11042,7 +11042,7 @@ Vvveb.Sections.add("navigation/navigation-1", {
 
 </nav>`
 });Vvveb.Sections.add("navigation/navigation-5", {
-    name: "Navigation 5",
+    name: "导航5",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/navigation/navigation-5-thumb.webp",
     html: `<nav class="navigation-1 clearfix" data-v-save-global="blank.html,.navigation-1">
 
@@ -11649,7 +11649,7 @@ Vvveb.Sections.add("navigation/navigation-1", {
   </div>
 </nav>`
 });Vvveb.Sections.add("navigation/navigation-6", {
-    name: "Navigation 6",
+    name: "导航6",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/navigation/navigation-6-thumb.webp",
     html: `<nav class="navigation-3 clearfix fixed-top transparent" title="navigation-3" data-v-save-global="index.html,.navigation-3">
 
@@ -12293,7 +12293,7 @@ Vvveb.Sections.add("navigation/navigation-1", {
 });
 	Vvveb.SectionsGroup["Navigation"] = ["navigation/navigation-1","navigation/navigation-2","navigation/navigation-3","navigation/navigation-4","navigation/navigation-5","navigation/navigation-6"];
 Vvveb.Sections.add("portfolio/portfolio-1", {
-    name: "Portfolio 1",
+    name: "作品集1",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/portfolio/portfolio-1-thumb.webp",
     html: `<section class="portfolio-1 my-5" aria-label="portfolio-1">
   <div class="row justify-content-center pb-2">
@@ -12370,7 +12370,7 @@ Vvveb.Sections.add("portfolio/portfolio-1", {
   </div>
 </section>`
 });Vvveb.Sections.add("portfolio/portfolio-2", {
-    name: "Portfolio 2",
+    name: "作品集2",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/portfolio/portfolio-2-thumb.webp",
     html: `<section class="portfolio-2 my-5" aria-label="portfolio-2">
   <div class="container">
@@ -12433,7 +12433,7 @@ Vvveb.Sections.add("portfolio/portfolio-1", {
   </div>
 </section>`
 });Vvveb.Sections.add("portfolio/portfolio-3", {
-    name: "Portfolio 3",
+    name: "作品集3",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/portfolio/portfolio-3-thumb.webp",
     html: `<section class="portfolio-2 my-5" aria-label="portfolio-3">
   <div class="container">
@@ -12482,7 +12482,7 @@ Vvveb.Sections.add("portfolio/portfolio-1", {
 });
 	Vvveb.SectionsGroup["Portfolio"] = ["portfolio/portfolio-1","portfolio/portfolio-2","portfolio/portfolio-3"];
 Vvveb.Sections.add("posts/posts-1", {
-    name: "Posts 1",
+    name: "文章1",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/posts/posts-1-thumb.webp",
     html: `<section class="posts-1" aria-label="latest-post-1">
   <div class="container">
@@ -12716,7 +12716,7 @@ Vvveb.Sections.add("posts/posts-1", {
   </div>
 </section>`
 });Vvveb.Sections.add("posts/posts-2", {
-    name: "Posts 2",
+    name: "文章2",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/posts/posts-2-thumb.webp",
     html: `<section class="pt-5 pb-5" aria-label="posts-2">
   <div class="container">
@@ -12870,7 +12870,7 @@ Vvveb.Sections.add("posts/posts-1", {
   </div>
 </section>`
 });Vvveb.Sections.add("posts/posts-3", {
-    name: "Posts 3",
+    name: "文章3",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/posts/posts-3-thumb.webp",
     html: `<section class="posts-3 py-5" aria-label="posts-3">
   <div class="container">
@@ -12948,7 +12948,7 @@ Vvveb.Sections.add("posts/posts-1", {
   </div>
 </section>`
 });Vvveb.Sections.add("posts/posts-4", {
-    name: "Posts 4",
+    name: "文章4",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/posts/posts-4-thumb.webp",
     html: `<section class="posts-4 py-5" aria-label="posts-4">
   <div class="container">
@@ -13066,7 +13066,7 @@ Vvveb.Sections.add("posts/posts-1", {
   </div>
 </section>`
 });Vvveb.Sections.add("posts/posts-5", {
-    name: "Posts 5",
+    name: "文章5",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/posts/posts-5-thumb.webp",
     html: `<section class="posts-5 py-5" aria-label="posts-5">
   <div class="container">
@@ -13163,7 +13163,7 @@ Vvveb.Sections.add("posts/posts-1", {
   </div>
 </section>`
 });Vvveb.Sections.add("posts/posts-6", {
-    name: "Posts 6",
+    name: "文章6",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/posts/posts-6-thumb.webp",
     html: `<section class="posts-6 py-5" aria-label="posts-6">
   <div class="container">
@@ -13237,7 +13237,7 @@ Vvveb.Sections.add("posts/posts-1", {
   </div>
 </section>`
 });Vvveb.Sections.add("posts/posts-7", {
-    name: "Posts 7",
+    name: "文章7",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/posts/posts-7-thumb.webp",
     html: `<section class="posts-7 py-5" aria-label="posts-7">
   <div class="container">
@@ -13349,7 +13349,7 @@ Vvveb.Sections.add("posts/posts-1", {
 });
 	Vvveb.SectionsGroup["Posts"] = ["posts/posts-1","posts/posts-2","posts/posts-3","posts/posts-4","posts/posts-5","posts/posts-6","posts/posts-7"];
 Vvveb.Sections.add("pricing-table/pricing-table-3", {
-    name: "Pricing table 3",
+    name: "价格表3",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/pricing-table/pricing-table-3-thumb.webp",
     html: `<section class="pricing-table-3 my-3" aria-label="pricing-table-3">
   <div class="container">
@@ -13463,7 +13463,7 @@ Vvveb.Sections.add("pricing-table/pricing-table-3", {
   </div>
 </section>`
 });Vvveb.Sections.add("pricing-table/pricing-table-4", {
-    name: "Pricing table 4",
+    name: "价格表4",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/pricing-table/pricing-table-4-thumb.webp",
     html: `<section class="pricing-table-4 my-3" aria-label="pricing-table-4">
   <div class="container py-4 py-lg-6">
@@ -13709,7 +13709,7 @@ Vvveb.Sections.add("pricing-table/pricing-table-3", {
   </div>
 </section>`
 });Vvveb.Sections.add("pricing-table/pricing-table-5", {
-    name: "Pricing table 5",
+    name: "价格表5",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/pricing-table/pricing-table-5-thumb.webp",
     html: `<section class="pricing-table-5 my-3" aria-label="pricing-table-5">
   <div class="container py-4">
@@ -13886,7 +13886,7 @@ Vvveb.Sections.add("pricing-table/pricing-table-3", {
 
 </section>`
 });Vvveb.Sections.add("pricing-table/pricing-table-6", {
-    name: "Pricing table 6",
+    name: "价格表6",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/pricing-table/pricing-table-6-thumb.webp",
     html: `<section class="pricing-table-6 my-3" aria-label="pricing-table-6">
   <div class="container py-4">
@@ -14157,7 +14157,7 @@ Vvveb.Sections.add("pricing-table/pricing-table-3", {
 
 </section>`
 });Vvveb.Sections.add("pricing-table/pricing-table-7", {
-    name: "Pricing table 7",
+    name: "价格表7",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/pricing-table/pricing-table-7-thumb.webp",
     html: `<section class="pricing-table-7 my-3" aria-label="pricing-table-7">
   <div class="container py-5 overflow-hidden">
@@ -14282,7 +14282,7 @@ Vvveb.Sections.add("pricing-table/pricing-table-3", {
   </div>
 </section>`
 });Vvveb.Sections.add("pricing-table/pricing-table-8", {
-    name: "Pricing table 8",
+    name: "价格表8",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/pricing-table/pricing-table-8-thumb.webp",
     html: `<section class="pricing-table-8 my-3" aria-label="pricing-table-8">
   <div class="container py-4">
@@ -14497,7 +14497,7 @@ Vvveb.Sections.add("pricing-table/pricing-table-3", {
   </div>
 </section>`
 });Vvveb.Sections.add("pricing-table/pricing-table-9", {
-    name: "Pricing table 9",
+    name: "价格表9",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/pricing-table/pricing-table-9-thumb.webp",
     html: `<section class="pricing-table-9 my-3" aria-label="pricing-table-9">
   <div class="container py-4">
@@ -14581,7 +14581,7 @@ Vvveb.Sections.add("pricing-table/pricing-table-3", {
   </div>
 </section>`
 });Vvveb.Sections.add("pricing-table/pricing-table-10", {
-    name: "Pricing table 10",
+    name: "价格表10",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/pricing-table/pricing-table-10-thumb.webp",
     html: `<section class="pricing-table-1 my-3" aria-label="pricing-table-10">
   <div class="container py-4">
@@ -14801,7 +14801,7 @@ Vvveb.Sections.add("pricing-table/pricing-table-3", {
   </div>
 </section>`
 });Vvveb.Sections.add("pricing-table/pricing-table-11", {
-    name: "Pricing table 11",
+    name: "价格表11",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/pricing-table/pricing-table-11-thumb.webp",
     html: `<section class="pricing-table-11 my-3" aria-label="pricing-table-11">
   <div class="container pb-5">
@@ -14947,7 +14947,7 @@ Vvveb.Sections.add("pricing-table/pricing-table-3", {
   </div>
 </section>`
 });Vvveb.Sections.add("pricing-table/pricing-table-12", {
-    name: "Pricing table 12",
+    name: "价格表12",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/pricing-table/pricing-table-12-thumb.webp",
     html: `<section class="pricing-table-12 my-3" aria-label="pricing-table-12">
   <div class="container py-4">
@@ -15067,7 +15067,7 @@ Vvveb.Sections.add("pricing-table/pricing-table-3", {
   </div>
 </section>`
 });Vvveb.Sections.add("pricing-table/pricing-table-13", {
-    name: "Pricing table 13",
+    name: "价格表13",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/pricing-table/pricing-table-13-thumb.webp",
     html: `<section class="pricing-table-13 my-3" aria-label="pricing-table-13">
   <div class="container pb-5">
@@ -15184,7 +15184,7 @@ Vvveb.Sections.add("pricing-table/pricing-table-3", {
   </div>
 </section>`
 });Vvveb.Sections.add("pricing-table/pricing-table-14", {
-    name: "Pricing table 14",
+    name: "价格表14",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/pricing-table/pricing-table-14-thumb.webp",
     html: `<section class="pricing-table-14 my-3" aria-label="pricing-table-14">
   <div class="container py-4">
@@ -15309,7 +15309,7 @@ Vvveb.Sections.add("pricing-table/pricing-table-3", {
 });
 	Vvveb.SectionsGroup["Pricing table"] = ["pricing-table/pricing-table-3","pricing-table/pricing-table-4","pricing-table/pricing-table-5","pricing-table/pricing-table-6","pricing-table/pricing-table-7","pricing-table/pricing-table-8","pricing-table/pricing-table-9","pricing-table/pricing-table-10","pricing-table/pricing-table-11","pricing-table/pricing-table-12","pricing-table/pricing-table-13","pricing-table/pricing-table-14"];
 Vvveb.Sections.add("products/products-1", {
-    name: "Products 1",
+    name: "产品1",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/products/products-1-thumb.webp",
     html: `<section class="products-1" aria-label="products-1">
   <div class="container">
@@ -16039,7 +16039,7 @@ Vvveb.Sections.add("products/products-1", {
 });
 	Vvveb.SectionsGroup["Products"] = ["products/products-1"];
 Vvveb.Sections.add("showcase/showcase-1", {
-    name: "Showcase 1",
+    name: "案例展示1",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/showcase/showcase-1-thumb.webp",
     html: `<section class="d-flex showcase-1" aria-label="showcase-1">
   <div class="container">
@@ -16059,7 +16059,7 @@ Vvveb.Sections.add("showcase/showcase-1", {
   </div>
 </section>`
 });Vvveb.Sections.add("showcase/showcase-2", {
-    name: "Showcase 2",
+    name: "案例展示2",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/showcase/showcase-2-thumb.webp",
     html: `<section class="d-flex showcase-2" aria-label="showcase-2">
   <div class="container">
@@ -16079,7 +16079,7 @@ Vvveb.Sections.add("showcase/showcase-1", {
   </div>
 </section>`
 });Vvveb.Sections.add("showcase/showcase-3", {
-    name: "Showcase 3",
+    name: "案例展示3",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/showcase/showcase-3-thumb.webp",
     html: `<section class="showcase-3" aria-label="showcase-3">
   <div class="container">
@@ -16143,7 +16143,7 @@ Vvveb.Sections.add("showcase/showcase-1", {
   </div>
 </section>`
 });Vvveb.Sections.add("showcase/showcase-4", {
-    name: "Showcase 4",
+    name: "案例展示4",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/showcase/showcase-4-thumb.webp",
     html: `<section class="showcase-4" aria-label="showcase-4">
   <div class="container">
@@ -16212,7 +16212,7 @@ Vvveb.Sections.add("showcase/showcase-1", {
   </div>
 </section>`
 });Vvveb.Sections.add("showcase/showcase-5", {
-    name: "Showcase 5",
+    name: "案例展示5",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/showcase/showcase-5-thumb.webp",
     html: `<section class="showcase-5" aria-label="showcase-5">
   <div class="container">
@@ -16281,7 +16281,7 @@ Vvveb.Sections.add("showcase/showcase-1", {
   </div>
 </section>`
 });Vvveb.Sections.add("showcase/showcase-6", {
-    name: "Showcase 6",
+    name: "案例展示6",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/showcase/showcase-6-thumb.webp",
     html: `<section class="showcase-6" aria-label="showcase-6">
   <div class="separator top">
@@ -16371,7 +16371,7 @@ Vvveb.Sections.add("showcase/showcase-1", {
 
 </section>`
 });Vvveb.Sections.add("showcase/showcase-7", {
-    name: "Showcase 7",
+    name: "案例展示7",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/showcase/showcase-7-thumb.webp",
     html: `<section class="showcase-7" aria-label="showcase-7">
   <div class="container">
@@ -16431,7 +16431,7 @@ Vvveb.Sections.add("showcase/showcase-1", {
   </div>
 </section>`
 });Vvveb.Sections.add("showcase/showcase-8", {
-    name: "Showcase 8",
+    name: "案例展示8",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/showcase/showcase-8-thumb.webp",
     html: `<section class="showcase-8" aria-label="showcase-8">
   <div class="container">
@@ -16456,7 +16456,7 @@ Vvveb.Sections.add("showcase/showcase-1", {
     </div>
 </section>`
 });Vvveb.Sections.add("showcase/showcase-9", {
-    name: "Showcase 9",
+    name: "案例展示9",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/showcase/showcase-9-thumb.webp",
     html: `<section class="showcase-8" aria-label="showcase-9">
   <div class="container">
@@ -16481,7 +16481,7 @@ Vvveb.Sections.add("showcase/showcase-1", {
     </div>
 </section>`
 });Vvveb.Sections.add("showcase/showcase-10", {
-    name: "Showcase 10",
+    name: "案例展示10",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/showcase/showcase-10-thumb.webp",
     html: `<section class="showcase-10" aria-label="showcase-10">
   <div class="container">
@@ -16506,7 +16506,7 @@ Vvveb.Sections.add("showcase/showcase-1", {
     </div>
 </section>`
 });Vvveb.Sections.add("showcase/showcase-11", {
-    name: "Showcase 11",
+    name: "案例展示11",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/showcase/showcase-11-thumb.webp",
     html: `<section class="pt-5 pb-5">
   <div class="container">
@@ -16541,7 +16541,7 @@ Vvveb.Sections.add("showcase/showcase-1", {
   </div>
 </section>`
 });Vvveb.Sections.add("showcase/showcase-12", {
-    name: "Showcase 12",
+    name: "案例展示12",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/showcase/showcase-12-thumb.webp",
     html: `<section class="showcase-12" aria-label="showcase-12">
   <div class="container">
@@ -16596,7 +16596,7 @@ Vvveb.Sections.add("showcase/showcase-1", {
 });
 	Vvveb.SectionsGroup["Showcase"] = ["showcase/showcase-1","showcase/showcase-2","showcase/showcase-3","showcase/showcase-4","showcase/showcase-5","showcase/showcase-6","showcase/showcase-7","showcase/showcase-8","showcase/showcase-9","showcase/showcase-10","showcase/showcase-11","showcase/showcase-12"];
 Vvveb.Sections.add("subscribe/subscribe-1", {
-    name: "Subscribe 1",
+    name: "订阅1",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/subscribe/subscribe-1-thumb.webp",
     html: `<section class="subscribe-1 text-white" aria-label="subscribe-1" data-bs-theme="dark">
 
@@ -16717,7 +16717,7 @@ Vvveb.Sections.add("subscribe/subscribe-1", {
 
 </section>`
 });Vvveb.Sections.add("subscribe/subscribe-2", {
-    name: "Subscribe 2",
+    name: "订阅2",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/subscribe/subscribe-2-thumb.webp",
     html: `<section class="subscribe-2" aria-label="subscribe-2">
 
@@ -16839,7 +16839,7 @@ Vvveb.Sections.add("subscribe/subscribe-1", {
 
 </section>`
 });Vvveb.Sections.add("subscribe/subscribe-3", {
-    name: "Subscribe 3",
+    name: "订阅3",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/subscribe/subscribe-3-thumb.webp",
     html: `<section class="subscribe-3 text-white" aria-label="subscribe-1" data-bs-theme="dark">
 
@@ -16961,7 +16961,7 @@ Vvveb.Sections.add("subscribe/subscribe-1", {
 
 </section>`
 });Vvveb.Sections.add("subscribe/subscribe-4", {
-    name: "Subscribe 4",
+    name: "订阅4",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/subscribe/subscribe-4-thumb.webp",
     html: `<section class="subscribe-4" aria-label="subscribe-4">
 
@@ -17082,7 +17082,7 @@ Vvveb.Sections.add("subscribe/subscribe-1", {
 
 </section>`
 });Vvveb.Sections.add("subscribe/subscribe-5", {
-    name: "Subscribe 5",
+    name: "订阅5",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/subscribe/subscribe-5-thumb.webp",
     html: `<section class="subscribe-5 text-white" aria-label="subscribe-5" data-bs-theme="dark">
 
@@ -17205,7 +17205,7 @@ Vvveb.Sections.add("subscribe/subscribe-1", {
 });
 	Vvveb.SectionsGroup["Subscribe"] = ["subscribe/subscribe-1","subscribe/subscribe-2","subscribe/subscribe-3","subscribe/subscribe-4","subscribe/subscribe-5"];
 Vvveb.Sections.add("team/team-1", {
-    name: "Team 1",
+    name: "团队1",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/team/team-1-thumb.webp",
     html: `<section class="py-5" aria-label="team-1">
   <div class="container">
@@ -17408,7 +17408,7 @@ Vvveb.Sections.add("team/team-1", {
   </div>
 </section>`
 });Vvveb.Sections.add("team/team-2", {
-    name: "Team 2",
+    name: "团队2",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/team/team-2-thumb.webp",
     html: `<section class="py-5 team-2" aria-label="team-2">
   <div class="container">
@@ -17554,7 +17554,7 @@ Vvveb.Sections.add("team/team-1", {
     </div>
 </section>`
 });Vvveb.Sections.add("team/team-3", {
-    name: "Team 3",
+    name: "团队3",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/team/team-3-thumb.webp",
     html: `<section class="py-5" aria-label="team-3">
   <div class="container">
@@ -17745,7 +17745,7 @@ Vvveb.Sections.add("team/team-1", {
   </div>
 </section>`
 });Vvveb.Sections.add("team/team-4", {
-    name: "Team 4",
+    name: "团队4",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/team/team-4-thumb.webp",
     html: `<section class="py-5" aria-label="team-4">
   <div class="container">
@@ -17889,7 +17889,7 @@ Vvveb.Sections.add("team/team-1", {
   </div>
 </section>`
 });Vvveb.Sections.add("team/team-5", {
-    name: "Team 5",
+    name: "团队5",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/team/team-5-thumb.webp",
     html: `<section class="py-5" aria-label="team-5">
   <div class="container">
@@ -18091,7 +18091,7 @@ Vvveb.Sections.add("team/team-1", {
   </div>
 </section>`
 });Vvveb.Sections.add("team/team-6", {
-    name: "Team 6",
+    name: "团队6",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/team/team-6-thumb.webp",
     html: `<section class="p-4" aria-label="team-6">
   <div class="container">
@@ -18247,7 +18247,7 @@ Vvveb.Sections.add("team/team-1", {
   </div>
 </section>`
 });Vvveb.Sections.add("team/team-7", {
-    name: "Team 7",
+    name: "团队7",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/team/team-7-thumb.webp",
     html: `<section class="p-4" aria-label="team-7">
   <div class="container">
@@ -18381,7 +18381,7 @@ Vvveb.Sections.add("team/team-1", {
   </div>
 </section>`
 });Vvveb.Sections.add("team/team-8", {
-    name: "Team 8",
+    name: "团队8",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/team/team-8-thumb.webp",
     html: `<section class="p-4" aria-label="team-8">
   <div class="container">
@@ -18569,7 +18569,7 @@ Vvveb.Sections.add("team/team-1", {
   </div>
 </section>`
 });Vvveb.Sections.add("team/team-9", {
-    name: "Team 9",
+    name: "团队9",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/team/team-9-thumb.webp",
     html: `<section class="p-4" aria-label="team-9">
   <div class="container">
@@ -18703,7 +18703,7 @@ Vvveb.Sections.add("team/team-1", {
   </div>
 </section>`
 });Vvveb.Sections.add("team/team-10", {
-    name: "Team 10",
+    name: "团队10",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/team/team-10-thumb.webp",
     html: `<section class="p-4" aria-label="team-10">
   <div class="container">
@@ -18837,7 +18837,7 @@ Vvveb.Sections.add("team/team-1", {
   </div>
 </section>`
 });Vvveb.Sections.add("team/team-11", {
-    name: "Team 11",
+    name: "团队11",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/team/team-11-thumb.webp",
     html: `<section class="py-5 team-11" aria-label="team-11">
   <div class="container">
@@ -18886,7 +18886,7 @@ Vvveb.Sections.add("team/team-1", {
   </div>
 </section>`
 });Vvveb.Sections.add("team/team-12", {
-    name: "Team 12",
+    name: "团队12",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/team/team-12-thumb.webp",
     html: `<section class="py-5 team-11" aria-label="team-12">
   <div class="container">
@@ -18992,7 +18992,7 @@ Vvveb.Sections.add("team/team-1", {
   </div>
 </section>`
 });Vvveb.Sections.add("team/team-13", {
-    name: "Team 13",
+    name: "团队13",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/team/team-13-thumb.webp",
     html: `<section class="py-5 team-11" aria-label="team-13">
   <div class="container">
@@ -19065,7 +19065,7 @@ Vvveb.Sections.add("team/team-1", {
   </div>
 </section>`
 });Vvveb.Sections.add("team/team-14", {
-    name: "Team 14",
+    name: "团队14",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/team/team-14-thumb.webp",
     html: `<section class="py-5 team-11" aria-label="team-14">
   <div class="container">
@@ -19171,7 +19171,7 @@ Vvveb.Sections.add("team/team-1", {
   </div>
 </section>`
 });Vvveb.Sections.add("team/team-15", {
-    name: "Team 15",
+    name: "团队15",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/team/team-15-thumb.webp",
     html: `<section class="py-5 team-15" aria-label="team-15">
   <div class="container">
@@ -19309,7 +19309,7 @@ Vvveb.Sections.add("team/team-1", {
 });
 	Vvveb.SectionsGroup["Team"] = ["team/team-1","team/team-2","team/team-3","team/team-4","team/team-5","team/team-6","team/team-7","team/team-8","team/team-9","team/team-10","team/team-11","team/team-12","team/team-13","team/team-14","team/team-15"];
 Vvveb.Sections.add("testimonials/testimonials-1", {
-    name: "Testimonials 1",
+    name: "客户评价1",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/testimonials/testimonials-1-thumb.webp",
     html: `<section class="testimonials-1 bg-alternate" aria-label="testimonials-1">
   <div class="container">
@@ -19403,7 +19403,7 @@ Vvveb.Sections.add("testimonials/testimonials-1", {
   </div>
 </section>`
 });Vvveb.Sections.add("testimonials/testimonials-2", {
-    name: "Testimonials 2",
+    name: "客户评价2",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/testimonials/testimonials-2-thumb.webp",
     html: `<section class="py-5" aria-label="testimonials-2">
   <div class="container">
@@ -19534,7 +19534,7 @@ Vvveb.Sections.add("testimonials/testimonials-1", {
   </div>
 </section>`
 });Vvveb.Sections.add("testimonials/testimonials-3", {
-    name: "Testimonials 3",
+    name: "客户评价3",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/testimonials/testimonials-3-thumb.webp",
     html: `<section class="py-5 team-2" aria-label="testimonials-3">
   <div class="container">
@@ -19622,7 +19622,7 @@ Vvveb.Sections.add("testimonials/testimonials-1", {
     </div>
 </section>`
 });Vvveb.Sections.add("testimonials/testimonials-4", {
-    name: "Testimonials 4",
+    name: "客户评价4",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/testimonials/testimonials-4-thumb.webp",
     html: `<section class="py-5 team-2" aria-label="testimonials-4">
   <div class="container">
@@ -19652,7 +19652,7 @@ Vvveb.Sections.add("testimonials/testimonials-1", {
   </div>
 </section>`
 });Vvveb.Sections.add("testimonials/testimonials-5", {
-    name: "Testimonials 5",
+    name: "客户评价5",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/testimonials/testimonials-5-thumb.webp",
     html: `<section class="py-5 team-2" aria-label="testimonials-5">
   <div class="container">
@@ -19682,7 +19682,7 @@ Vvveb.Sections.add("testimonials/testimonials-1", {
   </div>
 </section>`
 });Vvveb.Sections.add("testimonials/testimonials-6", {
-    name: "Testimonials 6",
+    name: "客户评价6",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/testimonials/testimonials-6-thumb.webp",
     html: `<section class="py-5 team-2" aria-label="testimonials-6">
   <div class="container">
@@ -19738,7 +19738,7 @@ Vvveb.Sections.add("testimonials/testimonials-1", {
   </div>
 </section>`
 });Vvveb.Sections.add("testimonials/testimonials-7", {
-    name: "Testimonials 7",
+    name: "客户评价7",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/testimonials/testimonials-7-thumb.webp",
     html: `<section class="py-5 team-2" aria-label="testimonials-7">
   <div class="container">
@@ -19792,7 +19792,7 @@ Vvveb.Sections.add("testimonials/testimonials-1", {
   </div>
 </section>`
 });Vvveb.Sections.add("testimonials/testimonials-8", {
-    name: "Testimonials 8",
+    name: "客户评价8",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/testimonials/testimonials-8-thumb.webp",
     html: `<section class="py-5 team-2" aria-label="testimonials-8">
   <div class="container">
@@ -19846,7 +19846,7 @@ Vvveb.Sections.add("testimonials/testimonials-1", {
   </div>
 </section>`
 });Vvveb.Sections.add("testimonials/testimonials-9", {
-    name: "Testimonials 9",
+    name: "客户评价9",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/testimonials/testimonials-9-thumb.webp",
     html: `<section class="py-5 team-2" aria-label="testimonials-9">
   <div class="container">
@@ -19913,7 +19913,7 @@ Vvveb.Sections.add("testimonials/testimonials-1", {
   </div>
 </section>`
 });Vvveb.Sections.add("testimonials/testimonials-10", {
-    name: "Testimonials 10",
+    name: "客户评价10",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/testimonials/testimonials-10-thumb.webp",
     html: `<section class="py-5 team-2" aria-label="testimonials-10">
   <div class="container">
