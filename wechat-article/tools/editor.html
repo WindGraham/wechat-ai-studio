@@ -929,7 +929,7 @@
 				</div>
 
 
-				<div id="block-canvas" style="width:375px;min-height:2500px;position:relative;background:#ffffff;margin:0 auto;box-shadow:0 2px 8px rgba(0,0,0,0.1);overflow:visible;">
+				<div id="block-canvas" style="width:375px;min-height:800px;position:relative;background:#ffffff;margin:0 auto;box-shadow:0 2px 8px rgba(0,0,0,0.1);overflow:visible;">
 				</div>
 			</div>
 
@@ -2795,12 +2795,21 @@ function selectBlock(block) {
 }
 
 function dragMoveListener(event) {
-	const target = event.target;
-	const x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx;
-	const y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy;
-	target.style.transform = 'translate(' + x + 'px, ' + y + 'px)';
-	target.setAttribute('data-x', x);
-	target.setAttribute('data-y', y);
+  var target = event.target;
+  var x = (parseFloat(target.style.left) || 0) + (streamMode ? 0 : event.dx);
+  var y = (parseFloat(target.style.top) || 0) + event.dy;
+  target.style.left = Math.max(0, x) + 'px';
+  target.style.top = Math.max(0, y) + 'px';
+  // Auto-extend canvas when dragging near bottom
+  var canvas = document.getElementById('block-canvas');
+  var blockBottom = y + target.offsetHeight;
+  var canvasHeight = parseInt(canvas.style.minHeight) || 800;
+  if (blockBottom > canvasHeight - 100) {
+    canvas.style.minHeight = (blockBottom + 400) + 'px';
+    // Scroll the iframe-wrapper to follow
+    var wrapper = document.getElementById('iframe-wrapper');
+    if (wrapper) wrapper.scrollTop = blockBottom - 300;
+  }
 }
 
 function resizeMoveListener(event) {
