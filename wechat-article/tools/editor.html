@@ -3248,6 +3248,37 @@ selectBlock = function(block) {
     }
   }
 };
+
+// 6. Mock FrameDocument for VvvebJs (no iframe)
+setTimeout(function() {
+  if (document.getElementById('block-canvas')) {
+    window.FrameDocument = document;
+    if (Vvveb && Vvveb.Builder) {
+      Vvveb.Builder.frameDoc = document.documentElement;
+      Vvveb.Builder.frameBody = document.body;
+      Vvveb.Builder.frameHead = document.head;
+      Vvveb.Builder.frameHtml = document.documentElement;
+    }
+    // Disable Google Fonts loading
+    if (Vvveb && Vvveb.GoogleFonts) Vvveb.GoogleFonts = null;
+  }
+}, 5000);
+
+// 7. Auto-expand canvas when blocks overflow
+setInterval(function() {
+  var canvas = document.getElementById('block-canvas');
+  if (!canvas) return;
+  var blocks = canvas.querySelectorAll('.canvas-block');
+  var maxBottom = 0;
+  blocks.forEach(function(b) {
+    var t = parseFloat(b.style.top) || 0;
+    var h = b.offsetHeight || 50;
+    if (t + h > maxBottom) maxBottom = t + h;
+  });
+  if (maxBottom > parseInt(canvas.style.minHeight) - 200) {
+    canvas.style.minHeight = (maxBottom + 500) + 'px';
+  }
+}, 3000);
 </script>
 
 <div id="terminal-panel" style="display:none;height:280px;background:#1a1a2e;border-top:2px solid #333;">
