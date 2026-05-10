@@ -3279,6 +3279,44 @@ setInterval(function() {
     canvas.style.minHeight = (maxBottom + 500) + 'px';
   }
 }, 3000);
+
+// 8. Global handler for all VvvebJs data-vvveb-action buttons
+document.addEventListener('click', function(e) {
+  var btn = e.target.closest('[data-vvveb-action]');
+  if (!btn) return;
+  var action = btn.getAttribute('data-vvveb-action');
+  if (!action) return;
+  e.preventDefault(); e.stopPropagation();
+  
+  var handlers = {
+    'toggleTreeList': function() { togglePanel('tree-list'); },
+    'treeListRight': function() { togglePanel('tree-list'); },
+    'toggleFileManager': function() { togglePanel('filemanager'); },
+    'toggleLeftColumn': function() { togglePanel('add-section-box'); },
+    'toggleRightColumn': function() { togglePanel('right-panel'); },
+    'undo': function() { undo(); },
+    'redo': function() { redo(); },
+    'setDesignerMode': function() { toggleModeBtn(btn); },
+    'preview': function() { togglePreview(); },
+    'fullscreen': function() { document.documentElement.requestFullscreen(); },
+    'toggleHidden': function() { toggleHiddenElements(); },
+    'download': function() { downloadHTML(); },
+    'darkMode': function() { document.body.classList.toggle('dark'); },
+    'toggleSections': function() {},
+    'toggleEditor': function() {},
+    'newPage': function() { newPage(); },
+    'newSection': function() { addBlock('text'); },
+    'deletePage': function() { newPage(); },
+    'viewport': function() { var v = btn.getAttribute('data-view'); if(v) setViewport(v === 'sm' ? 375 : v === 'md' ? 768 : v === 'xl' ? 1024 : 1400); },
+    'search': function() {},
+    'expand': function() {},
+    'clearSearch': function() {},
+    'toggleEditorJsExecute': function() {},
+  };
+  var fn = handlers[action];
+  if (fn) fn();
+  else console.log('Unhandled vvveb-action:', action);
+}, true);
 </script>
 
 <div id="terminal-panel" style="display:none;height:280px;background:#1a1a2e;border-top:2px solid #333;">

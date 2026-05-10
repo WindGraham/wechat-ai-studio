@@ -1169,8 +1169,8 @@ Vvveb.Builder = {
 						if (target) {
 							pos = offset(target);
 						
-							SelectBox.style.top  = (pos.top - (self.frameDoc.scrollTop ?? 0)  - self.selectPadding) + "px"; 
-							SelectBox.style.left = (pos.left - (self.frameDoc.scrollLeft ?? 0) - self.selectPadding) + "px";
+							SelectBox.style.top  = (pos.top - ((self.frameDoc ? self.frameDoc.scrollTop : 0))  - self.selectPadding) + "px"; 
+							SelectBox.style.left = (pos.left - ((self.frameDoc ? self.frameDoc.scrollLeft : 0)) - self.selectPadding) + "px";
 
 							SelectBox.style.width = ((target.offsetWidth ?? target.clientWidth) + self.selectPadding * 2) + "px"; 			
 							SelectBox.style.height = ((target.offsetHeight ?? target.clientHeight) + self.selectPadding * 2) + "px";
@@ -1397,10 +1397,10 @@ Vvveb.Builder = {
 
 		try {
 			let pos = offset(target);
-			let top = (pos.top - (self.frameDoc.scrollTop ?? 0)  - self.selectPadding);
+			let top = (pos.top - ((self.frameDoc ? self.frameDoc.scrollTop : 0))  - self.selectPadding);
 				
 			SelectBox.style.top  = top + "px"; 
-			SelectBox.style.left = (pos.left - (self.frameDoc.scrollLeft ?? 0) - self.selectPadding) + "px"; 			
+			SelectBox.style.left = (pos.left - ((self.frameDoc ? self.frameDoc.scrollLeft : 0)) - self.selectPadding) + "px"; 			
 			SelectBox.style.width = ((target.offsetWidth ?? target.clientWidth) + self.selectPadding * 2) + "px"; 			
 			SelectBox.style.height = ((target.offsetHeight ?? target.clientHeight) + self.selectPadding * 2) + "px";
 			SelectBox.style.display = "block";
@@ -1509,8 +1509,8 @@ Vvveb.Builder = {
 				    }
 
 					let SelectBox = document.getElementById("select-box");
-					SelectBox.style.top  = pos.top - (self.frameDoc.scrollTop ?? 0) + "px"; 
-					SelectBox.style.left = pos.left - (self.frameDoc.scrollLeft ?? 0) + "px"; 			
+					SelectBox.style.top  = pos.top - ((self.frameDoc ? self.frameDoc.scrollTop : 0)) + "px"; 
+					SelectBox.style.left = pos.left - ((self.frameDoc ? self.frameDoc.scrollLeft : 0)) + "px"; 			
 					SelectBox.style.width = width + "px"; 			
 					SelectBox.style.height = self.selectedEl.offsetHeight + "px";
 					SelectBox.style.display = "block";
@@ -1617,8 +1617,8 @@ Vvveb.Builder = {
 					}
 						 
 					document.getElementById("highlight-box").setAttribute("style",
-						`top:${pos.top - (self.frameDoc.scrollTop ?? 0)}px; 
-						 left:${pos.left - (self.frameDoc.scrollLeft ?? 0)}px;
+						`top:${pos.top - ((self.frameDoc ? self.frameDoc.scrollTop : 0))}px; 
+						 left:${pos.left - ((self.frameDoc ? self.frameDoc.scrollLeft : 0))}px;
 						 width:${width}px; 
 						 height:${height}px;
 						 display:${event.target.hasAttribute('contenteditable') ? "none":"block"};
@@ -1727,8 +1727,8 @@ Vvveb.Builder = {
 
 						let SelectBox = document.getElementById("select-box");
 
-						SelectBox.style.top  = (pos.top - (self.frameDoc.scrollTop ?? 0)  - self.selectPadding) + "px";
-						SelectBox.style.left = (pos.left - (self.frameDoc.scrollLeft ?? 0) - self.selectPadding) + "px";
+						SelectBox.style.top  = (pos.top - ((self.frameDoc ? self.frameDoc.scrollTop : 0))  - self.selectPadding) + "px";
+						SelectBox.style.left = (pos.left - ((self.frameDoc ? self.frameDoc.scrollLeft : 0)) - self.selectPadding) + "px";
 						SelectBox.style.width = (self.texteditEl.offsetWidth + (self.selectPadding * 2)) + "px";
 						SelectBox.style.height = (self.texteditEl.offsetHeight + (self.selectPadding * 2)) + "px";
 						SelectBox.style.display = "block";
