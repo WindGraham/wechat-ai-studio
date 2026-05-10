@@ -961,14 +961,13 @@
 								<small>段落</small>
 							</a>
 						</li>
-						<!--
-				  <li class="nav-item component-properties-tab" style="display:none">
-					<a class="nav-link" id="box-properties-tab" data-bs-toggle="tab" href="#box-properties" role="tab" aria-controls="properties" aria-selected="false"><i class="la la-lg la-cog"></i> <div><small>属性</small></div></a>
-				  </li>
-				  -->
 					</ul>
 
 					<div class="section-box-actions">
+						<button class="btn btn-sm btn-outline-secondary border-0 p-1 ms-2" id="toggle-vvveb-components" 
+							title="显示/隐藏网页组件" onclick="toggleVvvebComponents()" style="font-size:10px;">
+							🔧 网页组件
+						</button>
 
 						<div id="close-section-btn" class="btn btn-outline-secondary border-0 p-1 py-0 float-end">
 							<i class="la la-times"></i>
@@ -993,7 +992,8 @@
 					</div>
 
 					<div class="tab-content">
-						<div class="tab-pane show active" id="box-components" role="tabpanel"
+					<div id="vvveb-tab-panes" style="display:none;">
+				<div class="tab-pane show active" id="box-components" role="tabpanel"
 							aria-labelledby="components-tab">
 
 							<div class="search">
@@ -1088,6 +1088,7 @@
 					</div -->
 					</div>
 				</div>
+			</div><!-- end vvveb-tab-panes -->
 
 			<div class="wechat-components-section p-2" style="border-top:2px solid #07c160;">
 				<small class="text-success fw-bold d-block mb-1">📱 微信排版组件</small>
@@ -3211,6 +3212,15 @@ setTimeout(function() {
 }, 1000);
 
 // === VvvebJs toolbar function replicas ===
+
+function toggleVvvebComponents() {
+	var panes = document.getElementById('vvveb-tab-panes');
+	var btn = document.getElementById('toggle-vvveb-components');
+	if (!panes) return;
+	var visible = panes.style.display !== 'none';
+	panes.style.display = visible ? 'none' : '';
+	if (btn) btn.textContent = visible ? '🔧 网页组件' : '✅ 网页组件(已展开)';
+}
 
 function togglePanel(panelId) {
   var el = document.getElementById(panelId);
