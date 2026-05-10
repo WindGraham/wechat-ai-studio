@@ -526,7 +526,7 @@ Vvveb.Components.extend("_base", "widgets/paypal", {
 \
 			</form>',
     properties: [{
-        name: "Email",
+        name: "邮件",
         key: "business",
         htmlAttr: "value",
         child:"input[name='business']",

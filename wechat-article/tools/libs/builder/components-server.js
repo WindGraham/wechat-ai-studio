@@ -110,7 +110,7 @@ Vvveb.Components.add("components/products", {
             }, {
                 value: "automatic",
                 icon:"la la-cog",
-                text: "Configuration",
+                text: "配置",
                 title: "配置",
             }],
         },
@@ -255,7 +255,7 @@ Vvveb.Components.add("components/categories", {
     }]
 });
 Vvveb.Components.add("components/search", {
-    name: "Search",
+    name: "搜索",
     classes: ["component_search"],
     image: "icons/search.svg",
     html: '<div class="mb-3"><label>Your response:</label><textarea class="form-control"></textarea></div>',
@@ -277,7 +277,7 @@ Vvveb.Components.add("components/search", {
     }]
 });
 Vvveb.Components.add("components/user", {
-    name: "User",
+    name: "用户",
     classes: ["component_user"],
     image: "icons/user.svg",
     html: '<div class="mb-3"><label>Your response:</label><textarea class="form-control"></textarea></div>',
@@ -321,7 +321,7 @@ Vvveb.Components.add("components/product_gallery", {
     }]
 });
 Vvveb.Components.add("components/cart", {
-    name: "Cart",
+    name: "购物车",
     classes: ["component_cart"],
     image: "icons/cart.svg",
     html: '<div class="mb-3"><label>Your response:</label><textarea class="form-control"></textarea></div>',
@@ -343,7 +343,7 @@ Vvveb.Components.add("components/cart", {
     }]
 });
 Vvveb.Components.add("components/checkout", {
-    name: "Checkout",
+    name: "结账",
     classes: ["component_checkout"],
     image: "icons/checkout.svg",
     html: '<div class="mb-3"><label>Your response:</label><textarea class="form-control"></textarea></div>',

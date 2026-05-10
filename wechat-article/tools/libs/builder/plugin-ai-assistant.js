@@ -26,7 +26,7 @@ let aiModalTemplate = `<div class="modal fade" id="ai-assistant-modal" tabindex=
     <div class="modal-content">
       <div class="modal-header">
         <p class="modal-title text-primary"><i class="icon-color-wand"></i> Ai assistant</p>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="关闭">
         </button>
       </div>
       <div class="modal-body">

@@ -819,7 +819,7 @@
 
 							<div class="separator"></div>
 
-							<select id="font-size" class="form-select" aria-label="Font size">
+							<select id="font-size" class="form-select" aria-label="字号">
 								<option value="">- 字号 -</option>
 								<option value="8px">8 px</option>
 								<option value="9px">9 px</option>
@@ -846,7 +846,7 @@
 
 							<div class="separator"></div>
 
-							<select id="font-family" class="form-select" title="Font family">
+							<select id="font-family" class="form-select" title="字体">
 								<option value=""> - 字体 - </option>
 								<optgroup label="System default">
 									<option value="Arial, Helvetica, sans-serif">Arial</option>
@@ -1814,9 +1814,9 @@
 			<span>{%=title%}</span>
 			<!-- <span class="text-muted small">{%=url%}</span> -->
 			<div class="file-actions">
-				<button href="#" class="delete btn btn-outline-danger" title="Delete"><i class="la la-trash"></i></button>
+				<button href="#" class="delete btn btn-outline-danger" title="删除"><i class="la la-trash"></i></button>
 				<a href="{%=url%}" target="_blank" class="view btn btn-outline-primary" title="查看页面"><i class="la la la-external-link-alt"></i></a>
-				<button href="#" class="rename btn btn-outline-primary" title="Rename"><i class="la la-pen"></i></button>
+				<button href="#" class="rename btn btn-outline-primary" title="重命名"><i class="la la-pen"></i></button>
 				<button href="#" class="duplicate btn btn-outline-primary" title="Duplicate"><i class="icon-copy-outline"></i></button>
 			</div>
 		</label> <input type="checkbox" id="{%=name%}{%=rand%}" />
@@ -1969,7 +1969,7 @@
 					<button type="button" class="btn btn-light border btn-icon" data-bs-dismiss="modal"><i
 							class="la la-times"></i>Close</button>
 
-					<button class="btn btn-primary btn-icon save-btn" title="Save changes">
+					<button class="btn btn-primary btn-icon save-btn" title="保存修改">
 						<span class="loading d-none">
 							<i class="la la-save"></i>
 							<span class="spinner-border spinner-border-sm align-middle" role="status"
@@ -2311,7 +2311,7 @@ let defaultPages = {
 		filename: "index.html",
 		file: "demo/landing/index.html",
 		url: "demo/landing/index.html",
-		title: "Home page",
+		title: "首页",
 		folder: null,
 		description: "Website homepage"
 	},
@@ -2329,7 +2329,7 @@ let defaultPages = {
 		filename: "blank.html",
 		file: "demo/landing/blank.html",
 		url: "demo/landing/blank.html",
-		title: "Blank page",
+		title: "空白页",
 		folder: null,
 		description: "Template page used for new pages"
 	},
@@ -2338,7 +2338,7 @@ let defaultPages = {
 		filename: "error404.html",
 		file: "demo/landing/error404.html",
 		url: "demo/landing/error404.html",
-		title: "Page not found",
+		title: "页面未找到",
 		folder: null,
 		description: "Shows when a page is not available"
 	},
@@ -2347,7 +2347,7 @@ let defaultPages = {
 		filename: "error500.html",
 		file: "demo/landing/error500.html",
 		url: "demo/landing/error500.html",
-		title: "Server error",
+		title: "服务器错误",
 		folder: null,
 		description: "Site error display page"
 	},
@@ -2356,7 +2356,7 @@ let defaultPages = {
 		filename: "index-blog.html",
 		file: "demo/landing/index-blog.html",
 		url: "demo/landing/index-blog.html",
-		title: "Index blog",
+		title: "博客首页",
 		folder: null,
 		description: ""
 	},
@@ -2365,7 +2365,7 @@ let defaultPages = {
 		filename: "index-landing.html",
 		file: "demo/landing/index-landing.html",
 		url: "demo/landing/index-landing.html",
-		title: "Index landing",
+		title: "落地首页",
 		folder: null,
 		description: ""
 	},
@@ -2374,7 +2374,7 @@ let defaultPages = {
 		filename: "index.coming-soon.html",
 		file: "demo/landing/index.coming-soon.html",
 		url: "demo/landing/index.coming-soon.html",
-		title: "Coming soon",
+		title: "即将上线",
 		folder: null,
 		description: "Coming soon message page"
 	},
@@ -2383,7 +2383,7 @@ let defaultPages = {
 		filename: "index.maintenance.html",
 		file: "demo/landing/index.maintenance.html",
 		url: "demo/landing/index.maintenance.html",
-		title: "Under maintenance",
+		title: "维护中",
 		folder: null,
 		description: "Website under maintenance message page"
 	},
@@ -2446,7 +2446,7 @@ let defaultPages = {
 		filename: "edit.html",
 		file: "demo/landing/user/edit.html",
 		url: "demo/landing/user/edit.html",
-		title: "Edit",
+		title: "编辑",
 		folder: "user",
 		description: ""
 	},
@@ -2464,7 +2464,7 @@ let defaultPages = {
 		filename: "cart.html",
 		file: "demo/landing/cart/cart.html",
 		url: "demo/landing/cart/cart.html",
-		title: "Cart",
+		title: "购物车",
 		folder: "cart",
 		description: ""
 	},
@@ -2473,7 +2473,7 @@ let defaultPages = {
 		filename: "checkout.html",
 		file: "demo/landing/checkout/checkout.html",
 		url: "demo/landing/checkout/checkout.html",
-		title: "Checkout",
+		title: "结账",
 		folder: "checkout",
 		description: ""
 	},
@@ -2575,7 +2575,7 @@ let defaultPages = {
 		filename: "user.html",
 		file: "demo/landing/content/user.html",
 		url: "demo/landing/content/user.html",
-		title: "User",
+		title: "用户",
 		folder: "content",
 		description: ""
 	},
@@ -2611,7 +2611,7 @@ let defaultPages = {
 		filename: "product.html",
 		file: "demo/landing/product/product.html",
 		url: "demo/landing/product/product.html",
-		title: "Product",
+		title: "产品",
 		folder: "product",
 		description: ""
 	},
@@ -2705,13 +2705,13 @@ let defaultPages = {
 		folder: "user",
 		description: ""
 	},
-	"narrow-jumbotron": { name: "narrow-jumbotron", title: "窄横幅", url: "demo/narrow-jumbotron/index.html", file: "demo/narrow-jumbotron/index.html" },
+	"窄横幅": { name: "窄横幅", title: "窄横幅", url: "demo/narrow-jumbotron/index.html", file: "demo/narrow-jumbotron/index.html" },
 	"album": { name: "album", title: "Album", url: "demo/album/index.html", file: "demo/album/index.html", folder: "content" },
 	"blog": { name: "blog", title: "博客", url: "demo/blog/index.html", file: "demo/blog/index.html", folder: "content" },
 	"carousel": { name: "carousel", title: "Carousel", url: "demo/carousel/index.html", file: "demo/carousel/index.html", folder: "content" },
-	"offcanvas": { name: "offcanvas", title: "侧边栏", url: "demo/offcanvas/index.html", file: "demo/offcanvas/index.html", folder: "content" },
+	"侧边栏": { name: "侧边栏", title: "侧边栏", url: "demo/offcanvas/index.html", file: "demo/offcanvas/index.html", folder: "content" },
 	"pricing": { name: "pricing", title: "价格", url: "demo/pricing/index.html", file: "demo/pricing/index.html", folder: "ecommerce" },
-	"product": { name: "product", title: "Product", url: "demo/product/index.html", file: "demo/product/index.html", folder: "ecommerce" }
+	"product": { name: "product", title: "产品", url: "demo/product/index.html", file: "demo/product/index.html", folder: "ecommerce" }
 };
 
 

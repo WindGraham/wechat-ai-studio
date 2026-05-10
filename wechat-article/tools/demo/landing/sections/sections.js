@@ -3357,7 +3357,7 @@ Vvveb.Sections.add("contact-form/contact-form-1", {
                 </div>
 
 
-                <button type="button" class="btn-close align-middle" data-bs-dismiss="alert" aria-label="Close">
+                <button type="button" class="btn-close align-middle" data-bs-dismiss="alert" aria-label="关闭">
                   <span aria-hidden="true">
                     <!-- <i class="la la-times"></i> -->
                   </span>
@@ -3374,7 +3374,7 @@ Vvveb.Sections.add("contact-form/contact-form-1", {
                   This is a placeholder for a success message.
                 </div>
 
-                <button type="button" class="btn-close align-middle" data-bs-dismiss="alert" aria-label="Close">
+                <button type="button" class="btn-close align-middle" data-bs-dismiss="alert" aria-label="关闭">
                   <span aria-hidden="true">
                     <!-- <i class="la la-times"></i> -->
                   </span>
@@ -3391,7 +3391,7 @@ Vvveb.Sections.add("contact-form/contact-form-1", {
                   This is a placeholder for a info message.
                 </div>
 
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="关闭">
                   <span aria-hidden="true">
                     <!-- <i class="la la-times"></i> -->
                   </span>
@@ -3403,7 +3403,7 @@ Vvveb.Sections.add("contact-form/contact-form-1", {
             <div class="col-12 col-md-8">
               <form action="" method="post" data-v-vvveb-action="submit" data-selector="[data-v-component-plugin-contact-form-form]" data-v-vvveb-on="submit">
                 <input type="hidden" class="form-control" placeholder="First name" name="firstname-empty">
-                <input type="hidden" class="form-control" placeholder="Email" name="csrf" data-v-csrf>
+                <input type="hidden" class="form-control" placeholder="邮件" name="csrf" data-v-csrf>
                 <input type="hidden" class="form-control" name="form-name" value="contact-us-home">
 
 
@@ -3412,7 +3412,7 @@ Vvveb.Sections.add("contact-form/contact-form-1", {
                     <input type="text" class="form-control" placeholder="Name">
                   </div>
                   <div class="col-12 col-md mt-4 mt-md-0">
-                    <input type="text" class="form-control" placeholder="Email">
+                    <input type="text" class="form-control" placeholder="邮件">
                   </div>
                 </div>
 
@@ -3478,7 +3478,7 @@ Vvveb.Sections.add("contact-form/contact-form-1", {
             </div>
 
 
-            <button type="button" class="btn-close align-middle" data-bs-dismiss="alert" aria-label="Close">
+            <button type="button" class="btn-close align-middle" data-bs-dismiss="alert" aria-label="关闭">
               <span aria-hidden="true">
                 <!-- <i class="la la-times"></i> -->
               </span>
@@ -3495,7 +3495,7 @@ Vvveb.Sections.add("contact-form/contact-form-1", {
               This is a placeholder for a success message.
             </div>
 
-            <button type="button" class="btn-close align-middle" data-bs-dismiss="alert" aria-label="Close">
+            <button type="button" class="btn-close align-middle" data-bs-dismiss="alert" aria-label="关闭">
               <span aria-hidden="true">
                 <!-- <i class="la la-times"></i> -->
               </span>
@@ -3512,7 +3512,7 @@ Vvveb.Sections.add("contact-form/contact-form-1", {
               This is a placeholder for a info message.
             </div>
 
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="关闭">
               <span aria-hidden="true">
                 <!-- <i class="la la-times"></i> -->
               </span>
@@ -3523,7 +3523,7 @@ Vvveb.Sections.add("contact-form/contact-form-1", {
 
         <form action="" method="post" data-v-vvveb-action="submit" data-selector="[data-v-component-plugin-contact-form-form]" data-v-vvveb-on="submit">
           <input type="hidden" class="form-control" placeholder="First name" name="firstname-empty">
-          <input type="hidden" class="form-control" placeholder="Email" name="csrf" data-v-csrf>
+          <input type="hidden" class="form-control" placeholder="邮件" name="csrf" data-v-csrf>
           <input type="hidden" class="form-control" name="form-name" value="contact-us-home">
 
 
@@ -3609,7 +3609,7 @@ Vvveb.Sections.add("contact-form/contact-form-1", {
             </div>
 
 
-            <button type="button" class="btn-close align-middle" data-bs-dismiss="alert" aria-label="Close">
+            <button type="button" class="btn-close align-middle" data-bs-dismiss="alert" aria-label="关闭">
               <span aria-hidden="true">
                 <!-- <i class="la la-times"></i> -->
               </span>
@@ -3626,7 +3626,7 @@ Vvveb.Sections.add("contact-form/contact-form-1", {
               This is a placeholder for a success message.
             </div>
 
-            <button type="button" class="btn-close align-middle" data-bs-dismiss="alert" aria-label="Close">
+            <button type="button" class="btn-close align-middle" data-bs-dismiss="alert" aria-label="关闭">
               <span aria-hidden="true">
                 <!-- <i class="la la-times"></i> -->
               </span>
@@ -3643,7 +3643,7 @@ Vvveb.Sections.add("contact-form/contact-form-1", {
               This is a placeholder for a info message.
             </div>
 
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="关闭">
               <span aria-hidden="true">
                 <!-- <i class="la la-times"></i> -->
               </span>
@@ -3654,7 +3654,7 @@ Vvveb.Sections.add("contact-form/contact-form-1", {
 
         <form action="" method="post" data-v-vvveb-action="submit" data-selector="[data-v-component-plugin-contact-form-form]" data-v-vvveb-on="submit">
           <input type="hidden" class="form-control" placeholder="First name" name="firstname-empty">
-          <input type="hidden" class="form-control" placeholder="Email" name="csrf" data-v-csrf>
+          <input type="hidden" class="form-control" placeholder="邮件" name="csrf" data-v-csrf>
           <input type="hidden" class="form-control" name="form-name" value="contact-us-home">
 
 
@@ -3734,7 +3734,7 @@ Vvveb.Sections.add("contact-form/contact-form-1", {
             </div>
 
 
-            <button type="button" class="btn-close align-middle" data-bs-dismiss="alert" aria-label="Close">
+            <button type="button" class="btn-close align-middle" data-bs-dismiss="alert" aria-label="关闭">
               <span aria-hidden="true">
                 <!-- <i class="la la-times"></i> -->
               </span>
@@ -3751,7 +3751,7 @@ Vvveb.Sections.add("contact-form/contact-form-1", {
               This is a placeholder for a success message.
             </div>
 
-            <button type="button" class="btn-close align-middle" data-bs-dismiss="alert" aria-label="Close">
+            <button type="button" class="btn-close align-middle" data-bs-dismiss="alert" aria-label="关闭">
               <span aria-hidden="true">
                 <!-- <i class="la la-times"></i> -->
               </span>
@@ -3768,7 +3768,7 @@ Vvveb.Sections.add("contact-form/contact-form-1", {
               This is a placeholder for a info message.
             </div>
 
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="关闭">
               <span aria-hidden="true">
                 <!-- <i class="la la-times"></i> -->
               </span>
@@ -3779,13 +3779,13 @@ Vvveb.Sections.add("contact-form/contact-form-1", {
 
         <form action="" method="post" data-v-vvveb-action="submit" data-selector="[data-v-component-plugin-contact-form-form]" data-v-vvveb-on="submit">
           <input type="hidden" class="form-control" placeholder="First name" name="firstname-empty">
-          <input type="hidden" class="form-control" placeholder="Email" name="csrf" data-v-csrf>
+          <input type="hidden" class="form-control" placeholder="邮件" name="csrf" data-v-csrf>
           <input type="hidden" class="form-control" name="form-name" value="contact-us-home">
 
 
           <div class="row">
             <div class="col">
-              <input type="email" class="form-control" placeholder="Email">
+              <input type="email" class="form-control" placeholder="邮件">
             </div>
           </div>
 
@@ -3863,7 +3863,7 @@ Vvveb.Sections.add("contact-form/contact-form-1", {
                   </div>
 
 
-                  <button type="button" class="btn-close align-middle" data-bs-dismiss="alert" aria-label="Close">
+                  <button type="button" class="btn-close align-middle" data-bs-dismiss="alert" aria-label="关闭">
                     <span aria-hidden="true">
                       <!-- <i class="la la-times"></i> -->
                     </span>
@@ -3880,7 +3880,7 @@ Vvveb.Sections.add("contact-form/contact-form-1", {
                     This is a placeholder for a success message.
                   </div>
 
-                  <button type="button" class="btn-close align-middle" data-bs-dismiss="alert" aria-label="Close">
+                  <button type="button" class="btn-close align-middle" data-bs-dismiss="alert" aria-label="关闭">
                     <span aria-hidden="true">
                       <!-- <i class="la la-times"></i> -->
                     </span>
@@ -3897,7 +3897,7 @@ Vvveb.Sections.add("contact-form/contact-form-1", {
                     This is a placeholder for a info message.
                   </div>
 
-                  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">
+                  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="关闭">
                     <span aria-hidden="true">
                       <!-- <i class="la la-times"></i> -->
                     </span>
@@ -3914,7 +3914,7 @@ Vvveb.Sections.add("contact-form/contact-form-1", {
 
               <form id="contactForm" action="" method="post" data-v-vvveb-action="submit" data-selector="[data-v-component-plugin-contact-form-form]" data-v-vvveb-on="submit">
                 <input type="hidden" class="form-control" placeholder="First name" name="firstname-empty">
-                <input type="hidden" class="form-control" placeholder="Email" name="csrf" data-v-csrf>
+                <input type="hidden" class="form-control" placeholder="邮件" name="csrf" data-v-csrf>
                 <input type="hidden" class="form-control" name="form-name" value="contact-us-home">
 
 
@@ -4023,7 +4023,7 @@ Vvveb.Sections.add("contact-form/contact-form-1", {
             </div>
 
 
-            <button type="button" class="btn-close align-middle" data-bs-dismiss="alert" aria-label="Close">
+            <button type="button" class="btn-close align-middle" data-bs-dismiss="alert" aria-label="关闭">
               <span aria-hidden="true">
                 <!-- <i class="la la-times"></i> -->
               </span>
@@ -4040,7 +4040,7 @@ Vvveb.Sections.add("contact-form/contact-form-1", {
               This is a placeholder for a success message.
             </div>
 
-            <button type="button" class="btn-close align-middle" data-bs-dismiss="alert" aria-label="Close">
+            <button type="button" class="btn-close align-middle" data-bs-dismiss="alert" aria-label="关闭">
               <span aria-hidden="true">
                 <!-- <i class="la la-times"></i> -->
               </span>
@@ -4057,7 +4057,7 @@ Vvveb.Sections.add("contact-form/contact-form-1", {
               This is a placeholder for a info message.
             </div>
 
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="关闭">
               <span aria-hidden="true">
                 <!-- <i class="la la-times"></i> -->
               </span>
@@ -4068,7 +4068,7 @@ Vvveb.Sections.add("contact-form/contact-form-1", {
         <div class="border rounded-3 p-4 border-opacity-25 border-light-subtle">
           <form action="" method="post" data-v-vvveb-action="submit" data-selector="[data-v-component-plugin-contact-form-form]" data-v-vvveb-on="submit">
             <input type="hidden" class="form-control" placeholder="First name" name="firstname-empty">
-            <input type="hidden" class="form-control" placeholder="Email" name="csrf" data-v-csrf>
+            <input type="hidden" class="form-control" placeholder="邮件" name="csrf" data-v-csrf>
 
             <div class="row">
               <div class="col">
@@ -4081,7 +4081,7 @@ Vvveb.Sections.add("contact-form/contact-form-1", {
 
             <div class="row mt-4">
               <div class="col">
-                <input type="email" class="form-control" placeholder="Email" name="email" required>
+                <input type="email" class="form-control" placeholder="邮件" name="email" required>
               </div>
             </div>
 
@@ -4164,7 +4164,7 @@ Vvveb.Sections.add("contact-form/contact-form-1", {
             </div>
 
 
-            <button type="button" class="btn-close align-middle" data-bs-dismiss="alert" aria-label="Close">
+            <button type="button" class="btn-close align-middle" data-bs-dismiss="alert" aria-label="关闭">
               <span aria-hidden="true">
                 <!-- <i class="la la-times"></i> -->
               </span>
@@ -4181,7 +4181,7 @@ Vvveb.Sections.add("contact-form/contact-form-1", {
               This is a placeholder for a success message.
             </div>
 
-            <button type="button" class="btn-close align-middle" data-bs-dismiss="alert" aria-label="Close">
+            <button type="button" class="btn-close align-middle" data-bs-dismiss="alert" aria-label="关闭">
               <span aria-hidden="true">
                 <!-- <i class="la la-times"></i> -->
               </span>
@@ -4198,7 +4198,7 @@ Vvveb.Sections.add("contact-form/contact-form-1", {
               This is a placeholder for a info message.
             </div>
 
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="关闭">
               <span aria-hidden="true">
                 <!-- <i class="la la-times"></i> -->
               </span>
@@ -4209,13 +4209,13 @@ Vvveb.Sections.add("contact-form/contact-form-1", {
 
         <form action="" method="post" data-v-vvveb-action="submit" data-selector="[data-v-component-plugin-contact-form-form]" data-v-vvveb-on="submit">
           <input type="hidden" class="form-control" placeholder="First name" name="firstname-empty">
-          <input type="hidden" class="form-control" placeholder="Email" name="csrf" data-v-csrf>
+          <input type="hidden" class="form-control" placeholder="邮件" name="csrf" data-v-csrf>
           <input type="hidden" class="form-control" name="form-name" value="contact-us-home">
 
 
           <div class="row">
             <div class="col">
-              <input type="email" class="form-control" placeholder="Email">
+              <input type="email" class="form-control" placeholder="邮件">
             </div>
           </div>
 
@@ -4283,7 +4283,7 @@ Vvveb.Sections.add("contact-form/contact-form-1", {
             </div>
 
 
-            <button type="button" class="btn-close align-middle" data-bs-dismiss="alert" aria-label="Close">
+            <button type="button" class="btn-close align-middle" data-bs-dismiss="alert" aria-label="关闭">
               <span aria-hidden="true">
                 <!-- <i class="la la-times"></i> -->
               </span>
@@ -4300,7 +4300,7 @@ Vvveb.Sections.add("contact-form/contact-form-1", {
               This is a placeholder for a success message.
             </div>
 
-            <button type="button" class="btn-close align-middle" data-bs-dismiss="alert" aria-label="Close">
+            <button type="button" class="btn-close align-middle" data-bs-dismiss="alert" aria-label="关闭">
               <span aria-hidden="true">
                 <!-- <i class="la la-times"></i> -->
               </span>
@@ -4317,7 +4317,7 @@ Vvveb.Sections.add("contact-form/contact-form-1", {
               This is a placeholder for a info message.
             </div>
 
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="关闭">
               <span aria-hidden="true">
                 <!-- <i class="la la-times"></i> -->
               </span>
@@ -4328,13 +4328,13 @@ Vvveb.Sections.add("contact-form/contact-form-1", {
 
         <form action="" method="post" data-v-vvveb-action="submit" data-selector="[data-v-component-plugin-contact-form-form]" data-v-vvveb-on="submit">
           <input type="hidden" class="form-control" placeholder="First name" name="firstname-empty">
-          <input type="hidden" class="form-control" placeholder="Email" name="csrf" data-v-csrf>
+          <input type="hidden" class="form-control" placeholder="邮件" name="csrf" data-v-csrf>
           <input type="hidden" class="form-control" name="form-name" value="contact-us-home">
 
 
           <div class="row">
             <div class="col">
-              <input type="text" class="form-control" placeholder="Email">
+              <input type="text" class="form-control" placeholder="邮件">
             </div>
           </div>
 
@@ -4448,7 +4448,7 @@ Vvveb.Sections.add("contact-form/contact-form-1", {
                 </div>
 
 
-                <button type="button" class="btn-close align-middle" data-bs-dismiss="alert" aria-label="Close">
+                <button type="button" class="btn-close align-middle" data-bs-dismiss="alert" aria-label="关闭">
                   <span aria-hidden="true">
                     <!-- <i class="la la-times"></i> -->
                   </span>
@@ -4465,7 +4465,7 @@ Vvveb.Sections.add("contact-form/contact-form-1", {
                   This is a placeholder for a success message.
                 </div>
 
-                <button type="button" class="btn-close align-middle" data-bs-dismiss="alert" aria-label="Close">
+                <button type="button" class="btn-close align-middle" data-bs-dismiss="alert" aria-label="关闭">
                   <span aria-hidden="true">
                     <!-- <i class="la la-times"></i> -->
                   </span>
@@ -4482,7 +4482,7 @@ Vvveb.Sections.add("contact-form/contact-form-1", {
                   This is a placeholder for a info message.
                 </div>
 
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="关闭">
                   <span aria-hidden="true">
                     <!-- <i class="la la-times"></i> -->
                   </span>
@@ -4494,7 +4494,7 @@ Vvveb.Sections.add("contact-form/contact-form-1", {
             <h1 class=" mt-2">Quick Contact</h1>
             <form class="mt-4" action="" method="post" data-v-vvveb-action="submit" data-selector="[data-v-component-plugin-contact-form-form]" data-v-vvveb-on="submit">
               <input type="hidden" class="form-control" placeholder="First name" name="firstname-empty">
-              <input type="hidden" class="form-control" placeholder="Email" name="csrf" data-v-csrf>
+              <input type="hidden" class="form-control" placeholder="邮件" name="csrf" data-v-csrf>
               <input type="hidden" class="form-control" name="form-name" value="contact-us-home">
 
               <div class="row">
@@ -4641,7 +4641,7 @@ Vvveb.Sections.add("contact-form/contact-form-1", {
             </div>
 
 
-            <button type="button" class="btn-close align-middle" data-bs-dismiss="alert" aria-label="Close">
+            <button type="button" class="btn-close align-middle" data-bs-dismiss="alert" aria-label="关闭">
               <span aria-hidden="true">
                 <!-- <i class="la la-times"></i> -->
               </span>
@@ -4658,7 +4658,7 @@ Vvveb.Sections.add("contact-form/contact-form-1", {
               This is a placeholder for a success message.
             </div>
 
-            <button type="button" class="btn-close align-middle" data-bs-dismiss="alert" aria-label="Close">
+            <button type="button" class="btn-close align-middle" data-bs-dismiss="alert" aria-label="关闭">
               <span aria-hidden="true">
                 <!-- <i class="la la-times"></i> -->
               </span>
@@ -4675,7 +4675,7 @@ Vvveb.Sections.add("contact-form/contact-form-1", {
               This is a placeholder for a info message.
             </div>
 
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="关闭">
               <span aria-hidden="true">
                 <!-- <i class="la la-times"></i> -->
               </span>
@@ -4687,7 +4687,7 @@ Vvveb.Sections.add("contact-form/contact-form-1", {
         <div class="border rounded-3 p-4 border-opacity-25 border-light-subtle">
           <form action="" method="post" data-v-vvveb-action="submit" data-selector="[data-v-component-plugin-contact-form-form]" data-v-vvveb-on="submit">
             <input type="hidden" class="form-control" placeholder="First name" name="firstname-empty">
-            <input type="hidden" class="form-control" placeholder="Email" name="csrf" data-v-csrf>
+            <input type="hidden" class="form-control" placeholder="邮件" name="csrf" data-v-csrf>
             <input type="hidden" class="form-control" name="form-name" value="contact-us-home">
 
             <div class="row">
@@ -4701,7 +4701,7 @@ Vvveb.Sections.add("contact-form/contact-form-1", {
 
             <div class="row mt-4">
               <div class="col">
-                <input type="email" class="form-control" placeholder="Email" name="email" required>
+                <input type="email" class="form-control" placeholder="邮件" name="email" required>
               </div>
             </div>
 
@@ -9345,7 +9345,7 @@ Vvveb.Sections.add("navigation/navigation-1", {
                       </div>
 
 
-                      <button type="button" class="btn-close align-middle" data-bs-dismiss="alert" aria-label="Close">
+                      <button type="button" class="btn-close align-middle" data-bs-dismiss="alert" aria-label="关闭">
                         <span aria-hidden="true">
                           <!-- <i class="la la-times"></i> -->
                         </span>
@@ -9362,7 +9362,7 @@ Vvveb.Sections.add("navigation/navigation-1", {
                         This is a placeholder for a success message.
                       </div>
 
-                      <button type="button" class="btn-close align-middle" data-bs-dismiss="alert" aria-label="Close">
+                      <button type="button" class="btn-close align-middle" data-bs-dismiss="alert" aria-label="关闭">
                         <span aria-hidden="true">
                           <!-- <i class="la la-times"></i> -->
                         </span>
@@ -9379,7 +9379,7 @@ Vvveb.Sections.add("navigation/navigation-1", {
                         This is a placeholder for a info message.
                       </div>
 
-                      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">
+                      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="关闭">
                         <span aria-hidden="true">
                           <!-- <i class="la la-times"></i> -->
                         </span>
@@ -9527,9 +9527,9 @@ Vvveb.Sections.add("navigation/navigation-1", {
 
           <li class="nav-toggle">
             <!-- Cart Area -->
-            <div class="dropdown nav-item mini-cart" data-v-component-cart="offcanvas">
+            <div class="dropdown nav-item mini-cart" data-v-component-cart="侧边栏">
 
-              <a class="dropdown-toggle cart-info nav-link" role="button" id="cart-dropdown" data-bs-toggle="offcanvas" href="#cart-offcanvas" role="button" aria-controls="cart-offcanvas">
+              <a class="dropdown-toggle cart-info nav-link" role="button" id="cart-dropdown" data-bs-toggle="侧边栏" href="#cart-offcanvas" role="button" aria-controls="cart-offcanvas">
                 <!-- <img src="demo/img/bag.svg" width="20" alt> -->
                 <!--
 		<i class="la la-lg la-shopping-bag"></i><span class="visually-hidden">Cart</span>
@@ -9665,7 +9665,7 @@ Vvveb.Sections.add("navigation/navigation-1", {
 
 
 
-  <button class="btn btn-outline-secondary btn-sm border-0 shadow-none" type="submit" title="Search" data-bs-toggle="modal" data-bs-target="#searchModal">
+  <button class="btn btn-outline-secondary btn-sm border-0 shadow-none" type="submit" title="搜索" data-bs-toggle="modal" data-bs-target="#searchModal">
     <div class="la-flip-horizontal">
       <i class="la la-search la-lg" aria-hidden="true"></i>
     </div>
@@ -9678,7 +9678,7 @@ Vvveb.Sections.add("navigation/navigation-1", {
 			<input type="hidden" name="route" value="search">
 			<div class="input-group">
 				<input type="search" name="search" class="form-control" id="headerSearch" placeholder="Type for search" data-v-vvveb-action="search" data-v-vvveb-on="keyup">
-				<button class="btn border-0" type="submit" title="Search">
+				<button class="btn border-0" type="submit" title="搜索">
 					<div class="la-flip-horizontal">
 						<i class="la la-search la-lg" aria-hidden="true"></i>
 					</div>
@@ -9824,7 +9824,7 @@ Vvveb.Sections.add("navigation/navigation-1", {
                       </div>
 
 
-                      <button type="button" class="btn-close align-middle" data-bs-dismiss="alert" aria-label="Close">
+                      <button type="button" class="btn-close align-middle" data-bs-dismiss="alert" aria-label="关闭">
                         <span aria-hidden="true">
                           <!-- <i class="la la-times"></i> -->
                         </span>
@@ -9841,7 +9841,7 @@ Vvveb.Sections.add("navigation/navigation-1", {
                         This is a placeholder for a success message.
                       </div>
 
-                      <button type="button" class="btn-close align-middle" data-bs-dismiss="alert" aria-label="Close">
+                      <button type="button" class="btn-close align-middle" data-bs-dismiss="alert" aria-label="关闭">
                         <span aria-hidden="true">
                           <!-- <i class="la la-times"></i> -->
                         </span>
@@ -9858,7 +9858,7 @@ Vvveb.Sections.add("navigation/navigation-1", {
                         This is a placeholder for a info message.
                       </div>
 
-                      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">
+                      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="关闭">
                         <span aria-hidden="true">
                           <!-- <i class="la la-times"></i> -->
                         </span>
@@ -10006,9 +10006,9 @@ Vvveb.Sections.add("navigation/navigation-1", {
 
           <li class="nav-toggle">
             <!-- Cart Area -->
-            <div class="dropdown nav-item mini-cart" data-v-component-cart="offcanvas">
+            <div class="dropdown nav-item mini-cart" data-v-component-cart="侧边栏">
 
-              <a class="dropdown-toggle cart-info nav-link" role="button" id="cart-dropdown" data-bs-toggle="offcanvas" href="#cart-offcanvas" role="button" aria-controls="cart-offcanvas">
+              <a class="dropdown-toggle cart-info nav-link" role="button" id="cart-dropdown" data-bs-toggle="侧边栏" href="#cart-offcanvas" role="button" aria-controls="cart-offcanvas">
                 <!-- <img src="demo/img/bag.svg" width="20" alt> -->
                 <!--
 		<i class="la la-lg la-shopping-bag"></i><span class="visually-hidden">Cart</span>
@@ -10144,7 +10144,7 @@ Vvveb.Sections.add("navigation/navigation-1", {
 
 
 
-  <button class="btn btn-outline-secondary btn-sm border-0 shadow-none" type="submit" title="Search" data-bs-toggle="modal" data-bs-target="#searchModal">
+  <button class="btn btn-outline-secondary btn-sm border-0 shadow-none" type="submit" title="搜索" data-bs-toggle="modal" data-bs-target="#searchModal">
     <div class="la-flip-horizontal">
       <i class="la la-search la-lg" aria-hidden="true"></i>
     </div>
@@ -10157,7 +10157,7 @@ Vvveb.Sections.add("navigation/navigation-1", {
 			<input type="hidden" name="route" value="search">
 			<div class="input-group">
 				<input type="search" name="search" class="form-control" id="headerSearch" placeholder="Type for search" data-v-vvveb-action="search" data-v-vvveb-on="keyup">
-				<button class="btn border-0" type="submit" title="Search">
+				<button class="btn border-0" type="submit" title="搜索">
 					<div class="la-flip-horizontal">
 						<i class="la la-search la-lg" aria-hidden="true"></i>
 					</div>
@@ -10306,7 +10306,7 @@ Vvveb.Sections.add("navigation/navigation-1", {
                       </div>
 
 
-                      <button type="button" class="btn-close align-middle" data-bs-dismiss="alert" aria-label="Close">
+                      <button type="button" class="btn-close align-middle" data-bs-dismiss="alert" aria-label="关闭">
                         <span aria-hidden="true">
                           <!-- <i class="la la-times"></i> -->
                         </span>
@@ -10323,7 +10323,7 @@ Vvveb.Sections.add("navigation/navigation-1", {
                         This is a placeholder for a success message.
                       </div>
 
-                      <button type="button" class="btn-close align-middle" data-bs-dismiss="alert" aria-label="Close">
+                      <button type="button" class="btn-close align-middle" data-bs-dismiss="alert" aria-label="关闭">
                         <span aria-hidden="true">
                           <!-- <i class="la la-times"></i> -->
                         </span>
@@ -10340,7 +10340,7 @@ Vvveb.Sections.add("navigation/navigation-1", {
                         This is a placeholder for a info message.
                       </div>
 
-                      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">
+                      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="关闭">
                         <span aria-hidden="true">
                           <!-- <i class="la la-times"></i> -->
                         </span>
@@ -10488,9 +10488,9 @@ Vvveb.Sections.add("navigation/navigation-1", {
 
           <li class="nav-toggle">
             <!-- Cart Area -->
-            <div class="dropdown nav-item mini-cart" data-v-component-cart="offcanvas">
+            <div class="dropdown nav-item mini-cart" data-v-component-cart="侧边栏">
 
-              <a class="dropdown-toggle cart-info nav-link" role="button" id="cart-dropdown" data-bs-toggle="offcanvas" href="#cart-offcanvas" role="button" aria-controls="cart-offcanvas">
+              <a class="dropdown-toggle cart-info nav-link" role="button" id="cart-dropdown" data-bs-toggle="侧边栏" href="#cart-offcanvas" role="button" aria-controls="cart-offcanvas">
                 <!-- <img src="demo/img/bag.svg" width="20" alt> -->
                 <!--
 		<i class="la la-lg la-shopping-bag"></i><span class="visually-hidden">Cart</span>
@@ -10626,7 +10626,7 @@ Vvveb.Sections.add("navigation/navigation-1", {
 
 
 
-  <button class="btn btn-outline-secondary btn-sm border-0 shadow-none" type="submit" title="Search" data-bs-toggle="modal" data-bs-target="#searchModal">
+  <button class="btn btn-outline-secondary btn-sm border-0 shadow-none" type="submit" title="搜索" data-bs-toggle="modal" data-bs-target="#searchModal">
     <div class="la-flip-horizontal">
       <i class="la la-search la-lg" aria-hidden="true"></i>
     </div>
@@ -10639,7 +10639,7 @@ Vvveb.Sections.add("navigation/navigation-1", {
 			<input type="hidden" name="route" value="search">
 			<div class="input-group">
 				<input type="search" name="search" class="form-control" id="headerSearch" placeholder="Type for search" data-v-vvveb-action="search" data-v-vvveb-on="keyup">
-				<button class="btn border-0" type="submit" title="Search">
+				<button class="btn border-0" type="submit" title="搜索">
 					<div class="la-flip-horizontal">
 						<i class="la la-search la-lg" aria-hidden="true"></i>
 					</div>
@@ -10794,7 +10794,7 @@ Vvveb.Sections.add("navigation/navigation-1", {
                       </div>
 
 
-                      <button type="button" class="btn-close align-middle" data-bs-dismiss="alert" aria-label="Close">
+                      <button type="button" class="btn-close align-middle" data-bs-dismiss="alert" aria-label="关闭">
                         <span aria-hidden="true">
                           <!-- <i class="la la-times"></i> -->
                         </span>
@@ -10811,7 +10811,7 @@ Vvveb.Sections.add("navigation/navigation-1", {
                         This is a placeholder for a success message.
                       </div>
 
-                      <button type="button" class="btn-close align-middle" data-bs-dismiss="alert" aria-label="Close">
+                      <button type="button" class="btn-close align-middle" data-bs-dismiss="alert" aria-label="关闭">
                         <span aria-hidden="true">
                           <!-- <i class="la la-times"></i> -->
                         </span>
@@ -10828,7 +10828,7 @@ Vvveb.Sections.add("navigation/navigation-1", {
                         This is a placeholder for a info message.
                       </div>
 
-                      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">
+                      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="关闭">
                         <span aria-hidden="true">
                           <!-- <i class="la la-times"></i> -->
                         </span>
@@ -10974,7 +10974,7 @@ Vvveb.Sections.add("navigation/navigation-1", {
           </li>
 
           <li class="nav-toggle">
-            <button class="btn btn-outline-secondary btn-sm border-0" type="submit" title="Search" data-bs-toggle="modal" data-bs-target="#searchModal">
+            <button class="btn btn-outline-secondary btn-sm border-0" type="submit" title="搜索" data-bs-toggle="modal" data-bs-target="#searchModal">
               <div class="la-flip-horizontal">
                 <i class="la la-search la-lg" aria-hidden="true"></i>
               </div>
@@ -10995,7 +10995,7 @@ Vvveb.Sections.add("navigation/navigation-1", {
 						<input type="hidden" name="route" value="search">
 						<div class="input-group">
 							<input type="search" name="search" class="form-control" id="headerSearch" placeholder="Type for search" data-v-vvveb-action="search" data-v-vvveb-on="keyup">
-							<button class="btn border-0" type="submit" title="Search">
+							<button class="btn border-0" type="submit" title="搜索">
 								<div class="la-flip-horizontal">
 									<i class="la la-search la-lg" aria-hidden="true"></i>
 								</div>
@@ -11059,7 +11059,7 @@ Vvveb.Sections.add("navigation/navigation-1", {
             </li>
             <!--
 					<li class="list-inline-item"  data-v-if="site.contact-email">
-						<a href="mailto:contact@mysite.com" class="p-2 p-md-0" title="Email" data-v-site-contact-email>
+						<a href="mailto:contact@mysite.com" class="p-2 p-md-0" title="邮件" data-v-site-contact-email>
 						<i class="la la-envelope"></i> 
 						<span class=" text-muted" data-v-site-contact-email>contact@mysite.com</span></a>
 					</li>
@@ -11070,7 +11070,7 @@ Vvveb.Sections.add("navigation/navigation-1", {
           <ul class="list-inline">
             <!--
 					<li class="list-inline-item"><a id="wishlist-total" title="Wish List (0)"><i class="la la-heart"></i> <span class="">Favorites</span></a></li>
-					<li class="list-inline-item"><a title="Checkout"><i class="la la-share"></i> <span class="">Checkout</span></a></li>
+					<li class="list-inline-item"><a title="结账"><i class="la la-share"></i> <span class="">Checkout</span></a></li>
 					<li class="list-inline-item">
 						<div class="dropdown">
 							<a href="" class="dropdown-toggle" data-bs-toggle="dropdown" role="button"><i class="la la-user"></i> <span class="">My Account</span></i></a>
@@ -11300,7 +11300,7 @@ Vvveb.Sections.add("navigation/navigation-1", {
                       </div>
 
 
-                      <button type="button" class="btn-close align-middle" data-bs-dismiss="alert" aria-label="Close">
+                      <button type="button" class="btn-close align-middle" data-bs-dismiss="alert" aria-label="关闭">
                         <span aria-hidden="true">
                           <!-- <i class="la la-times"></i> -->
                         </span>
@@ -11317,7 +11317,7 @@ Vvveb.Sections.add("navigation/navigation-1", {
                         This is a placeholder for a success message.
                       </div>
 
-                      <button type="button" class="btn-close align-middle" data-bs-dismiss="alert" aria-label="Close">
+                      <button type="button" class="btn-close align-middle" data-bs-dismiss="alert" aria-label="关闭">
                         <span aria-hidden="true">
                           <!-- <i class="la la-times"></i> -->
                         </span>
@@ -11334,7 +11334,7 @@ Vvveb.Sections.add("navigation/navigation-1", {
                         This is a placeholder for a info message.
                       </div>
 
-                      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">
+                      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="关闭">
                         <span aria-hidden="true">
                           <!-- <i class="la la-times"></i> -->
                         </span>
@@ -11482,9 +11482,9 @@ Vvveb.Sections.add("navigation/navigation-1", {
 
           <li class="nav-toggle">
             <!-- Cart Area -->
-            <div class="dropdown nav-item mini-cart" data-v-component-cart="offcanvas">
+            <div class="dropdown nav-item mini-cart" data-v-component-cart="侧边栏">
 
-              <a class="dropdown-toggle cart-info nav-link" role="button" id="cart-dropdown" data-bs-toggle="offcanvas" href="#cart-offcanvas" role="button" aria-controls="cart-offcanvas">
+              <a class="dropdown-toggle cart-info nav-link" role="button" id="cart-dropdown" data-bs-toggle="侧边栏" href="#cart-offcanvas" role="button" aria-controls="cart-offcanvas">
                 <!-- <img src="demo/img/bag.svg" width="20" alt> -->
                 <!--
 		<i class="la la-lg la-shopping-bag"></i><span class="visually-hidden">Cart</span>
@@ -11620,7 +11620,7 @@ Vvveb.Sections.add("navigation/navigation-1", {
 
 
 
-  <button class="btn btn-outline-secondary btn-sm border-0 shadow-none" type="submit" title="Search" data-bs-toggle="modal" data-bs-target="#searchModal">
+  <button class="btn btn-outline-secondary btn-sm border-0 shadow-none" type="submit" title="搜索" data-bs-toggle="modal" data-bs-target="#searchModal">
     <div class="la-flip-horizontal">
       <i class="la la-search la-lg" aria-hidden="true"></i>
     </div>
@@ -11633,7 +11633,7 @@ Vvveb.Sections.add("navigation/navigation-1", {
 			<input type="hidden" name="route" value="search">
 			<div class="input-group">
 				<input type="search" name="search" class="form-control" id="headerSearch" placeholder="Type for search" data-v-vvveb-action="search" data-v-vvveb-on="keyup">
-				<button class="btn border-0" type="submit" title="Search">
+				<button class="btn border-0" type="submit" title="搜索">
 					<div class="la-flip-horizontal">
 						<i class="la la-search la-lg" aria-hidden="true"></i>
 					</div>
@@ -11666,7 +11666,7 @@ Vvveb.Sections.add("navigation/navigation-1", {
             </li>
             <!--
 					<li class="list-inline-item" class="p-2 p-md-0" data-v-if="site.contact-email">
-						<a href="mailto:contact@mysite.com" title="Email" data-v-site-contact-email>
+						<a href="mailto:contact@mysite.com" title="邮件" data-v-site-contact-email>
 						<i class="la la-envelope"></i> 
 						<span class=" text-muted" data-v-site-contact-email>contact@mysite.com</span></a>
 					</li>
@@ -11677,7 +11677,7 @@ Vvveb.Sections.add("navigation/navigation-1", {
           <ul class="list-inline">
             <!--
 					<li class="list-inline-item"><a id="wishlist-total" title="Wish List (0)"><i class="la la-heart"></i> <span class="">Favorites</span></a></li>
-					<li class="list-inline-item"><a title="Checkout"><i class="la la-share"></i> <span class="">Checkout</span></a></li>
+					<li class="list-inline-item"><a title="结账"><i class="la la-share"></i> <span class="">Checkout</span></a></li>
 					<li class="list-inline-item">
 						<div class="dropdown">
 							<a href="" class="dropdown-toggle" data-bs-toggle="dropdown" role="button"><i class="la la-user"></i> <span class="">My Account</span></i></a>
@@ -11909,7 +11909,7 @@ Vvveb.Sections.add("navigation/navigation-1", {
                       </div>
 
 
-                      <button type="button" class="btn-close align-middle" data-bs-dismiss="alert" aria-label="Close">
+                      <button type="button" class="btn-close align-middle" data-bs-dismiss="alert" aria-label="关闭">
                         <span aria-hidden="true">
                           <!-- <i class="la la-times"></i> -->
                         </span>
@@ -11926,7 +11926,7 @@ Vvveb.Sections.add("navigation/navigation-1", {
                         This is a placeholder for a success message.
                       </div>
 
-                      <button type="button" class="btn-close align-middle" data-bs-dismiss="alert" aria-label="Close">
+                      <button type="button" class="btn-close align-middle" data-bs-dismiss="alert" aria-label="关闭">
                         <span aria-hidden="true">
                           <!-- <i class="la la-times"></i> -->
                         </span>
@@ -11943,7 +11943,7 @@ Vvveb.Sections.add("navigation/navigation-1", {
                         This is a placeholder for a info message.
                       </div>
 
-                      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">
+                      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="关闭">
                         <span aria-hidden="true">
                           <!-- <i class="la la-times"></i> -->
                         </span>
@@ -12091,9 +12091,9 @@ Vvveb.Sections.add("navigation/navigation-1", {
 
           <li class="nav-toggle">
             <!-- Cart Area -->
-            <div class="dropdown nav-item mini-cart" data-v-component-cart="offcanvas">
+            <div class="dropdown nav-item mini-cart" data-v-component-cart="侧边栏">
 
-              <a class="dropdown-toggle cart-info nav-link" role="button" id="cart-dropdown" data-bs-toggle="offcanvas" href="#cart-offcanvas" role="button" aria-controls="cart-offcanvas">
+              <a class="dropdown-toggle cart-info nav-link" role="button" id="cart-dropdown" data-bs-toggle="侧边栏" href="#cart-offcanvas" role="button" aria-controls="cart-offcanvas">
                 <!-- <img src="demo/img/bag.svg" width="20" alt> -->
                 <!--
 		<i class="la la-lg la-shopping-bag"></i><span class="visually-hidden">Cart</span>
@@ -12229,7 +12229,7 @@ Vvveb.Sections.add("navigation/navigation-1", {
 
 
 
-  <button class="btn btn-outline-secondary btn-sm border-0 shadow-none" type="submit" title="Search" data-bs-toggle="modal" data-bs-target="#searchModal">
+  <button class="btn btn-outline-secondary btn-sm border-0 shadow-none" type="submit" title="搜索" data-bs-toggle="modal" data-bs-target="#searchModal">
     <div class="la-flip-horizontal">
       <i class="la la-search la-lg" aria-hidden="true"></i>
     </div>
@@ -12242,7 +12242,7 @@ Vvveb.Sections.add("navigation/navigation-1", {
 			<input type="hidden" name="route" value="search">
 			<div class="input-group">
 				<input type="search" name="search" class="form-control" id="headerSearch" placeholder="Type for search" data-v-vvveb-action="search" data-v-vvveb-on="keyup">
-				<button class="btn border-0" type="submit" title="Search">
+				<button class="btn border-0" type="submit" title="搜索">
 					<div class="la-flip-horizontal">
 						<i class="la la-search la-lg" aria-hidden="true"></i>
 					</div>
@@ -16627,7 +16627,7 @@ Vvveb.Sections.add("subscribe/subscribe-1", {
               </div>
 
 
-              <button type="button" class="btn-close align-middle" data-bs-dismiss="alert" aria-label="Close">
+              <button type="button" class="btn-close align-middle" data-bs-dismiss="alert" aria-label="关闭">
                 <span aria-hidden="true">
                   <!-- <i class="la la-times"></i> -->
                 </span>
@@ -16644,7 +16644,7 @@ Vvveb.Sections.add("subscribe/subscribe-1", {
                 This is a placeholder for a success message.
               </div>
 
-              <button type="button" class="btn-close align-middle" data-bs-dismiss="alert" aria-label="Close">
+              <button type="button" class="btn-close align-middle" data-bs-dismiss="alert" aria-label="关闭">
                 <span aria-hidden="true">
                   <!-- <i class="la la-times"></i> -->
                 </span>
@@ -16661,7 +16661,7 @@ Vvveb.Sections.add("subscribe/subscribe-1", {
                 This is a placeholder for a info message.
               </div>
 
-              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="关闭">
                 <span aria-hidden="true">
                   <!-- <i class="la la-times"></i> -->
                 </span>
@@ -16672,7 +16672,7 @@ Vvveb.Sections.add("subscribe/subscribe-1", {
 
           <form action="" method="post" data-v-vvveb-action="submit" data-selector="[data-v-component-plugin-newsletter-form]" data-v-vvveb-on="submit">
             <input type="hidden" class="form-control" placeholder="First name" name="firstname-empty">
-            <input type="hidden" class="form-control" placeholder="Email" name="csrf" data-v-csrf>
+            <input type="hidden" class="form-control" placeholder="邮件" name="csrf" data-v-csrf>
 
 
             <div class="col-md-6 mx-auto mt-5">
@@ -16750,7 +16750,7 @@ Vvveb.Sections.add("subscribe/subscribe-1", {
               </div>
 
 
-              <button type="button" class="btn-close align-middle" data-bs-dismiss="alert" aria-label="Close">
+              <button type="button" class="btn-close align-middle" data-bs-dismiss="alert" aria-label="关闭">
                 <span aria-hidden="true">
                   <!-- <i class="la la-times"></i> -->
                 </span>
@@ -16767,7 +16767,7 @@ Vvveb.Sections.add("subscribe/subscribe-1", {
                 This is a placeholder for a success message.
               </div>
 
-              <button type="button" class="btn-close align-middle" data-bs-dismiss="alert" aria-label="Close">
+              <button type="button" class="btn-close align-middle" data-bs-dismiss="alert" aria-label="关闭">
                 <span aria-hidden="true">
                   <!-- <i class="la la-times"></i> -->
                 </span>
@@ -16784,7 +16784,7 @@ Vvveb.Sections.add("subscribe/subscribe-1", {
                 This is a placeholder for a info message.
               </div>
 
-              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="关闭">
                 <span aria-hidden="true">
                   <!-- <i class="la la-times"></i> -->
                 </span>
@@ -16795,7 +16795,7 @@ Vvveb.Sections.add("subscribe/subscribe-1", {
 
           <form action="" method="post" data-v-vvveb-action="submit" data-selector="[data-v-component-plugin-newsletter-form]" data-v-vvveb-on="submit">
             <input type="hidden" class="form-control" placeholder="First name" name="firstname-empty">
-            <input type="hidden" class="form-control" placeholder="Email" name="csrf" data-v-csrf>
+            <input type="hidden" class="form-control" placeholder="邮件" name="csrf" data-v-csrf>
             <input type="hidden" class="form-control" name="form-name" value="subscribe-footer">
 
             <div class="search position-relative">
@@ -16872,7 +16872,7 @@ Vvveb.Sections.add("subscribe/subscribe-1", {
               </div>
 
 
-              <button type="button" class="btn-close align-middle" data-bs-dismiss="alert" aria-label="Close">
+              <button type="button" class="btn-close align-middle" data-bs-dismiss="alert" aria-label="关闭">
                 <span aria-hidden="true">
                   <!-- <i class="la la-times"></i> -->
                 </span>
@@ -16889,7 +16889,7 @@ Vvveb.Sections.add("subscribe/subscribe-1", {
                 This is a placeholder for a success message.
               </div>
 
-              <button type="button" class="btn-close align-middle" data-bs-dismiss="alert" aria-label="Close">
+              <button type="button" class="btn-close align-middle" data-bs-dismiss="alert" aria-label="关闭">
                 <span aria-hidden="true">
                   <!-- <i class="la la-times"></i> -->
                 </span>
@@ -16906,7 +16906,7 @@ Vvveb.Sections.add("subscribe/subscribe-1", {
                 This is a placeholder for a info message.
               </div>
 
-              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="关闭">
                 <span aria-hidden="true">
                   <!-- <i class="la la-times"></i> -->
                 </span>
@@ -16917,7 +16917,7 @@ Vvveb.Sections.add("subscribe/subscribe-1", {
 
           <form action="" method="post" data-v-vvveb-action="submit" data-selector="[data-v-component-plugin-newsletter-form]" data-v-vvveb-on="submit">
             <input type="hidden" class="form-control" placeholder="First name" name="firstname-empty">
-            <input type="hidden" class="form-control" placeholder="Email" name="csrf" data-v-csrf>
+            <input type="hidden" class="form-control" placeholder="邮件" name="csrf" data-v-csrf>
 
 
             <div class="search position-relative">
@@ -16992,7 +16992,7 @@ Vvveb.Sections.add("subscribe/subscribe-1", {
               </div>
 
 
-              <button type="button" class="btn-close align-middle" data-bs-dismiss="alert" aria-label="Close">
+              <button type="button" class="btn-close align-middle" data-bs-dismiss="alert" aria-label="关闭">
                 <span aria-hidden="true">
                   <!-- <i class="la la-times"></i> -->
                 </span>
@@ -17009,7 +17009,7 @@ Vvveb.Sections.add("subscribe/subscribe-1", {
                 This is a placeholder for a success message.
               </div>
 
-              <button type="button" class="btn-close align-middle" data-bs-dismiss="alert" aria-label="Close">
+              <button type="button" class="btn-close align-middle" data-bs-dismiss="alert" aria-label="关闭">
                 <span aria-hidden="true">
                   <!-- <i class="la la-times"></i> -->
                 </span>
@@ -17026,7 +17026,7 @@ Vvveb.Sections.add("subscribe/subscribe-1", {
                 This is a placeholder for a info message.
               </div>
 
-              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="关闭">
                 <span aria-hidden="true">
                   <!-- <i class="la la-times"></i> -->
                 </span>
@@ -17037,7 +17037,7 @@ Vvveb.Sections.add("subscribe/subscribe-1", {
 
           <form action="" method="post" data-v-vvveb-action="submit" data-selector="[data-v-component-plugin-newsletter-form]" data-v-vvveb-on="submit">
             <input type="hidden" class="form-control" placeholder="First name" name="firstname-empty">
-            <input type="hidden" class="form-control" placeholder="Email" name="csrf" data-v-csrf>
+            <input type="hidden" class="form-control" placeholder="邮件" name="csrf" data-v-csrf>
 
 
             <div class="col-md-6 mx-auto mt-5">
@@ -17113,7 +17113,7 @@ Vvveb.Sections.add("subscribe/subscribe-1", {
               </div>
 
 
-              <button type="button" class="btn-close align-middle" data-bs-dismiss="alert" aria-label="Close">
+              <button type="button" class="btn-close align-middle" data-bs-dismiss="alert" aria-label="关闭">
                 <span aria-hidden="true">
                   <!-- <i class="la la-times"></i> -->
                 </span>
@@ -17130,7 +17130,7 @@ Vvveb.Sections.add("subscribe/subscribe-1", {
                 This is a placeholder for a success message.
               </div>
 
-              <button type="button" class="btn-close align-middle" data-bs-dismiss="alert" aria-label="Close">
+              <button type="button" class="btn-close align-middle" data-bs-dismiss="alert" aria-label="关闭">
                 <span aria-hidden="true">
                   <!-- <i class="la la-times"></i> -->
                 </span>
@@ -17147,7 +17147,7 @@ Vvveb.Sections.add("subscribe/subscribe-1", {
                 This is a placeholder for a info message.
               </div>
 
-              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="关闭">
                 <span aria-hidden="true">
                   <!-- <i class="la la-times"></i> -->
                 </span>
@@ -17158,7 +17158,7 @@ Vvveb.Sections.add("subscribe/subscribe-1", {
 
           <form action="" method="post" data-v-vvveb-action="submit" data-selector="[data-v-component-plugin-newsletter-form]" data-v-vvveb-on="submit">
             <input type="hidden" class="form-control" placeholder="First name" name="firstname-empty">
-            <input type="hidden" class="form-control" placeholder="Email" name="csrf" data-v-csrf>
+            <input type="hidden" class="form-control" placeholder="邮件" name="csrf" data-v-csrf>
 
 
             <div class="col-md-6 mx-auto mt-5">

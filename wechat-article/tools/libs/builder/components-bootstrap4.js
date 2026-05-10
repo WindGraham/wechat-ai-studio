@@ -1146,7 +1146,7 @@ Vvveb.Components.extend("_base", "html/button", {
                 text: "Dark outline"
             }, {
                 value: "btn-link",
-                text: "Link"
+                text: "链接"
             }]
         }
     }, {
@@ -1186,7 +1186,7 @@ Vvveb.Components.extend("_base", "html/button", {
 });
 Vvveb.Components.extend("_base", "html/buttongroup", {
     classes: ["btn-group"],
-    name: "Button Group",
+    name: "按钮组",
     image: "icons/button_group.svg",
     html: '<div class="btn-group" role="group" aria-label="Basic example"><button type="button" class="btn btn-secondary">Left</button><button type="button" class="btn btn-secondary">Middle</button> <button type="button" class="btn btn-secondary">Right</button></div>',
 	properties: [{
@@ -1253,7 +1253,7 @@ Vvveb.Components.extend("_base","html/alert", {
     name: "警告框",
     image: "icons/alert.svg",
     html: '<div class="alert alert-warning alert-dismissible fade show" role="alert">\
-		  <button type="button" class="btn-close" data-dismiss="alert" aria-label="Close">\
+		  <button type="button" class="btn-close" data-dismiss="alert" aria-label="关闭">\
 			<span aria-hidden="true">&times;</span>\
 		  </button>\
 		  <strong>Holy guacamole!</strong> You should check in on some of those fields below.\
@@ -1572,7 +1572,7 @@ Vvveb.Components.extend("_base", "html/navbar", {
 			  </li>\
 			</ul>\
 			<form class="form-inline my-2 my-lg-0">\
-			  <input class="form-control mr-sm-2" type="text" placeholder="Search" aria-label="Search">\
+			  <input class="form-control mr-sm-2" type="text" placeholder="搜索" aria-label="搜索">\
 			  <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>\
 			</form>\
 		  </div>\
@@ -1646,7 +1646,7 @@ Vvveb.Components.extend("_base", "html/form", {
                 text: "Default"
             }, {
                 value: "form-search",
-                text: "Search"
+                text: "搜索"
             }, {
                 value: "form-inline",
                 text: "Inline"
@@ -1669,7 +1669,7 @@ Vvveb.Components.extend("_base", "html/form", {
 });
 
 Vvveb.Components.extend("_base", "html/textinput", {
-    name: "Input",
+    name: "输入",
 	nodes: ["input"],
 	//attributes: {"type":"text"},
     image: "icons/text_input.svg",
@@ -1799,7 +1799,7 @@ Vvveb.Components.extend("_base", "html/textinput", {
 
 Vvveb.Components.extend("_base", "html/selectinput", {
 	nodes: ["select"],
-    name: "Select Input",
+    name: "下拉选择",
     image: "icons/select_input.svg",
     html: '<div class="mb-3"><label>Choose an option </label><select class="form-control"><option value="value1">Text 1</option><option value="value2">Text 2</option><option value="value3">Text 3</option></select></div>',
 
@@ -1877,12 +1877,12 @@ Vvveb.Components.extend("_base", "html/selectinput", {
 	}]
 });
 Vvveb.Components.extend("_base", "html/textareainput", {
-    name: "Text Area",
+    name: "文本域",
     image: "icons/text_area.svg",
     html: '<div class="mb-3"><label>Your response:</label><textarea class="form-control"></textarea></div>'
 });
 Vvveb.Components.extend("_base", "html/radiobutton", {
-    name: "Radio Button",
+    name: "单选框",
 	attributes: {"type":"radio"},
     image: "icons/radio.svg",
     html: '<label class="radio"><input type="radio"> Radio</label>',
@@ -2388,7 +2388,7 @@ Vvveb.Components.extend("_base", "html/video", {
 
 Vvveb.Components.extend("_base", "html/button", {
     nodes: ["button"],
-    name: "Html Button",
+    name: "HTML按钮",
     image: "icons/button.svg",
     html: '<button>Button</button>',
     properties: [{

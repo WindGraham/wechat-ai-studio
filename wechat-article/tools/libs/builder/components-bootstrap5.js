@@ -123,7 +123,7 @@ Vvveb.Components.extend("html/link", "html/btn", {
                 text: "Dark outline"
             },{
                 value: "btn-link",
-                text: "Link"
+                text: "链接"
             }]
         }
     },{
@@ -167,13 +167,13 @@ Vvveb.Components.extend("html/link", "html/btn", {
 	key: "link_options",
         inputtype: SectionInput,
         name:false,
-        data: {header:"Link"},
+        data: {header:"链接"},
     }]
 });
 	
 Vvveb.Components.extend("_base", "html/buttongroup", {
     classes: ["btn-group"],
-    name: "Button Group",
+    name: "按钮组",
     image: "icons/button_group.svg",
     html: '<div class="btn-group" role="group" aria-label="Basic example"><button type="button" class="btn btn-secondary">Left</button><button type="button" class="btn btn-secondary">Middle</button> <button type="button" class="btn btn-secondary">Right</button></div>',
 	properties: [{
@@ -240,7 +240,7 @@ Vvveb.Components.extend("_base","html/alert", {
     name: "警告框",
     image: "icons/alert.svg",
     html: '<div class="alert alert-warning alert-dismissible fade show" role="alert">\
-		  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">\
+		  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="关闭">\
 			<!--span aria-hidden="true">&times;</span-->\
 		  </button>\
 		  <strong>Holy guacamole!</strong> You should check in on some of those fields below.\
@@ -657,7 +657,7 @@ Vvveb.Components.extend("_base", "html/navbar", {
 					</li>
 				  </ul>
 				  <form class="d-flex" role="search">
-					<input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+					<input class="form-control me-2" type="search" placeholder="搜索" aria-label="搜索">
 					<button class="btn btn-outline-success" type="submit">Search</button>
 				  </form>
 				</div>

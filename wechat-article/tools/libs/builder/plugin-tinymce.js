@@ -98,7 +98,7 @@ Vvveb.WysiwygEditor = {
                     <div class="modal-content">
                         <div class="modal-header">
                             <h5 class="modal-title" id="TinyMceModalLabel">Editor</h5>
-                            <button type="button" class="btn btn-sm" id="btn-tiny-iconclose" aria-label="Close">
+                            <button type="button" class="btn btn-sm" id="btn-tiny-iconclose" aria-label="关闭">
                                 <span aria-hidden="true"><i class="la la-times la-lg"></i></span>
                             </button>
                         </div>

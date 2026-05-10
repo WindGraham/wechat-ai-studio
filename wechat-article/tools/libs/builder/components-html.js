@@ -208,7 +208,7 @@ Vvveb.Components.extend("_base", "html/image", {
 		key: "link_options",
         inputtype: SectionInput,
         //name:false,
-        data: {header:"Link"},
+        data: {header:"链接"},
     },{
         name: "Enable link",
         key: "enable_link",
@@ -380,7 +380,7 @@ Vvveb.Components.extend("_base", "html/label", {
 
 
 Vvveb.Components.extend("_base", "html/textinput", {
-    name: "Input",
+    name: "输入",
 	nodes: ["input"],
 	//attributes: {"type":"text"},
     image: "icons/text_input.svg",
@@ -496,7 +496,7 @@ Vvveb.Components.extend("_base", "html/textinput", {
 
 Vvveb.Components.extend("_base", "html/selectinput", {
 	nodes: ["select"],
-    name: "Select Input",
+    name: "下拉选择",
     image: "icons/select_input.svg",
     html: '<select class="form-control"><option value="value1">Text 1</option><option value="value2">Text 2</option><option value="value3">Text 3</option></select>',
 
@@ -590,7 +590,7 @@ Vvveb.Components.extend("_base", "html/selectinput", {
 
 Vvveb.Components.extend("_base", "html/textareainput", {
 	nodes: ["textarea"],
-    name: "Text Area",
+    name: "文本域",
     image: "icons/text_area.svg",
     html: '<textarea class="form-control"></textarea>',
 	properties: [{
@@ -635,7 +635,7 @@ Vvveb.Components.extend("_base", "html/textareainput", {
     }]	
 });
 Vvveb.Components.extend("_base", "html/radiobutton", {
-    name: "Radio Button",
+    name: "单选框",
 	attributes: {"type":"radio"},
     image: "icons/radio.svg",
     html: `<div class="form-check">
@@ -817,7 +817,7 @@ Vvveb.Components.extend("_base", "html/video", {
 
 Vvveb.Components.extend("_base", "html/button", {
     nodes: ["button"],
-    name: "Html Button",
+    name: "HTML按钮",
     image: "icons/button.svg",
     html: '<button>Button</button>',
     properties: [{
@@ -942,7 +942,7 @@ Vvveb.Components.extend("_base", "html/list-item", {
 
 Vvveb.Components.extend("_base", "html/list", {
     nodes: ["ul", "ol"],
-    name: "List",
+    name: "列表",
 	image: "icons/list.svg",
 	html: `<ul>
 				<li>Begin with the possible; begin with one step.</li>
@@ -1058,7 +1058,7 @@ Vvveb.Components.extend("_base", "html/form", {
                 text: "Default"
             }, {
                 value: "form-search",
-                text: "Search"
+                text: "搜索"
             }, {
                 value: "form-inline",
                 text: "Inline"

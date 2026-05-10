@@ -1245,7 +1245,7 @@ Vvveb.Builder = {
 		
 		self.frameDoc  = window.FrameDocument;
 		self.frameHtml = window.FrameDocument.querySelector("html");
-		self.frameBody = window.FrameDocument.querySelector("body");
+		self.frameBody = window.FrameDocument.querySelector("页面主体");
 		self.frameHead = window.FrameDocument.querySelector("head");
 		
 		//insert editor helpers like non editable areas
@@ -2317,14 +2317,14 @@ Vvveb.Builder = {
 		}
 
 		if (this.runJsOnSetHtml) {
-			this.frameBody.innerHTML = getTag(html, "body");
+			this.frameBody.innerHTML = getTag(html, "页面主体");
 		}
 		else {
-			window.FrameDocument.body.innerHTML = getTag(html, "body");
+			window.FrameDocument.body.innerHTML = getTag(html, "页面主体");
 		}
 			
 		//use outerHTML if you want to set body tag attributes
-		//window.FrameDocument.body.outerHTML = getTag(html, "body", true);
+		//window.FrameDocument.body.outerHTML = getTag(html, "页面主体", true);
 
 		//set head html only if changed to avoid page flicker
 		let headHtml = getTag(html, "head");
@@ -2375,7 +2375,7 @@ Vvveb.Builder = {
 				bg = "danger";
 			}
 			
-			displayToast(bg, "Save", data.message ?? data);					
+			displayToast(bg, "保存", data.message ?? data);					
 		})
 		.catch(error => {
 			console.log(error.statusText);
@@ -2395,7 +2395,7 @@ Vvveb.Builder = {
 				bg = "danger";
 			}
 			
-			displayToast(bg, "Save", data.message ?? data);			
+			displayToast(bg, "保存", data.message ?? data);			
 		}).fail(function (data) {
 			displayToast("danger", "Error", "Error saving!");
 			alert(data.responseText);
@@ -2741,7 +2741,7 @@ Vvveb.Gui = {
 				bg = "danger";
 			}
 			
-			displayToast(bg, "Save", data.message ?? data);
+			displayToast(bg, "保存", data.message ?? data);
 
 			const offcanvas = document.getElementById('save-offcanvas');
 			if (offcanvas) {
@@ -2943,7 +2943,7 @@ Vvveb.Gui = {
 	//layout
 	togglePanel: function (panel, cssVar) {
 		panel = document.querySelector(panel);
-		let body = document.querySelector("body");
+		let body = document.querySelector("页面主体");
 		let prevValue = getComputedStyle(body).getPropertyValue(cssVar);
 		let visible = false;
 		
@@ -3158,7 +3158,7 @@ Vvveb.StyleManager = {
 			//element (tag) selector
 			let tag = currentElement.tagName.toLowerCase();
 			//exclude top most element body unless the parent element is body
-			if (tag == "body" && selector.length > 1) {
+			if (tag == "页面主体" && selector.length > 1) {
 				break;
 			}
 			
@@ -4095,7 +4095,7 @@ Vvveb.FileManager = {
 							bg = "danger";
 						}
 
-						displayToast(bg, "Delete", data.message ?? data);
+						displayToast(bg, "删除", data.message ?? data);
 				})
 				.catch(error => {
 					console.log(error);
@@ -4141,7 +4141,7 @@ Vvveb.FileManager = {
 						}
 
 						newfile = data.newfile ?? newfile;	
-						displayToast(bg, "Rename", data.message ?? data);
+						displayToast(bg, "重命名", data.message ?? data);
 						let baseName = newfile.replace('.html', '');
 						let newName = friendlyName(newfile.replace(/.*[\/\\]+/, '')).replace('.html', '');
 						

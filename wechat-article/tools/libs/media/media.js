@@ -24,7 +24,7 @@ class MediaModal {
 			  <div class="modal-header">
 				<h5 class="modal-title fw-normal" id="MediaModalLabel">Media</h5>
                 
-				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="关闭">
 				  <!-- <span aria-hidden="true"><i class="la la-times la-lg"></i></span> -->
 				</button>
 			  </div>
@@ -60,7 +60,7 @@ class MediaModal {
 
 							<div class="upload-collapse collapse">
 
-								<button id="upload-close" type="button" class="btn btn-sm btn-light" aria-label="Close" data-bs-toggle="collapse" data-bs-target=".upload-collapse" aria-expanded="true">
+								<button id="upload-close" type="button" class="btn btn-sm btn-light" aria-label="关闭" data-bs-toggle="collapse" data-bs-target=".upload-collapse" aria-expanded="true">
 								   <span aria-hidden="true"><i class="la la-times la-lg"></i></span>
 								</button>
 								
@@ -596,7 +596,7 @@ _
 						//bg = "bg-danger";
 					}
 
-					displayToast(bg, "Delete", data.message ?? data);
+					displayToast(bg, "删除", data.message ?? data);
 				
 					parent.remove();	
 				})
@@ -631,7 +631,7 @@ _
 						//bg = "bg-danger";
 					}
 					
-					displayToast(bg, "Save", data.message ?? data);
+					displayToast(bg, "保存", data.message ?? data);
 				})
 				.catch(error => {
 					console.log(error);
@@ -664,7 +664,7 @@ _
 
 				
 				
-				actions += '<a href="javascript:void(0);" title="Rename" class="btn btn-outline-primary btn-sm border-0 btn-rename"><i class="la la-edit"></i></a> <a href="javascript:void(0);" title="Delete" class="btn btn-outline-danger btn-sm border-0 btn-delete"><i class="la la-trash"></i></a>';
+				actions += '<a href="javascript:void(0);" title="重命名" class="btn btn-outline-primary btn-sm border-0 btn-rename"><i class="la la-edit"></i></a> <a href="javascript:void(0);" title="删除" class="btn btn-outline-danger btn-sm border-0 btn-delete"><i class="la la-trash"></i></a>';
 
 				const event = new CustomEvent("mediaModal:fileActions", {detail: { file: _this.mediaPath + f.path, name, fileType, fileSize, isImage, fileType, actions} });
 				window.dispatchEvent(event);			

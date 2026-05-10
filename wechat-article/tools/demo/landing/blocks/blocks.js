@@ -20,7 +20,7 @@ Vvveb.Blocks.add("contact-form/contact-form-1", {
       </div>
 
 
-      <button type="button" class="btn-close align-middle" data-bs-dismiss="alert" aria-label="Close">
+      <button type="button" class="btn-close align-middle" data-bs-dismiss="alert" aria-label="关闭">
         <span aria-hidden="true">
           <!-- <i class="la la-times"></i> -->
         </span>
@@ -37,7 +37,7 @@ Vvveb.Blocks.add("contact-form/contact-form-1", {
         This is a placeholder for a success message.
       </div>
 
-      <button type="button" class="btn-close align-middle" data-bs-dismiss="alert" aria-label="Close">
+      <button type="button" class="btn-close align-middle" data-bs-dismiss="alert" aria-label="关闭">
         <span aria-hidden="true">
           <!-- <i class="la la-times"></i> -->
         </span>
@@ -54,7 +54,7 @@ Vvveb.Blocks.add("contact-form/contact-form-1", {
         This is a placeholder for a info message.
       </div>
 
-      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="关闭">
         <span aria-hidden="true">
           <!-- <i class="la la-times"></i> -->
         </span>
@@ -65,7 +65,7 @@ Vvveb.Blocks.add("contact-form/contact-form-1", {
 
   <form action="" method="post">
     <input type="hidden" class="form-control" placeholder="First name" name="firstname-empty">
-    <input type="hidden" class="form-control" placeholder="Email" name="csrf" data-v-csrf>
+    <input type="hidden" class="form-control" placeholder="邮件" name="csrf" data-v-csrf>
 
     <div class="row">
       <div class="col">
@@ -78,7 +78,7 @@ Vvveb.Blocks.add("contact-form/contact-form-1", {
 
     <div class="row mt-4">
       <div class="col">
-        <input type="email" class="form-control" placeholder="Email" name="email" required>
+        <input type="email" class="form-control" placeholder="邮件" name="email" required>
       </div>
     </div>
 
@@ -133,7 +133,7 @@ Vvveb.Blocks.add("contact-form/contact-form-1", {
       </div>
 
 
-      <button type="button" class="btn-close align-middle" data-bs-dismiss="alert" aria-label="Close">
+      <button type="button" class="btn-close align-middle" data-bs-dismiss="alert" aria-label="关闭">
         <span aria-hidden="true">
           <!-- <i class="la la-times"></i> -->
         </span>
@@ -150,7 +150,7 @@ Vvveb.Blocks.add("contact-form/contact-form-1", {
         This is a placeholder for a success message.
       </div>
 
-      <button type="button" class="btn-close align-middle" data-bs-dismiss="alert" aria-label="Close">
+      <button type="button" class="btn-close align-middle" data-bs-dismiss="alert" aria-label="关闭">
         <span aria-hidden="true">
           <!-- <i class="la la-times"></i> -->
         </span>
@@ -167,7 +167,7 @@ Vvveb.Blocks.add("contact-form/contact-form-1", {
         This is a placeholder for a info message.
       </div>
 
-      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="关闭">
         <span aria-hidden="true">
           <!-- <i class="la la-times"></i> -->
         </span>
@@ -178,7 +178,7 @@ Vvveb.Blocks.add("contact-form/contact-form-1", {
 
   <form action="" method="post">
     <input type="hidden" class="form-control" placeholder="First name" name="firstname-empty">
-    <input type="hidden" class="form-control" placeholder="Email" name="csrf" data-v-csrf>
+    <input type="hidden" class="form-control" placeholder="邮件" name="csrf" data-v-csrf>
 
     <div class="row">
       <div class="col">
@@ -191,7 +191,7 @@ Vvveb.Blocks.add("contact-form/contact-form-1", {
 
     <div class="row mt-4">
       <div class="col">
-        <input type="email" class="form-control" placeholder="Email" name="email" required>
+        <input type="email" class="form-control" placeholder="邮件" name="email" required>
       </div>
     </div>
 
@@ -247,7 +247,7 @@ Vvveb.Blocks.add("contact-form/contact-form-1", {
       </div>
 
 
-      <button type="button" class="btn-close align-middle" data-bs-dismiss="alert" aria-label="Close">
+      <button type="button" class="btn-close align-middle" data-bs-dismiss="alert" aria-label="关闭">
         <span aria-hidden="true">
           <!-- <i class="la la-times"></i> -->
         </span>
@@ -264,7 +264,7 @@ Vvveb.Blocks.add("contact-form/contact-form-1", {
         This is a placeholder for a success message.
       </div>
 
-      <button type="button" class="btn-close align-middle" data-bs-dismiss="alert" aria-label="Close">
+      <button type="button" class="btn-close align-middle" data-bs-dismiss="alert" aria-label="关闭">
         <span aria-hidden="true">
           <!-- <i class="la la-times"></i> -->
         </span>
@@ -281,7 +281,7 @@ Vvveb.Blocks.add("contact-form/contact-form-1", {
         This is a placeholder for a info message.
       </div>
 
-      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="关闭">
         <span aria-hidden="true">
           <!-- <i class="la la-times"></i> -->
         </span>
@@ -292,7 +292,7 @@ Vvveb.Blocks.add("contact-form/contact-form-1", {
 
   <form action="" method="post">
     <input type="hidden" class="form-control" placeholder="First name" name="firstname-empty">
-    <input type="hidden" class="form-control" placeholder="Email" name="csrf" data-v-csrf>
+    <input type="hidden" class="form-control" placeholder="邮件" name="csrf" data-v-csrf>
 
     <div class="row">
       <div class="col">
@@ -305,7 +305,7 @@ Vvveb.Blocks.add("contact-form/contact-form-1", {
 
     <div class="row mt-4">
       <div class="col">
-        <input type="email" class="form-control" placeholder="Email" name="email" required>
+        <input type="email" class="form-control" placeholder="邮件" name="email" required>
       </div>
     </div>
 
@@ -1467,7 +1467,7 @@ Vvveb.Blocks.add("subscribe/notify-1", {
       </div>
 
 
-      <button type="button" class="btn-close align-middle" data-bs-dismiss="alert" aria-label="Close">
+      <button type="button" class="btn-close align-middle" data-bs-dismiss="alert" aria-label="关闭">
         <span aria-hidden="true">
           <!-- <i class="la la-times"></i> -->
         </span>
@@ -1484,7 +1484,7 @@ Vvveb.Blocks.add("subscribe/notify-1", {
         This is a placeholder for a success message.
       </div>
 
-      <button type="button" class="btn-close align-middle" data-bs-dismiss="alert" aria-label="Close">
+      <button type="button" class="btn-close align-middle" data-bs-dismiss="alert" aria-label="关闭">
         <span aria-hidden="true">
           <!-- <i class="la la-times"></i> -->
         </span>
@@ -1501,7 +1501,7 @@ Vvveb.Blocks.add("subscribe/notify-1", {
         This is a placeholder for a info message.
       </div>
 
-      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="关闭">
         <span aria-hidden="true">
           <!-- <i class="la la-times"></i> -->
         </span>
@@ -1512,7 +1512,7 @@ Vvveb.Blocks.add("subscribe/notify-1", {
 
   <form action="" method="post" data-v-vvveb-action="submit" data-selector="[data-v-component-plugin-newsletter-form='']" data-v-vvveb-on="submit">
     <input type="hidden" class="form-control" placeholder="First name" name="firstname-empty">
-    <input type="hidden" class="form-control" placeholder="Email" name="csrf" data-v-csrf>
+    <input type="hidden" class="form-control" placeholder="邮件" name="csrf" data-v-csrf>
 
 
     <div class="search position-relative d-flex">
@@ -1566,7 +1566,7 @@ Vvveb.Blocks.add("subscribe/notify-1", {
       </div>
 
 
-      <button type="button" class="btn-close align-middle" data-bs-dismiss="alert" aria-label="Close">
+      <button type="button" class="btn-close align-middle" data-bs-dismiss="alert" aria-label="关闭">
         <span aria-hidden="true">
           <!-- <i class="la la-times"></i> -->
         </span>
@@ -1583,7 +1583,7 @@ Vvveb.Blocks.add("subscribe/notify-1", {
         This is a placeholder for a success message.
       </div>
 
-      <button type="button" class="btn-close align-middle" data-bs-dismiss="alert" aria-label="Close">
+      <button type="button" class="btn-close align-middle" data-bs-dismiss="alert" aria-label="关闭">
         <span aria-hidden="true">
           <!-- <i class="la la-times"></i> -->
         </span>
@@ -1600,7 +1600,7 @@ Vvveb.Blocks.add("subscribe/notify-1", {
         This is a placeholder for a info message.
       </div>
 
-      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="关闭">
         <span aria-hidden="true">
           <!-- <i class="la la-times"></i> -->
         </span>
@@ -1611,7 +1611,7 @@ Vvveb.Blocks.add("subscribe/notify-1", {
 
   <form action="" method="post" data-v-vvveb-action="submit" data-selector="[data-v-component-plugin-contact-form-form]" data-v-vvveb-on="submit">
     <input type="hidden" class="form-control" placeholder="First name" name="firstname-empty">
-    <input type="hidden" class="form-control" placeholder="Email" name="csrf" data-v-csrf>
+    <input type="hidden" class="form-control" placeholder="邮件" name="csrf" data-v-csrf>
 
     <div class="row">
       <div class="search position-relative">

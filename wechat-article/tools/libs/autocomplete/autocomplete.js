@@ -303,7 +303,7 @@ function _AutocompleteList(el, options) {
 			
 			list.append(generateElements('<div>\
 				<span>' + text + '</span>\
-				<button type="button" class="btn-close remove-btn" aria-label="Remove"></button>\
+				<button type="button" class="btn-close remove-btn" aria-label="移除"></button>\
 				<input name="' + settings.listName + '[' + value + ']" value="' + value + '" type="hidden">\
 			 </div>')[0]);
 			 autocomplete.value = "";
