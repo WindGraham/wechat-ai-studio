@@ -2838,16 +2838,15 @@ function ensureCanvasHeight(extraBottom) {
 function updateSelectionBox(block) {
 	if (!block) return;
 	var highlight = document.getElementById('highlight-box');
-	if (highlight) {
-		var rect = block.getBoundingClientRect();
-		var iframeLayer = document.getElementById('iframe-layer');
-		var layerRect = iframeLayer ? iframeLayer.getBoundingClientRect() : getCanvas().getBoundingClientRect();
-		highlight.style.display = 'block';
-		highlight.style.top = (rect.top - layerRect.top) + 'px';
-		highlight.style.left = (rect.left - layerRect.left) + 'px';
-		highlight.style.width = rect.width + 'px';
-		highlight.style.height = rect.height + 'px';
-	}
+	if (!highlight) return;
+	var rect = block.getBoundingClientRect();
+	var wrapper = document.getElementById('iframe-wrapper');
+	var wrapperRect = wrapper ? wrapper.getBoundingClientRect() : rect;
+	highlight.style.display = 'block';
+	highlight.style.top = (rect.top - wrapperRect.top + (wrapper ? wrapper.scrollTop : 0)) + 'px';
+	highlight.style.left = (rect.left - wrapperRect.left) + 'px';
+	highlight.style.width = rect.width + 'px';
+	highlight.style.height = rect.height + 'px';
 }
 
 function renderSelectedProperties(block) {
