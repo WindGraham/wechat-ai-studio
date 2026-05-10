@@ -8,7 +8,7 @@ You may obtain a copy of the License at
    http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
+distributed under the License is distributed on an "原样" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
@@ -20,7 +20,7 @@ bgcolorClasses = ["bg-primary", "bg-secondary", "bg-success", "bg-danger", "bg-w
 
 bgcolorSelectOptions = 
 [{
-	value: "Default",
+	value: "默认",
 	text: ""
 }, 
 {
@@ -302,7 +302,7 @@ Vvveb.Components.extend("_base", "_base", {
         data: {
 			options: [{
 				value: "",
-				text: "Default"
+				text: "默认"
 			}, {	
 				value: "100",
 				text: "Thin"
@@ -344,7 +344,7 @@ Vvveb.Components.extend("_base", "_base", {
         data: {
 			options: [{
 				value: "",
-				text: "Default"
+				text: "默认"
 			}, {
 				value: "Arial, Helvetica, sans-serif",
 				text: "Arial"
@@ -511,7 +511,7 @@ Vvveb.Components.extend("_base", "_base", {
         data: {
 			options: [{
 				value: "",
-				text: "Default"
+				text: "默认"
 			}, {	
 				value: "solid",
 				text: "Solid"
@@ -716,7 +716,7 @@ Vvveb.Components.extend("_base", "_base", {
         data: {
 			options: [{
 				value: "",
-				text: "Default"
+				text: "默认"
 			}, {	
 				value: "solid",
 				text: "Solid"
@@ -838,7 +838,7 @@ Vvveb.Components.extend("_base", "_base", {
         data: {
 			options: [{
 				value: "",
-				text: "Default"
+				text: "默认"
 			}, {	
 				value: "repeat-x",
 				text: "repeat-x"
@@ -860,7 +860,7 @@ Vvveb.Components.extend("_base", "_base", {
         data: {
 			options: [{
 				value: "",
-				text: "Default"
+				text: "默认"
 			}, {	
 				value: "contain",
 				text: "contain"
@@ -881,7 +881,7 @@ Vvveb.Components.extend("_base", "_base", {
         data: {
 			options: [{
 				value: "",
-				text: "Default"
+				text: "默认"
 			}, {	
 				value: "center",
 				text: "center"
@@ -905,7 +905,7 @@ Vvveb.Components.extend("_base", "_base", {
         data: {
 			options: [{
 				value: "",
-				text: "Default"
+				text: "默认"
 			}, {	
 				value: "center",
 				text: "center"
@@ -935,7 +935,7 @@ Vvveb.Components.extend("_base", "html/container", {
         data: {
             options: [{
                 value: "container",
-                text: "Default"
+                text: "默认"
             }, {
                 value: "container-fluid",
                 text: "Fluid"
@@ -1101,7 +1101,7 @@ Vvveb.Components.extend("_base", "html/button", {
         data: {
             options: [{
                 value: "btn-default",
-                text: "Default"
+                text: "默认"
             }, {
                 value: "btn-primary",
                 text: "Primary"
@@ -1158,7 +1158,7 @@ Vvveb.Components.extend("_base", "html/button", {
         data: {
             options: [{
                 value: "",
-                text: "Default"
+                text: "默认"
             }, {
                 value: "btn-lg",
                 text: "Large"
@@ -1198,7 +1198,7 @@ Vvveb.Components.extend("_base", "html/buttongroup", {
         data: {
             options: [{
                 value: "",
-                text: "Default"
+                text: "默认"
             }, {
                 value: "btn-group-lg",
                 text: "Large"
@@ -1216,7 +1216,7 @@ Vvveb.Components.extend("_base", "html/buttongroup", {
         data: {
             options: [{
                 value: "",
-                text: "Default"
+                text: "默认"
             }, {
                 value: "btn-group",
                 text: "Horizontal"
@@ -1267,7 +1267,7 @@ Vvveb.Components.extend("_base","html/alert", {
         data: {
             options: [{
                 value: "alert-primary",
-                text: "Default"
+                text: "默认"
             }, {
                 value: "alert-secondary",
                 text: "Secondary"
@@ -1307,7 +1307,7 @@ Vvveb.Components.extend("_base", "html/badge", {
         data: {
             options: [{
                 value: "",
-                text: "Default"
+                text: "默认"
             }, {
                 value: "badge-primary",
                 text: "Primary"
@@ -1409,7 +1409,7 @@ Vvveb.Components.extend("_base", "html/pagination", {
         data: {
             options: [{
                 value: "",
-                text: "Default"
+                text: "默认"
             }, {
                 value: "btn-lg",
                 text: "Large"
@@ -1427,7 +1427,7 @@ Vvveb.Components.extend("_base", "html/pagination", {
         data: {
             options: [{
                 value: "",
-                text: "Default"
+                text: "默认"
             }, {
                 value: "justify-content-center",
                 text: "Center"
@@ -1587,7 +1587,7 @@ Vvveb.Components.extend("_base", "html/navbar", {
         data: {
             options: [{
                 value: "",
-                text: "Default"
+                text: "默认"
             }, {
                 value: "navbar-light",
                 text: "Light"
@@ -1614,7 +1614,7 @@ Vvveb.Components.extend("_base", "html/navbar", {
         data: {
             options: [{
                 value: "",
-                text: "Default"
+                text: "默认"
             }, {
                 value: "fixed-top",
                 text: "Fixed Top"
@@ -1643,7 +1643,7 @@ Vvveb.Components.extend("_base", "html/form", {
         data: {
             options: [{
                 value: "",
-                text: "Default"
+                text: "默认"
             }, {
                 value: "form-search",
                 text: "搜索"
@@ -1957,7 +1957,7 @@ Vvveb.Components.extend("_base", "html/table", {
         inputtype: SelectInput,
         data: {
             options: [{
-				value: "Default",
+				value: "默认",
 				text: ""
 			}, {
 				value: "table-primary",
@@ -2068,7 +2068,7 @@ Vvveb.Components.extend("_base", "html/table", {
                 text: "None"
             }, {
                 value: "thead-default",
-                text: "Default"
+                text: "默认"
             }, {
                 value: "thead-inverse",
                 text: "Inverse"
@@ -2089,13 +2089,13 @@ Vvveb.Components.extend("_base", "html/tablerow", {
         data: {
             options: [{
                 value: "",
-                text: "Default"
+                text: "默认"
             }, {
                 value: "success",
                 text: "Success"
             }, {
                 value: "error",
-                text: "Error"
+                text: "错误"
             }, {
                 value: "warning",
                 text: "Warning"
@@ -2129,13 +2129,13 @@ Vvveb.Components.extend("_base", "html/tablehead", {
         data: {
             options: [{
                 value: "",
-                text: "Default"
+                text: "默认"
             }, {
                 value: "success",
                 text: "Success"
             }, {
                 value: "anger",
-                text: "Error"
+                text: "错误"
             }, {
                 value: "warning",
                 text: "Warning"

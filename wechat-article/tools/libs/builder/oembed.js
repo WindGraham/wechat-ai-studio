@@ -292,7 +292,7 @@ async function getOembed(url, maxwidth = 800, maxheight = 600, silent = false) {
 		 
 		 if (!silent) {
 			 let message = 'Embed error: URL did not match any provider.';
-			 displayToast("bg-danger", "Error", message);
+			 displayToast("bg-danger", "错误", message);
 		 }
 		 
 		 return;
@@ -315,14 +315,14 @@ async function getOembed(url, maxwidth = 800, maxheight = 600, silent = false) {
 
 	 if (!remoteResponse || remoteResponse.status !== 200) {
 		let message = `Embed error: Could not fetch embed URL.`;
-		displayToast("bg-danger", "Error", message);
+		displayToast("bg-danger", "错误", message);
 	 }
 
 	 const json = await remoteResponse.json();
 
 	 if (json.html === undefined) {
 		const message = `Eembed error: ${message}`;
-		displayToast("bg-danger", "Error", message);
+		displayToast("bg-danger", "错误", message);
 		return;
 	 }
 

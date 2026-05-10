@@ -258,7 +258,7 @@ class MediaModal {
 			})
 			.catch(error => {
 				console.log(error.statusText);
-				displayToast("bg-danger", "Error", "Error loading media!");
+				displayToast("bg-danger", "错误", "Error loading media!");
 			});
 		} else {
 			this.goto("");
@@ -567,12 +567,12 @@ _
 						let [response, responseInText] = error;
 						let message = responseInText ?? error.statusText ?? "Error uploading!";
 						Vvveb.MediaModal.hideUploadLoading();						
-						displayToast("bg-danger", "Error", message.substr(0, 200));
+						displayToast("bg-danger", "错误", message.substr(0, 200));
 						if (response.text && !response.bodyUsed) {
 							response.text().then( errorMessage => {
 								let message = errorMessage.substr(0, 200);
 								console.log(message);
-								displayToast("bg-danger", "Error", message);
+								displayToast("bg-danger", "错误", message);
 							});			
 						}			
 					});		
@@ -603,10 +603,10 @@ _
 				.catch(error => {
 					console.log(error);
 					let message = error.statusText ?? "Error deleting file!";
-					displayToast("bg-danger", "Error", message);
+					displayToast("bg-danger", "错误", message);
 					error.text().then( errorMessage => {
 						let message = errorMessage.substr(0, 200);
-						displayToast("bg-danger", "Error", message);
+						displayToast("bg-danger", "错误", message);
 					})	
 				});	
 			}
@@ -635,7 +635,7 @@ _
 				})
 				.catch(error => {
 					console.log(error);
-					displayToast("bg-danger", "Error", "Error renaming file!");
+					displayToast("bg-danger", "错误", "Error renaming file!");
 				});	
 			}
 		}

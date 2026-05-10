@@ -8,7 +8,7 @@ You may obtain a copy of the License at
    http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
+distributed under the License is distributed on an "原样" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
@@ -150,7 +150,7 @@ let delay = (function(){
 function isElement(obj){
    return (typeof obj==="object") &&
       (obj.nodeType===1) && (typeof obj.style === "object") &&
-      (typeof obj.ownerDocument ==="object")/* && obj.tagName != "BODY"*/;
+      (typeof obj.ownerDocument ==="object")/* && obj.tagName != "页面主体"*/;
 }
 
 function generateElements(html) {
@@ -1432,7 +1432,7 @@ Vvveb.Builder = {
 			self.texteditEl = null;
 		}
 
-		if (elementType[1] == "BODY") {
+		if (elementType[1] == "页面主体") {
 			SelectActions.style.display = "none";
 			AddSectionBtn.style.display = "none";
 		} else {
@@ -2379,7 +2379,7 @@ Vvveb.Builder = {
 		})
 		.catch(error => {
 			console.log(error.statusText);
-			displayToast("danger", "Error", "Error saving!");
+			displayToast("danger", "错误", "Error saving!");
 		});
 		/*
 		return $.ajax({
@@ -2397,7 +2397,7 @@ Vvveb.Builder = {
 			
 			displayToast(bg, "保存", data.message ?? data);			
 		}).fail(function (data) {
-			displayToast("danger", "Error", "Error saving!");
+			displayToast("danger", "错误", "Error saving!");
 			alert(data.responseText);
 		});		
 		*/
@@ -2447,10 +2447,10 @@ Vvveb.Builder = {
 
 			if (err.hasOwnProperty('text')) err.text().then( errorMessage => {
 			  	let message = errorMessage.substr(0, 200);
-				displayToast("danger", "Error", message);
+				displayToast("danger", "错误", message);
 			});
 
-			displayToast("danger", "Error", message.substr(0, 200));
+			displayToast("danger", "错误", message.substr(0, 200));
 		});
 	},
 	
@@ -2755,7 +2755,7 @@ Vvveb.Gui = {
 			btn.querySelector(".loading").classList.add("d-none");
 			btn.querySelector(".button-text").classList.remove("d-none");
 			let message = error?.statusText ?? "Error saving!";
-			displayToast("danger", "Error", message);
+			displayToast("danger", "错误", message);
 		});		
 	},
 	
@@ -4100,11 +4100,11 @@ Vvveb.FileManager = {
 				.catch(error => {
 					console.log(error);
 					let message = error.statusText ?? "Error deleting page!";
-					displayToast("danger", "Error", message);
+					displayToast("danger", "错误", message);
 
 					error.text().then( errorMessage => {
 						let message = errorMessage.substr(0, 200);
-						displayToast("danger", "Error", message);
+						displayToast("danger", "错误", message);
 					})					
 				});
 
@@ -4164,11 +4164,11 @@ Vvveb.FileManager = {
 				.catch(error => {
 					console.log(error);
 					let message = error.statusText ?? "Error renaming page!";
-					displayToast("danger", "Error", message);
+					displayToast("danger", "错误", message);
 
 					error.text().then( errorMessage => {
 						let message = errorMessage.substr(0, 200);
-						displayToast("danger", "Error", message);
+						displayToast("danger", "错误", message);
 					})
 				});				
 			}
@@ -4678,7 +4678,7 @@ function launchFullScreen(document) {
 
 let fontList = [{
 	value: "",
-	text: "Default"
+	text: "默认"
 }, {
 	value: "Arial, Helvetica, sans-serif",
 	text: "Arial"

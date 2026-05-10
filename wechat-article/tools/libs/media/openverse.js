@@ -53,7 +53,7 @@ class OpenVerse {
 		})
 		.catch(error => {
 			console.log(error.statusText);
-			displayToast("bg-danger", "Error", "Openverse authentication failed!");
+			displayToast("bg-danger", "错误", "Openverse authentication failed!");
 		});	
 	}
 	
@@ -81,7 +81,7 @@ class OpenVerse {
 		})
 		.catch(error => {
 			console.log(error.statusText);
-			displayToast("bg-danger", "Error", "Openverse error!");
+			displayToast("bg-danger", "错误", "Openverse error!");
 		});
 	}
 }

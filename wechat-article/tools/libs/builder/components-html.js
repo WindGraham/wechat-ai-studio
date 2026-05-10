@@ -8,7 +8,7 @@ You may obtain a copy of the License at
    http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
+distributed under the License is distributed on an "原样" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
@@ -281,7 +281,7 @@ Vvveb.Components.extend("_base", "html/hr", {
         inputtype: SelectInput,
         data: {
             options: [{
-				value: "Default",
+				value: "默认",
 				text: ""
 			}, {
 				value: "border-primary",
@@ -320,7 +320,7 @@ Vvveb.Components.extend("_base", "html/hr", {
         inputtype: SelectInput,
         data: {
             options: [{
-				value: "Default",
+				value: "默认",
 				text: ""
 			}, {
 				value: "border-1",
@@ -347,7 +347,7 @@ Vvveb.Components.extend("_base", "html/hr", {
         inputtype: SelectInput,
         data: {
             options: [{
-				value: "Default",
+				value: "默认",
 				text: ""
 			}, {
 				value: "opacity-25",
@@ -1055,7 +1055,7 @@ Vvveb.Components.extend("_base", "html/form", {
         data: {
             options: [{
                 value: "",
-                text: "Default"
+                text: "默认"
             }, {
                 value: "form-search",
                 text: "搜索"
@@ -1123,13 +1123,13 @@ Vvveb.Components.extend("_base", "html/tablerow", {
         data: {
             options: [{
                 value: "",
-                text: "Default"
+                text: "默认"
             }, {
                 value: "success",
                 text: "Success"
             }, {
                 value: "error",
-                text: "Error"
+                text: "错误"
             }, {
                 value: "warning",
                 text: "Warning"
@@ -1182,13 +1182,13 @@ Vvveb.Components.extend("_base", "html/tablehead", {
         data: {
             options: [{
                 value: "",
-                text: "Default"
+                text: "默认"
             }, {
                 value: "success",
                 text: "Success"
             }, {
                 value: "anger",
-                text: "Error"
+                text: "错误"
             }, {
                 value: "warning",
                 text: "Warning"
@@ -1242,7 +1242,7 @@ Vvveb.Components.extend("_base", "html/table", {
         inputtype: SelectInput,
         data: {
             options: [{
-				value: "Default",
+				value: "默认",
 				text: ""
 			}, {
 				value: "table-primary",
@@ -1347,7 +1347,7 @@ Vvveb.Components.extend("_base", "html/table", {
                 text: "None"
             }, {
                 value: "thead-default",
-                text: "Default"
+                text: "默认"
             }, {
                 value: "thead-inverse",
                 text: "Inverse"

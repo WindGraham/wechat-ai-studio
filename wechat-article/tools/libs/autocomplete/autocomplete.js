@@ -158,7 +158,7 @@ function _AutocompleteInput(el, params) {
 				.then(results)
 				.catch(error => {
 					console.log(error.statusText);
-					//displayToast("bg-danger", "Error", "Error saving!");
+					//displayToast("bg-danger", "错误", "Error saving!");
 				});			
 			}
 			
