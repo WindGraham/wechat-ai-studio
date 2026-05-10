@@ -991,7 +991,7 @@ initSwiper();
 
 </header>`
 });
-	Vvveb.SectionsGroup["Hero"] = ["hero/hero-1","hero/hero-2","hero/hero-3-full","hero/hero-3","hero/hero-4","hero/hero-5","hero/hero-6","hero/hero-7","hero/hero-8","hero/hero-9","hero/hero-10","hero/hero-11","hero/hero-12","hero/hero-13","hero/hero-14","hero/hero-slider"];
+	Vvveb.SectionsGroup["首页横幅"] = ["hero/hero-1","hero/hero-2","hero/hero-3-full","hero/hero-3","hero/hero-4","hero/hero-5","hero/hero-6","hero/hero-7","hero/hero-8","hero/hero-9","hero/hero-10","hero/hero-11","hero/hero-12","hero/hero-13","hero/hero-14","hero/hero-slider"];
 Vvveb.Sections.add("features/features-1", {
     name: "特性1",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/features/features-1-thumb.webp",
@@ -2470,7 +2470,7 @@ Vvveb.Sections.add("features/features-1", {
   </div>
 </section>`
 });
-	Vvveb.SectionsGroup["Features"] = ["features/features-1","features/features-2","features/features-3","features/features-4","features/features-5","features/features-6","features/features-7","features/features-8","features/features-9","features/features-10","features/features-11","features/features-12","features/features-13","features/features-14","features/features-15","features/features-16","features/features-17","features/features-18","features/features-19"];
+	Vvveb.SectionsGroup["特性"] = ["features/features-1","features/features-2","features/features-3","features/features-4","features/features-5","features/features-6","features/features-7","features/features-8","features/features-9","features/features-10","features/features-11","features/features-12","features/features-13","features/features-14","features/features-15","features/features-16","features/features-17","features/features-18","features/features-19"];
 Vvveb.Sections.add("services/services-1", {
     name: "服务1",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/services/services-1-thumb.webp",
@@ -3052,7 +3052,7 @@ Vvveb.Sections.add("services/services-1", {
   </div>
 </section>`
 });
-	Vvveb.SectionsGroup["Services"] = ["services/services-1","services/services-2","services/services-3","services/services-4","services/services-5","services/services-6","services/services-7"];
+	Vvveb.SectionsGroup["服务"] = ["services/services-1","services/services-2","services/services-3","services/services-4","services/services-5","services/services-6","services/services-7"];
 Vvveb.Sections.add("base/1-column", {
     name: "1列",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/base/1-column-thumb.webp",
@@ -3261,7 +3261,7 @@ Vvveb.Sections.add("base/1-column", {
   </div>
 </section>`
 });
-	Vvveb.SectionsGroup["Base"] = ["base/1-column","base/2-columns-ratio","base/2-columns","base/3-columns-ratio","base/3-columns","base/3-grid-left","base/3-grid","base/4-columns","base/4-grid-masonry","base/4-grid","base/6-columns","base/6-grid","base/8-columns","base/12-columns","base/blank"];
+	Vvveb.SectionsGroup["基础"] = ["base/1-column","base/2-columns-ratio","base/2-columns","base/3-columns-ratio","base/3-columns","base/3-grid-left","base/3-grid","base/4-columns","base/4-grid-masonry","base/4-grid","base/6-columns","base/6-grid","base/8-columns","base/12-columns","base/blank"];
 Vvveb.Sections.add("clients/clients-1", {
     name: "客户1",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/clients/clients-1-thumb.webp",
@@ -3322,7 +3322,7 @@ Vvveb.Sections.add("clients/clients-1", {
   </div>
 </section>`
 });
-	Vvveb.SectionsGroup["Clients"] = ["clients/clients-1"];
+	Vvveb.SectionsGroup["客户"] = ["clients/clients-1"];
 Vvveb.Sections.add("contact-form/contact-form-1", {
     name: "联系表单1",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/contact-form/contact-form-1-thumb.webp",
@@ -4749,7 +4749,7 @@ Vvveb.Sections.add("contact-form/contact-form-1", {
   </div>
 </section>`
 });
-	Vvveb.SectionsGroup["Contact form"] = ["contact-form/contact-form-1","contact-form/contact-form-2","contact-form/contact-form-3","contact-form/contact-form-4","contact-form/contact-form-5","contact-form/contact-form-6","contact-form/contact-form-7","contact-form/contact-form-8","contact-form/contact-form-9","contact-form/contact-form-10"];
+	Vvveb.SectionsGroup["联系表单"] = ["contact-form/contact-form-1","contact-form/contact-form-2","contact-form/contact-form-3","contact-form/contact-form-4","contact-form/contact-form-5","contact-form/contact-form-6","contact-form/contact-form-7","contact-form/contact-form-8","contact-form/contact-form-9","contact-form/contact-form-10"];
 Vvveb.Sections.add("counter/counter-1", {
     name: "计数器1",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/counter/counter-1-thumb.webp",
@@ -4871,7 +4871,7 @@ Vvveb.Sections.add("counter/counter-1", {
   </div>
 </section>`
 });
-	Vvveb.SectionsGroup["Counter"] = ["counter/counter-1","counter/counter-2"];
+	Vvveb.SectionsGroup["计数器"] = ["counter/counter-1","counter/counter-2"];
 Vvveb.Sections.add("cta/cta-1", {
     name: "Cta 1",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/cta/cta-1-thumb.webp",
@@ -4957,7 +4957,7 @@ Vvveb.Sections.add("cta/cta-1", {
 
 </section>`
 });
-	Vvveb.SectionsGroup["Cta"] = ["cta/cta-1","cta/cta-2","cta/cta-3"];
+	Vvveb.SectionsGroup["行动号召"] = ["cta/cta-1","cta/cta-2","cta/cta-3"];
 Vvveb.Sections.add("faq/faq-1", {
     name: "Faq 1",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/faq/faq-1-thumb.webp",
@@ -5808,7 +5808,7 @@ Vvveb.Sections.add("faq/faq-1", {
   </div>
 </section>`
 });
-	Vvveb.SectionsGroup["Faq"] = ["faq/faq-1","faq/faq-2","faq/faq-3","faq/faq-4","faq/faq-5","faq/faq-6","faq/faq-7"];
+	Vvveb.SectionsGroup["常见问题"] = ["faq/faq-1","faq/faq-2","faq/faq-3","faq/faq-4","faq/faq-5","faq/faq-6","faq/faq-7"];
 Vvveb.Sections.add("footer/footer-1", {
     name: "页脚1",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/footer/footer-1-thumb.webp",
@@ -8870,7 +8870,7 @@ Vvveb.Sections.add("footer/footer-1", {
 
 </footer>`
 });
-	Vvveb.SectionsGroup["Footer"] = ["footer/footer-1","footer/footer-2","footer/footer-3","footer/footer-4","footer/footer-5","footer/footer-6","footer/footer-7","footer/footer-8","footer/footer-9","footer/footer-10","footer/footer-11","footer/footer-12","footer/footer-13","footer/footer-14","footer/footer-15"];
+	Vvveb.SectionsGroup["页脚"] = ["footer/footer-1","footer/footer-2","footer/footer-3","footer/footer-4","footer/footer-5","footer/footer-6","footer/footer-7","footer/footer-8","footer/footer-9","footer/footer-10","footer/footer-11","footer/footer-12","footer/footer-13","footer/footer-14","footer/footer-15"];
 Vvveb.Sections.add("how-it-works/how-it-works-1", {
     name: "如何运作1",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/how-it-works/how-it-works-1-thumb.webp",
@@ -9214,7 +9214,7 @@ Vvveb.Sections.add("how-it-works/how-it-works-1", {
   </div>
 </section>`
 });
-	Vvveb.SectionsGroup["How it works"] = ["how-it-works/how-it-works-1","how-it-works/how-it-works-2","how-it-works/how-it-works-3","how-it-works/how-it-works-4","how-it-works/how-it-works-5"];
+	Vvveb.SectionsGroup["如何运作"] = ["how-it-works/how-it-works-1","how-it-works/how-it-works-2","how-it-works/how-it-works-3","how-it-works/how-it-works-4","how-it-works/how-it-works-5"];
 Vvveb.Sections.add("navigation/navigation-1", {
     name: "导航1",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/navigation/navigation-1-thumb.webp",
@@ -12291,7 +12291,7 @@ Vvveb.Sections.add("navigation/navigation-1", {
 
 </nav>`
 });
-	Vvveb.SectionsGroup["Navigation"] = ["navigation/navigation-1","navigation/navigation-2","navigation/navigation-3","navigation/navigation-4","navigation/navigation-5","navigation/navigation-6"];
+	Vvveb.SectionsGroup["导航"] = ["navigation/navigation-1","navigation/navigation-2","navigation/navigation-3","navigation/navigation-4","navigation/navigation-5","navigation/navigation-6"];
 Vvveb.Sections.add("portfolio/portfolio-1", {
     name: "作品集1",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/portfolio/portfolio-1-thumb.webp",
@@ -12480,7 +12480,7 @@ Vvveb.Sections.add("portfolio/portfolio-1", {
   </div>
 </section>`
 });
-	Vvveb.SectionsGroup["Portfolio"] = ["portfolio/portfolio-1","portfolio/portfolio-2","portfolio/portfolio-3"];
+	Vvveb.SectionsGroup["作品集"] = ["portfolio/portfolio-1","portfolio/portfolio-2","portfolio/portfolio-3"];
 Vvveb.Sections.add("posts/posts-1", {
     name: "文章1",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/posts/posts-1-thumb.webp",
@@ -13347,7 +13347,7 @@ Vvveb.Sections.add("posts/posts-1", {
   </div>
 </section>`
 });
-	Vvveb.SectionsGroup["Posts"] = ["posts/posts-1","posts/posts-2","posts/posts-3","posts/posts-4","posts/posts-5","posts/posts-6","posts/posts-7"];
+	Vvveb.SectionsGroup["文章"] = ["posts/posts-1","posts/posts-2","posts/posts-3","posts/posts-4","posts/posts-5","posts/posts-6","posts/posts-7"];
 Vvveb.Sections.add("pricing-table/pricing-table-3", {
     name: "价格表3",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/pricing-table/pricing-table-3-thumb.webp",
@@ -15307,7 +15307,7 @@ Vvveb.Sections.add("pricing-table/pricing-table-3", {
   </div>
 </section>`
 });
-	Vvveb.SectionsGroup["Pricing table"] = ["pricing-table/pricing-table-3","pricing-table/pricing-table-4","pricing-table/pricing-table-5","pricing-table/pricing-table-6","pricing-table/pricing-table-7","pricing-table/pricing-table-8","pricing-table/pricing-table-9","pricing-table/pricing-table-10","pricing-table/pricing-table-11","pricing-table/pricing-table-12","pricing-table/pricing-table-13","pricing-table/pricing-table-14"];
+	Vvveb.SectionsGroup["价格表"] = ["pricing-table/pricing-table-3","pricing-table/pricing-table-4","pricing-table/pricing-table-5","pricing-table/pricing-table-6","pricing-table/pricing-table-7","pricing-table/pricing-table-8","pricing-table/pricing-table-9","pricing-table/pricing-table-10","pricing-table/pricing-table-11","pricing-table/pricing-table-12","pricing-table/pricing-table-13","pricing-table/pricing-table-14"];
 Vvveb.Sections.add("products/products-1", {
     name: "产品1",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/products/products-1-thumb.webp",
@@ -16037,7 +16037,7 @@ Vvveb.Sections.add("products/products-1", {
   </div>
 </section>`
 });
-	Vvveb.SectionsGroup["Products"] = ["products/products-1"];
+	Vvveb.SectionsGroup["产品"] = ["products/products-1"];
 Vvveb.Sections.add("showcase/showcase-1", {
     name: "案例展示1",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/showcase/showcase-1-thumb.webp",
@@ -16594,7 +16594,7 @@ Vvveb.Sections.add("showcase/showcase-1", {
   </div>
 </section>`
 });
-	Vvveb.SectionsGroup["Showcase"] = ["showcase/showcase-1","showcase/showcase-2","showcase/showcase-3","showcase/showcase-4","showcase/showcase-5","showcase/showcase-6","showcase/showcase-7","showcase/showcase-8","showcase/showcase-9","showcase/showcase-10","showcase/showcase-11","showcase/showcase-12"];
+	Vvveb.SectionsGroup["案例展示"] = ["showcase/showcase-1","showcase/showcase-2","showcase/showcase-3","showcase/showcase-4","showcase/showcase-5","showcase/showcase-6","showcase/showcase-7","showcase/showcase-8","showcase/showcase-9","showcase/showcase-10","showcase/showcase-11","showcase/showcase-12"];
 Vvveb.Sections.add("subscribe/subscribe-1", {
     name: "订阅1",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/subscribe/subscribe-1-thumb.webp",
@@ -17203,7 +17203,7 @@ Vvveb.Sections.add("subscribe/subscribe-1", {
 
 </section>`
 });
-	Vvveb.SectionsGroup["Subscribe"] = ["subscribe/subscribe-1","subscribe/subscribe-2","subscribe/subscribe-3","subscribe/subscribe-4","subscribe/subscribe-5"];
+	Vvveb.SectionsGroup["订阅"] = ["subscribe/subscribe-1","subscribe/subscribe-2","subscribe/subscribe-3","subscribe/subscribe-4","subscribe/subscribe-5"];
 Vvveb.Sections.add("team/team-1", {
     name: "团队1",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/team/team-1-thumb.webp",
@@ -19307,7 +19307,7 @@ Vvveb.Sections.add("team/team-1", {
   </div>
 </section>`
 });
-	Vvveb.SectionsGroup["Team"] = ["team/team-1","team/team-2","team/team-3","team/team-4","team/team-5","team/team-6","team/team-7","team/team-8","team/team-9","team/team-10","team/team-11","team/team-12","team/team-13","team/team-14","team/team-15"];
+	Vvveb.SectionsGroup["团队"] = ["team/team-1","team/team-2","team/team-3","team/team-4","team/team-5","team/team-6","team/team-7","team/team-8","team/team-9","team/team-10","team/team-11","team/team-12","team/team-13","team/team-14","team/team-15"];
 Vvveb.Sections.add("testimonials/testimonials-1", {
     name: "客户评价1",
     image: Vvveb.themeBaseUrl + "/screenshots/sections/testimonials/testimonials-1-thumb.webp",
@@ -19971,4 +19971,4 @@ Vvveb.Sections.add("testimonials/testimonials-1", {
   </div>
 </section>`
 });
-	Vvveb.SectionsGroup["Testimonials"] = ["testimonials/testimonials-1","testimonials/testimonials-2","testimonials/testimonials-3","testimonials/testimonials-4","testimonials/testimonials-5","testimonials/testimonials-6","testimonials/testimonials-7","testimonials/testimonials-8","testimonials/testimonials-9","testimonials/testimonials-10"];
+	Vvveb.SectionsGroup["客户评价"] = ["testimonials/testimonials-1","testimonials/testimonials-2","testimonials/testimonials-3","testimonials/testimonials-4","testimonials/testimonials-5","testimonials/testimonials-6","testimonials/testimonials-7","testimonials/testimonials-8","testimonials/testimonials-9","testimonials/testimonials-10"];
