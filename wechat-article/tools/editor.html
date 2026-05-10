@@ -939,6 +939,11 @@
 			<div id="add-section-box" class="drag-elements">
 
 				<div class="header">
+					<button class="btn btn-sm btn-outline-secondary border-0 p-1 ms-2 float-end" id="toggle-vvveb-components" 
+						title="显示/隐藏网页组件" onclick="toggleVvvebComponents()" style="font-size:10px;">
+						🔧 展开网页组件
+					</button>
+					<div id="vvveb-tab-header" style="display:none;">
 					<ul class="nav nav-tabs bg-secondary bg-opacity-10" id="box-elements-tabs" role="tablist">
 						<li class="nav-item component-tab">
 							<a class="nav-link px-3 active" id="box-components-tab" data-bs-toggle="tab"
@@ -962,12 +967,9 @@
 							</a>
 						</li>
 					</ul>
+					</div><!-- end vvveb-tab-header -->
 
 					<div class="section-box-actions">
-						<button class="btn btn-sm btn-outline-secondary border-0 p-1 ms-2" id="toggle-vvveb-components" 
-							title="显示/隐藏网页组件" onclick="toggleVvvebComponents()" style="font-size:10px;">
-							🔧 网页组件
-						</button>
 
 						<div id="close-section-btn" class="btn btn-outline-secondary border-0 p-1 py-0 float-end">
 							<i class="la la-times"></i>
@@ -3215,11 +3217,13 @@ setTimeout(function() {
 
 function toggleVvvebComponents() {
 	var panes = document.getElementById('vvveb-tab-panes');
+	var header = document.getElementById('vvveb-tab-header');
 	var btn = document.getElementById('toggle-vvveb-components');
-	if (!panes) return;
+	if (!panes || !header) return;
 	var visible = panes.style.display !== 'none';
 	panes.style.display = visible ? 'none' : '';
-	if (btn) btn.textContent = visible ? '🔧 网页组件' : '✅ 网页组件(已展开)';
+	header.style.display = visible ? 'none' : '';
+	if (btn) btn.textContent = visible ? '🔧 展开网页组件' : '✅ 收起网页组件';
 }
 
 function togglePanel(panelId) {
