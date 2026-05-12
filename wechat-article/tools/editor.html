@@ -4120,6 +4120,14 @@ function resizeMoveListener(event) {
 	if (target.getAttribute('data-type') === 'group') {
 		target.style.height = 'auto';
 		target.style.minHeight = '40px';
+		// Sync child blocks width when group is resized
+		var groupChildren = target.querySelectorAll(':scope > .canvas-block');
+		groupChildren.forEach(function(child) {
+			child.style.width = width + 'px';
+			// Sync inner section width for each child
+			var childInner = child.querySelector(':scope > section');
+			if (childInner) childInner.style.width = width + 'px';
+		});
 	} else {
 		target.style.height = height + 'px';
 		target.style.aspectRatio = width + ' / ' + height;
@@ -4754,7 +4762,23 @@ function groupSelection() {
 	var blocks = getSelectedBlocks();
 	if (blocks.length < 2) return;
 	saveState();
-	var bounds = selectionBounds(blocks);
+	// Flatten nested groups: extract children from any selected group blocks
+	var flatBlocks = [];
+	blocks.forEach(function(block) {
+		if (block.getAttribute('data-type') === 'group') {
+			// Extract children from group, preserving their absolute positions
+			var gx = parseBlockNumber(block, 'left'), gy = parseBlockNumber(block, 'top');
+			Array.from(block.querySelectorAll(':scope > .canvas-block')).forEach(function(child) {
+				child.style.left = (gx + parseBlockNumber(child, 'left')) + 'px';
+				child.style.top = (gy + parseBlockNumber(child, 'top')) + 'px';
+				flatBlocks.push(child);
+			});
+		} else {
+			flatBlocks.push(block);
+		}
+	});
+	if (flatBlocks.length < 2) return;
+	var bounds = selectionBounds(flatBlocks);
 	var group = document.createElement('div');
 	group.className = 'canvas-block';
 	group.id = getNextBlockId();
@@ -4767,7 +4791,7 @@ function groupSelection() {
 	group.setAttribute('data-role', 'group');
 	group.setAttribute('data-ai-note', '组合组件');
 	group.setAttribute('data-lock-ratio', '0');
-	blocks.forEach(function(block) {
+	flatBlocks.forEach(function(block) {
 		block.style.left = (parseBlockNumber(block, 'left') - bounds.left) + 'px';
 		block.style.top = (parseBlockNumber(block, 'top') - bounds.top) + 'px';
 		group.appendChild(block);
@@ -4793,6 +4817,7 @@ function ungroupSelection() {
 				child.style.left = (gx + parseBlockNumber(child, 'left')) + 'px';
 				child.style.top = (gy + parseBlockNumber(child, 'top')) + 'px';
 				getCanvas().appendChild(child);
+				ensureBlockMetadata(child);
 				makeInteractable(child);
 				moved.push(child);
 			});
@@ -5348,6 +5373,41 @@ function buildWorkbenchHTML() {
 	return '<section data-wx-workbench="1" data-wx-version="' + WORKBENCH_VERSION + '" data-mode="canvas" style="width:100%;max-width:375px;margin-left:auto;margin-right:auto;text-align:center;box-sizing:border-box;">\n' + html + '\n</section>';
 }
 
+function cleanBlockForExport(block) {
+	var clone = cleanWechatExportNode(block.cloneNode(true));
+	clone.style.cssText = '';
+	clone.className = '';
+	clone.removeAttribute('id');
+	clone.removeAttribute('data-type');
+	clone.removeAttribute('data-role');
+	clone.removeAttribute('data-ai-note');
+	clone.removeAttribute('data-lock-ratio');
+	clone.removeAttribute('data-catalog-id');
+	clone.removeAttribute('data-source-provider');
+	clone.removeAttribute('data-license-status');
+	clone.removeAttribute('data-wechat-compat');
+	clone.removeAttribute('data-external-asset');
+	clone.removeAttribute('data-x');
+	clone.removeAttribute('data-y');
+	return clone;
+}
+
+function extractGroupContent(groupBlock) {
+	var result = '';
+	var childBlocks = Array.from(groupBlock.querySelectorAll(':scope > .canvas-block'));
+	childBlocks.sort(function(a, b) { return (parseFloat(a.style.top)||0) - (parseFloat(b.style.top)||0); });
+	childBlocks.forEach(function(child) {
+		if (child.getAttribute('data-type') === 'group') {
+			// Recursively extract nested group content
+			result += extractGroupContent(child);
+		} else {
+			var clone = cleanBlockForExport(child);
+			result += clone.innerHTML.trim() + '\n';
+		}
+	});
+	return result;
+}
+
 function buildWechatHTML() {
 	syncWorkbenchDocumentMetadata();
 	var canvas = document.getElementById('block-canvas');
@@ -5356,44 +5416,11 @@ function buildWechatHTML() {
 	blocks.sort(function(a, b) { return (parseFloat(a.style.top)||0) - (parseFloat(b.style.top)||0); });
 	var html = '';
 	blocks.forEach(function(b) {
-		// Handle group blocks: extract child sections directly
+		// Handle group blocks: extract child sections directly (recursively)
 		if (b.getAttribute('data-type') === 'group') {
-			var childBlocks = Array.from(b.querySelectorAll(':scope > .canvas-block'));
-			childBlocks.sort(function(a, b) { return (parseFloat(a.style.top)||0) - (parseFloat(b.style.top)||0); });
-			childBlocks.forEach(function(child) {
-				var clone = cleanWechatExportNode(child.cloneNode(true));
-				clone.style.cssText = '';
-				clone.className = '';
-				clone.removeAttribute('id');
-				clone.removeAttribute('data-type');
-				clone.removeAttribute('data-role');
-				clone.removeAttribute('data-ai-note');
-				clone.removeAttribute('data-lock-ratio');
-				clone.removeAttribute('data-catalog-id');
-				clone.removeAttribute('data-source-provider');
-				clone.removeAttribute('data-license-status');
-				clone.removeAttribute('data-wechat-compat');
-				clone.removeAttribute('data-external-asset');
-				clone.removeAttribute('data-x');
-				clone.removeAttribute('data-y');
-				html += clone.innerHTML.trim() + '\n';
-			});
+			html += extractGroupContent(b);
 		} else {
-			var clone = cleanWechatExportNode(b.cloneNode(true));
-			clone.style.cssText = '';
-			clone.className = '';
-			clone.removeAttribute('id');
-			clone.removeAttribute('data-type');
-			clone.removeAttribute('data-role');
-			clone.removeAttribute('data-ai-note');
-			clone.removeAttribute('data-lock-ratio');
-			clone.removeAttribute('data-catalog-id');
-			clone.removeAttribute('data-source-provider');
-			clone.removeAttribute('data-license-status');
-			clone.removeAttribute('data-wechat-compat');
-			clone.removeAttribute('data-external-asset');
-			clone.removeAttribute('data-x');
-			clone.removeAttribute('data-y');
+			var clone = cleanBlockForExport(b);
 			html += clone.innerHTML.trim() + '\n';
 		}
 	});
