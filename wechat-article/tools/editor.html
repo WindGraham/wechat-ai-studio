@@ -4761,7 +4761,8 @@ function groupSelection() {
 	group.style.left = bounds.left + 'px';
 	group.style.top = bounds.top + 'px';
 	group.style.width = bounds.width + 'px';
-	group.style.height = bounds.height + 'px';
+	group.style.height = 'auto';
+	group.style.minHeight = '40px';
 	group.setAttribute('data-type', 'group');
 	group.setAttribute('data-role', 'group');
 	group.setAttribute('data-ai-note', '组合组件');
@@ -4804,7 +4805,9 @@ function ungroupSelection() {
 				block.id = getNextBlockId();
 				block.style.left = gx + 'px';
 				block.style.top = gy + 'px';
-				block.style.width = CANVAS_WIDTH + 'px';
+				// Preserve original width if available, otherwise use canvas width
+				var childWidth = child.style.width || child.getAttribute('data-flow-width');
+				block.style.width = childWidth ? childWidth : CANVAS_WIDTH + 'px';
 				block.style.height = 'auto';
 				block.style.minHeight = '40px';
 				block.setAttribute('data-type', child.getAttribute('data-wb-type') || 'cell');
@@ -4829,10 +4832,19 @@ function mergeSelection() {
 	if (blocks.length < 2) return;
 	saveState();
 	var bounds = selectionBounds(blocks);
+	// Determine merged type from primary block or first block
+	var primaryBlock = selectedBlock || blocks[0];
+	var mergedType = primaryBlock.getAttribute('data-type') || 'component';
+	// Preserve image type if any block is an image
+	var hasImage = blocks.some(function(block) { return block.getAttribute('data-type') === 'image'; });
+	if (hasImage) mergedType = 'image';
 	var html = blocks.sort(function(a, b) { return parseBlockNumber(a, 'top') - parseBlockNumber(b, 'top'); }).map(function(block) { return cleanWechatExportNode(block.cloneNode(true)).innerHTML; }).join('\n');
 	blocks.forEach(function(block) { block.remove(); });
-	var merged = createCanvasBlock('<section style="box-sizing:border-box;width:100%;">' + html + '</section>', { type: 'component', width: bounds.width });
-	if (merged) { merged.style.left = bounds.left + 'px'; merged.style.top = bounds.top + 'px'; }
+	var merged = createCanvasBlock('<section style="box-sizing:border-box;width:100%;">' + html + '</section>', { type: mergedType, width: bounds.width });
+	if (merged) { 
+		merged.style.left = bounds.left + 'px'; 
+		merged.style.top = bounds.top + 'px'; 
+	}
 	scheduleAutoSave();
 }
 
@@ -5344,22 +5356,46 @@ function buildWechatHTML() {
 	blocks.sort(function(a, b) { return (parseFloat(a.style.top)||0) - (parseFloat(b.style.top)||0); });
 	var html = '';
 	blocks.forEach(function(b) {
-		var clone = cleanWechatExportNode(b.cloneNode(true));
-		clone.style.cssText = '';
-		clone.className = '';
-		clone.removeAttribute('id');
-		clone.removeAttribute('data-type');
-		clone.removeAttribute('data-role');
-		clone.removeAttribute('data-ai-note');
-		clone.removeAttribute('data-lock-ratio');
-		clone.removeAttribute('data-catalog-id');
-		clone.removeAttribute('data-source-provider');
-		clone.removeAttribute('data-license-status');
-		clone.removeAttribute('data-wechat-compat');
-		clone.removeAttribute('data-external-asset');
-		clone.removeAttribute('data-x');
-		clone.removeAttribute('data-y');
-		html += clone.innerHTML.trim() + '\n';
+		// Handle group blocks: extract child sections directly
+		if (b.getAttribute('data-type') === 'group') {
+			var childBlocks = Array.from(b.querySelectorAll(':scope > .canvas-block'));
+			childBlocks.sort(function(a, b) { return (parseFloat(a.style.top)||0) - (parseFloat(b.style.top)||0); });
+			childBlocks.forEach(function(child) {
+				var clone = cleanWechatExportNode(child.cloneNode(true));
+				clone.style.cssText = '';
+				clone.className = '';
+				clone.removeAttribute('id');
+				clone.removeAttribute('data-type');
+				clone.removeAttribute('data-role');
+				clone.removeAttribute('data-ai-note');
+				clone.removeAttribute('data-lock-ratio');
+				clone.removeAttribute('data-catalog-id');
+				clone.removeAttribute('data-source-provider');
+				clone.removeAttribute('data-license-status');
+				clone.removeAttribute('data-wechat-compat');
+				clone.removeAttribute('data-external-asset');
+				clone.removeAttribute('data-x');
+				clone.removeAttribute('data-y');
+				html += clone.innerHTML.trim() + '\n';
+			});
+		} else {
+			var clone = cleanWechatExportNode(b.cloneNode(true));
+			clone.style.cssText = '';
+			clone.className = '';
+			clone.removeAttribute('id');
+			clone.removeAttribute('data-type');
+			clone.removeAttribute('data-role');
+			clone.removeAttribute('data-ai-note');
+			clone.removeAttribute('data-lock-ratio');
+			clone.removeAttribute('data-catalog-id');
+			clone.removeAttribute('data-source-provider');
+			clone.removeAttribute('data-license-status');
+			clone.removeAttribute('data-wechat-compat');
+			clone.removeAttribute('data-external-asset');
+			clone.removeAttribute('data-x');
+			clone.removeAttribute('data-y');
+			html += clone.innerHTML.trim() + '\n';
+		}
 	});
 	return '<section style="width:100%;max-width:375px;margin-left:auto;margin-right:auto;text-align:center;box-sizing:border-box;">\n' + html.trim() + '\n</section>';
 }
