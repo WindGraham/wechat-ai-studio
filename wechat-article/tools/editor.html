@@ -85,6 +85,7 @@
 	.wechat-snap-guide { position: absolute; display: none; pointer-events: none; z-index: 2000; background: var(--wechat-primary); opacity: 0.95; box-shadow: 0 0 0 3px rgba(7,193,96,0.12); }
 	#wechat-snap-v { top: 0; bottom: 0; width: 1px; }
 	#wechat-snap-h { left: 0; right: 0; height: 1px; }
+	#wechat-snap-purple { position: absolute; display: none; pointer-events: none; z-index: 2001; background: #8b5cf6; opacity: 0.95; width: 2px; box-shadow: 0 0 0 4px rgba(139,92,246,0.18); border-radius: 1px; }
 	.wechat-components-section { padding: 12px !important; background: linear-gradient(180deg, #ffffff, #f7fbf8); border-top: 1px solid rgba(7,193,96,0.14) !important; }
 	.wechat-catalog-shell { display: flex; flex-direction: column; gap: 12px; height: calc(100vh - 78px); min-height: 520px; color: var(--wechat-ink); }
 	.wechat-catalog-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
@@ -370,6 +371,11 @@
 									<button class="dropdown-item" onclick="showBatchReplaceModal()">批量替换文字</button>
 									<button class="dropdown-item" onclick="showBatchImageModal()">批量替换图片</button>
 									<button class="dropdown-item" onclick="applyUniformStyle()">批量统一样式</button>
+									<div class="dropdown-divider"></div>
+									<div class="dropdown-header">列布局</div>
+									<button class="dropdown-item" onclick="addColumns(2)">→ 2列</button>
+									<button class="dropdown-item" onclick="addColumns(3)">→ 3列</button>
+									<button class="dropdown-item" onclick="addColumns(4)">→ 4列</button>
 									<div class="dropdown-divider"></div>
 									<button class="dropdown-item" onclick="showShortcutsPanel()">快捷键面板</button>
 								</div>
@@ -3048,7 +3054,13 @@ const TEMPLATES = {
 	blockquote: '<blockquote style="border-left:4px solid #07c160;background:#f0faf3;margin:12px 0;padding:12px 16px;font-size:14px;color:#555;line-height:1.6;">引用文字内容，可以用于突出显示重要信息或引用他人观点。</blockquote>',
 	'boxed-title': '<div style="background:linear-gradient(135deg,#07c160,#05a650);color:#fff;text-align:center;padding:14px 20px;border-radius:6px;margin:12px 0;"><h2 style="font-size:18px;font-weight:700;margin:0;letter-spacing:1px;">框式标题</h2></div>',
 	'circle-decor': '<div style="text-align:center;padding:16px 0;"><div style="display:inline-block;width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,#07c160,#66d9a0);"></div><p style="font-size:13px;color:#999;margin:8px 0 0 0;">圆形装饰</p></div>',
-	'three-images': '<section style="text-align:center;padding:12px 0;font-size:0;"><section style="display:inline-block;width:30%;vertical-align:top;box-sizing:border-box;"><img src="" alt="" style="width:100%;height:auto;border-radius:4px;display:block;"></section><!-- --><section style="display:inline-block;width:30%;vertical-align:top;margin-left:3%;box-sizing:border-box;"><img src="" alt="" style="width:100%;height:auto;border-radius:4px;display:block;"></section><!-- --><section style="display:inline-block;width:30%;vertical-align:top;margin-left:3%;box-sizing:border-box;"><img src="" alt="" style="width:100%;height:auto;border-radius:4px;display:block;"></section></section>'
+	'three-images': '<section style="text-align:center;padding:12px 0;font-size:0;"><section style="display:inline-block;width:30%;vertical-align:top;box-sizing:border-box;"><img src="" alt="" style="width:100%;height:auto;border-radius:4px;display:block;"></section><!-- --><section style="display:inline-block;width:30%;vertical-align:top;margin-left:3%;box-sizing:border-box;"><img src="" alt="" style="width:100%;height:auto;border-radius:4px;display:block;"></section><!-- --><section style="display:inline-block;width:30%;vertical-align:top;margin-left:3%;box-sizing:border-box;"><img src="" alt="" style="width:100%;height:auto;border-radius:4px;display:block;"></section></section>',
+	banner: '<div style="background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;text-align:center;padding:40px 24px;border-radius:12px;margin:12px 0;"><div style="font-size:40px;line-height:1;margin-bottom:16px;">🚀</div><h1 style="font-size:22px;font-weight:700;margin:0 0 8px;line-height:1.4;">横幅标题</h1><p style="font-size:14px;opacity:0.9;margin:0;line-height:1.6;">横幅副标题或简介文字</p></div>',
+	'feature-card': '<div style="background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:24px 20px;margin:12px 0;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,0.04);"><div style="font-size:36px;line-height:1;margin-bottom:12px;">✨</div><h3 style="font-size:17px;font-weight:700;color:#1f2937;margin:0 0 8px;">功能标题</h3><p style="font-size:14px;color:#6b7280;line-height:1.6;margin:0;">功能描述文字，详细说明该功能的特点与优势</p></div>',
+	'step-list': '<div style="padding:16px 0;margin:12px 0;"><div style="display:flex;align-items:flex-start;margin-bottom:20px;"><div style="flex-shrink:0;width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#07c160,#11d879);color:#fff;font-size:16px;font-weight:700;text-align:center;line-height:32px;margin-right:14px;">1</div><div><h4 style="font-size:16px;font-weight:600;color:#1f2937;margin:0 0 4px;">第一步</h4><p style="font-size:14px;color:#6b7280;line-height:1.6;margin:0;">步骤描述文字</p></div></div><div style="display:flex;align-items:flex-start;margin-bottom:20px;"><div style="flex-shrink:0;width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#07c160,#11d879);color:#fff;font-size:16px;font-weight:700;text-align:center;line-height:32px;margin-right:14px;">2</div><div><h4 style="font-size:16px;font-weight:600;color:#1f2937;margin:0 0 4px;">第二步</h4><p style="font-size:14px;color:#6b7280;line-height:1.6;margin:0;">步骤描述文字</p></div></div><div style="display:flex;align-items:flex-start;margin-bottom:20px;"><div style="flex-shrink:0;width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#07c160,#11d879);color:#fff;font-size:16px;font-weight:700;text-align:center;line-height:32px;margin-right:14px;">3</div><div><h4 style="font-size:16px;font-weight:600;color:#1f2937;margin:0 0 4px;">第三步</h4><p style="font-size:14px;color:#6b7280;line-height:1.6;margin:0;">步骤描述文字</p></div></div></div>',
+	'quote-card': '<div style="background:#f8f5ff;border-left:5px solid #8b5cf6;border-radius:0 10px 10px 0;padding:20px 24px;margin:16px 0;"><p style="font-size:16px;color:#4c1d95;line-height:1.75;margin:0;font-style:italic;">"引用的名言或重要观点，用斜体和紫色左边框突出显示，增强视觉层次感。"</p><p style="font-size:13px;color:#8b5cf6;margin:12px 0 0;font-weight:600;">— 引用来源</p></div>',
+	'cta-button': '<div style="text-align:center;padding:24px 16px;margin:16px 0;"><p style="font-size:16px;color:#374151;margin:0 0 16px;line-height:1.6;">准备好了吗？立即开始体验吧！</p><a style="display:inline-block;background:linear-gradient(135deg,#07c160,#11d879);color:#fff;font-size:16px;font-weight:700;padding:14px 40px;border-radius:50px;text-decoration:none;box-shadow:0 6px 20px rgba(7,193,96,0.25);">立即行动</a></div>',
+	'stat-row': '<div style="display:flex;justify-content:space-around;text-align:center;padding:20px 8px;margin:16px 0;flex-wrap:wrap;"><div style="flex:1;min-width:80px;padding:8px;"><div style="font-size:28px;font-weight:800;color:#07c160;line-height:1.2;">99+</div><div style="font-size:12px;color:#6b7280;margin-top:4px;">用户数量</div></div><div style="flex:1;min-width:80px;padding:8px;"><div style="font-size:28px;font-weight:800;color:#07c160;line-height:1.2;">4.9</div><div style="font-size:12px;color:#6b7280;margin-top:4px;">用户评分</div></div><div style="flex:1;min-width:80px;padding:8px;"><div style="font-size:28px;font-weight:800;color:#07c160;line-height:1.2;">100%</div><div style="font-size:12px;color:#6b7280;margin-top:4px;">满意度</div></div></div>'
 };
 
 const EXTERNAL_LIBRARY_SOURCES = [
@@ -3100,7 +3112,10 @@ const MIN_BLOCK_HEIGHT = 20;
 const AUTO_SAVE_KEY = 'wechat-editor-layout-state-v1';
 const WORKBENCH_VERSION = '0.1';
 const SNAP_THRESHOLD = 3;
+const SIDE_SNAP_DISTANCE = 30;
 let autoSaveTimer = null;
+let snapToSideBlock = null;
+let currentDragBlock = null;
 
 function getResizeHandles() {
 	return ['top-left', 'top-center', 'top-right', 'center-left', 'center-right', 'bottom-left', 'bottom-center', 'bottom-right']
@@ -3144,7 +3159,14 @@ function inferRole(type) {
 		blockquote: 'quote',
 		'boxed-title': 'boxed-title',
 		'circle-decor': 'decor',
-		'three-images': 'image-grid'
+		'three-images': 'image-grid',
+		banner: 'banner',
+		'feature-card': 'feature-card',
+		'step-list': 'step-list',
+		'quote-card': 'pull-quote',
+		'cta-button': 'cta',
+		'stat-row': 'stat-row',
+		'flex-row': 'flex-row'
 	}[type] || 'custom-block';
 }
 
@@ -3161,12 +3183,19 @@ function getWorkbenchType(type) {
 		'boxed-title': 'title',
 		'circle-decor': 'decoration',
 		'three-images': 'gallery',
-		group: 'group'
+		group: 'group',
+		'flex-row': 'flex-row',
+		banner: 'banner',
+		'feature-card': 'card',
+		'step-list': 'steps',
+		'quote-card': 'quote',
+		'cta-button': 'cta',
+		'stat-row': 'stats'
 	}[type] || 'raw-html';
 }
 
 function getDefaultLayoutForType(type) {
-	if (type === 'double-column' || type === 'three-images') return 'row';
+	if (type === 'double-column' || type === 'three-images' || type === 'flex-row' || type === 'stat-row') return 'row';
 	if (type === 'group') return 'group';
 	return 'stack';
 }
@@ -3851,6 +3880,7 @@ function ensureSnapGuides() {
 	if (!canvas) return null;
 	var v = document.getElementById('wechat-snap-v');
 	var h = document.getElementById('wechat-snap-h');
+	var p = document.getElementById('wechat-snap-purple');
 	if (!v) {
 		v = document.createElement('div');
 		v.id = 'wechat-snap-v';
@@ -3863,14 +3893,26 @@ function ensureSnapGuides() {
 		h.className = 'wechat-snap-guide';
 		canvas.appendChild(h);
 	}
-	return { v: v, h: h };
+	if (!p) {
+		p = document.createElement('div');
+		p.id = 'wechat-snap-purple';
+		canvas.appendChild(p);
+	}
+	return { v: v, h: h, p: p };
 }
 
 function hideSnapGuides() {
 	var v = document.getElementById('wechat-snap-v');
 	var h = document.getElementById('wechat-snap-h');
+	var p = document.getElementById('wechat-snap-purple');
 	if (v) v.style.display = 'none';
 	if (h) h.style.display = 'none';
+	if (p) p.style.display = 'none';
+}
+
+function hideSnapGuidePurple() {
+	var p = document.getElementById('wechat-snap-purple');
+	if (p) p.style.display = 'none';
 }
 
 function applySnap(target, left, top) {
@@ -3930,6 +3972,7 @@ function applySnap(target, left, top) {
 function dragMoveListener(event) {
 	const target = event.target;
 	const canvas = getCanvas();
+	currentDragBlock = target;
 	var group = getSelectedBlocks();
 	if (group.length > 1 && group.indexOf(target) !== -1) {
 		group.forEach(function(block) {
@@ -3956,6 +3999,39 @@ function dragMoveListener(event) {
 	var snapped = applySnap(target, left, top);
 	left = snapped.left;
 	top = snapped.top;
+
+	// Side-snap detection (drag-to-side)
+	hideSnapGuidePurple();
+	snapToSideBlock = null;
+	var tRight = left + target.offsetWidth;
+	var tVertCenter = top + target.offsetHeight / 2;
+	if (streamMode && target.getAttribute('data-type') !== 'flex-row') {
+		canvas.querySelectorAll(':scope > .canvas-block').forEach(function(block) {
+			if (block === target) return;
+			if (block.getAttribute('data-type') === 'flex-row') return;
+			if (block.getAttribute('data-type') === 'group') return;
+			var bLeft = parseBlockNumber(block, 'left');
+			var bRight = bLeft + block.offsetWidth;
+			var bTop = parseBlockNumber(block, 'top');
+			var bBottom = bTop + block.offsetHeight;
+			// Need vertical overlap
+			if (bBottom < top || bTop > top + target.offsetHeight) return;
+			var distLeft = Math.abs(left - bRight);
+			var distRight = Math.abs(tRight - bLeft);
+			var minDist = Math.min(distLeft, distRight);
+			if (minDist <= SIDE_SNAP_DISTANCE) {
+				snapToSideBlock = block;
+				var guide = document.getElementById('wechat-snap-purple');
+				if (guide) {
+					guide.style.left = (distLeft < distRight ? bRight : bLeft) + 'px';
+					guide.style.top = Math.min(bTop, top) + 'px';
+					guide.style.height = Math.max(bBottom, top + target.offsetHeight) - Math.min(bTop, top) + 'px';
+					guide.style.display = 'block';
+				}
+			}
+		});
+	}
+
 	target.style.left = left + 'px';
 	target.style.top = top + 'px';
 	syncBlockDataset(target);
@@ -4083,7 +4159,7 @@ function makeInteractable(element) {
 			listeners: {
 				start(event) { saveState(); if (getSelectedBlocks().indexOf(element) === -1) selectBlock(element); },
 				move: dragMoveListener,
-				end() { hideSnapGuides(); scheduleAutoSave(); }
+				end() { hideSnapGuides(); if (snapToSideBlock && currentDragBlock && streamMode) { saveState(); createFlexRowGroup(snapToSideBlock, currentDragBlock); snapToSideBlock = null; currentDragBlock = null; } else { scheduleAutoSave(); } }
 			}
 		})
 		.resizable({
@@ -4961,6 +5037,124 @@ function showWechatContextMenu(x, y) {
 	});
 }
 
+function createFlexRowGroup(block1, block2) {
+	var canvas = getCanvas();
+	if (!canvas || !block1 || !block2 || block1 === block2) return;
+	var b1Left = parseBlockNumber(block1, 'left');
+	var b1Top = parseBlockNumber(block1, 'top');
+	var b1Width = block1.offsetWidth;
+	var b1Height = block1.offsetHeight;
+	var b2Left = parseBlockNumber(block2, 'left');
+	var b2Top = parseBlockNumber(block2, 'top');
+	var b2Width = block2.offsetWidth;
+	var b2Height = block2.offsetHeight;
+	var groupLeft = Math.min(b1Left, b2Left);
+	var groupTop = Math.min(b1Top, b2Top);
+	var groupRight = Math.max(b1Left + b1Width, b2Left + b2Width);
+	var groupBottom = Math.max(b1Top + b1Height, b2Top + b2Height);
+	var groupWidth = groupRight - groupLeft;
+	var groupHeight = groupBottom - groupTop;
+	var group = document.createElement('div');
+	group.className = 'canvas-block';
+	group.id = getNextBlockId();
+	group.style.left = groupLeft + 'px';
+	group.style.top = groupTop + 'px';
+	group.style.width = groupWidth + 'px';
+	group.style.height = groupHeight + 'px';
+	group.style.display = 'flex';
+	group.style.flexWrap = 'nowrap';
+	group.style.justifyContent = 'space-between';
+	group.style.alignItems = 'flex-start';
+	group.style.boxSizing = 'border-box';
+	group.style.minHeight = '40px';
+	group.setAttribute('data-type', 'flex-row');
+	group.setAttribute('data-role', 'flex-row');
+	group.setAttribute('data-ai-note', '并排布局');
+	group.setAttribute('data-lock-ratio', '0');
+
+	// Detach first, check parent
+	if (block1.parentElement === canvas) block1.remove();
+	if (block2.parentElement === canvas) block2.remove();
+
+	var cells = [block1, block2];
+	cells.forEach(function(cell) {
+		cell.style.position = 'relative';
+		cell.style.left = '0px';
+		cell.style.top = '0px';
+		cell.style.display = 'inline-block';
+		cell.style.width = '48%';
+		cell.style.verticalAlign = 'top';
+		cell.style.boxSizing = 'border-box';
+		group.appendChild(cell);
+	});
+
+	getCanvas().appendChild(group);
+	ensureBlockMetadata(group);
+	makeInteractable(group);
+	selectBlock(group);
+	scheduleAutoSave();
+	return group;
+}
+
+function addColumns(n) {
+	var canvas = getCanvas();
+	if (!canvas) return;
+	n = parseInt(n, 10) || 2;
+	// Reuse createFlexRowGroup pattern with n cell placeholders
+	var position = getInsertionPosition(CANVAS_WIDTH);
+	saveState();
+	var columnWidth = Math.floor(100 / n) - 0.5;
+	var group = document.createElement('div');
+	group.className = 'canvas-block';
+	group.id = getNextBlockId();
+	group.style.left = position.left + 'px';
+	group.style.top = position.top + 'px';
+	group.style.width = CANVAS_WIDTH + 'px';
+	group.style.height = 'auto';
+	group.style.display = 'flex';
+	group.style.flexWrap = 'nowrap';
+	group.style.justifyContent = 'space-between';
+	group.style.alignItems = 'flex-start';
+	group.style.boxSizing = 'border-box';
+	group.style.minHeight = '60px';
+	group.style.padding = '8px';
+	group.setAttribute('data-type', 'flex-row');
+	group.setAttribute('data-role', 'flex-row');
+	group.setAttribute('data-ai-note', n + '列布局');
+	group.setAttribute('data-lock-ratio', '0');
+	for (var i = 0; i < n; i++) {
+		var cell = document.createElement('div');
+		cell.className = 'canvas-block';
+		cell.id = getNextBlockId();
+		cell.style.position = 'relative';
+		cell.style.left = '0px';
+		cell.style.top = '0px';
+		cell.style.display = 'inline-block';
+		cell.style.width = columnWidth + '%';
+		cell.style.verticalAlign = 'top';
+		cell.style.boxSizing = 'border-box';
+		cell.style.minHeight = '80px';
+		cell.style.background = '#f8faf9';
+		cell.style.borderRadius = '8px';
+		cell.style.padding = '12px';
+		cell.innerHTML = '<p style="font-size:14px;color:#999;text-align:center;margin:0;line-height:80px;">列 ' + (i + 1) + '</p>';
+		cell.setAttribute('data-type', 'text');
+		cell.setAttribute('data-role', 'body-text');
+		cell.setAttribute('data-lock-ratio', '0');
+		ensureBlockMetadata(cell);
+		ensureResizeHandles(cell);
+		makeInteractable(cell);
+		group.appendChild(cell);
+	}
+	getCanvas().appendChild(group);
+	ensureBlockMetadata(group);
+	makeInteractable(group);
+	selectBlock(group);
+	ensureCanvasHeight();
+	scheduleAutoSave();
+	return group;
+}
+
 function addBlock(type) {
 	const template = TEMPLATES[type];
 	if (!template) return;
@@ -4971,12 +5165,16 @@ function addBlock(type) {
 }
 
 function findSelectableChild(block, target) {
-	// Walk up from target to find a direct child section/p/img of the block
+	// Walk up from target to find the deepest content container
+	// Content containers: sections without child sections, or p/img/span itself
 	var el = target;
 	while (el && el !== block) {
-		if (el.parentElement === block && (el.tagName === 'SECTION' || el.tagName === 'P' || el.tagName === 'IMG')) {
-			return el;
+		// If this is a section with no child sections (leaf content section), or p/img/span
+		if (el.tagName === 'SECTION') {
+			var childSections = el.querySelectorAll(':scope > section').length;
+			if (childSections === 0) return el;
 		}
+		if (el.tagName === 'P' || el.tagName === 'IMG') return el;
 		el = el.parentElement;
 	}
 	return null;
@@ -5048,7 +5246,15 @@ document.addEventListener('DOMContentLoaded', function() {
 		{ type: 'text', label: '正文', bg: 'rgb(248,248,246)', color: '#333' },
 		{ type: 'image', label: '图片', bg: 'rgb(200,200,200)', color: '#333' },
 		{ type: 'divider', label: '分割线', bg: 'rgb(150,150,150)', color: '#fff' },
-		{ type: 'component', label: '组件', bg: 'rgb(200,220,210)', color: '#333' }
+		{ type: 'component', label: '组件', bg: 'rgb(200,220,210)', color: '#333' },
+		{ type: 'double-column', label: '双栏', bg: 'rgb(100,150,255)', color: '#fff' },
+		{ type: 'card', label: '卡片', bg: 'rgb(255,200,120)', color: '#333' },
+		{ type: 'banner', label: '横幅', bg: 'rgb(102,126,234)', color: '#fff' },
+		{ type: 'feature-card', label: '特色卡', bg: 'rgb(139,92,246)', color: '#fff' },
+		{ type: 'step-list', label: '步骤', bg: 'rgb(7,193,96)', color: '#fff' },
+		{ type: 'quote-card', label: '引用', bg: 'rgb(139,92,246)', color: '#fff' },
+		{ type: 'cta-button', label: 'CTA', bg: 'rgb(34,197,94)', color: '#fff' },
+		{ type: 'stat-row', label: '数据', bg: 'rgb(59,130,246)', color: '#fff' }
 	];
 	components.forEach(function(c) {
 		var btn = document.createElement('button');
@@ -5065,7 +5271,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 function removeEditorArtifacts(node) {
 	node.querySelectorAll('.resize-handle').forEach(function(h) { h.remove(); });
-	node.querySelectorAll('#wechat-selection-box, #wechat-context-menu, .wechat-snap-guide').forEach(function(el) { el.remove(); });
+	node.querySelectorAll('#wechat-selection-box, #wechat-context-menu, .wechat-snap-guide, #wechat-snap-purple').forEach(function(el) { el.remove(); });
 	node.querySelectorAll('[contenteditable]').forEach(function(el) { el.removeAttribute('contenteditable'); });
 	node.querySelectorAll('.selected, .multi-selected, .grid-visible').forEach(function(el) { el.classList.remove('selected', 'multi-selected', 'grid-visible'); });
 	return node;
