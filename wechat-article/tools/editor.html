@@ -4949,7 +4949,7 @@ function showWechatContextMenu(x, y) {
 			var cr = canvas.getBoundingClientRect();
 			var leftSpace = cr.left - 8;
 			var rightSpace = window.innerWidth - cr.right - 8;
-			var menuX = leftSpace >= mw + 8 ? cr.left - mw - 8 : (rightSpace >= mw + 8 ? cr.right + 8 : Math.max(8, window.innerWidth - mw - 8));
+			var menuX = rightSpace >= mw + 8 ? cr.right + 8 : (leftSpace >= mw + 8 ? cr.left - mw - 8 : Math.max(8, window.innerWidth - mw - 8));
 			var menuY = Math.max(8, Math.min(y, window.innerHeight - mh - 8));
 		} else {
 			var menuX = Math.max(8, Math.min(x, window.innerWidth - mw - 8));
@@ -4970,6 +4970,30 @@ function addBlock(type) {
 	createCanvasBlock(template, { type: type, width: CANVAS_WIDTH, allowEmptyImages: type === 'image' });
 }
 
+function findSelectableChild(block, target) {
+	// Walk up from target to find a direct child section/p/img of the block
+	var el = target;
+	while (el && el !== block) {
+		if (el.parentElement === block && (el.tagName === 'SECTION' || el.tagName === 'P' || el.tagName === 'IMG')) {
+			return el;
+		}
+		el = el.parentElement;
+	}
+	return null;
+}
+
+function selectGroupChild(block, child) {
+	// Clear previous child selection
+	block.querySelectorAll('[data-wb-child-selected]').forEach(function(c) {
+		c.removeAttribute('data-wb-child-selected');
+		c.style.outline = '';
+	});
+	child.setAttribute('data-wb-child-selected', '1');
+	child.style.outline = '2px solid #3b82f6';
+	child.style.outlineOffset = '2px';
+	block.setAttribute('data-selected-child', '1');
+}
+
 document.addEventListener('DOMContentLoaded', function() {
 	const canvas = document.getElementById('block-canvas');
 	ensureWechatInspector();
@@ -4982,7 +5006,14 @@ document.addEventListener('DOMContentLoaded', function() {
 			const block = e.target.closest('.canvas-block');
 			if (block && (e.ctrlKey || e.metaKey)) { toggleBlockSelection(block); return; }
 			if (block && e.shiftKey) toggleBlockSelection(block);
-			else if (block) selectBlock(block);
+			else if (block) {
+				selectBlock(block);
+				// If group, try to select inner child element
+				if (block.getAttribute('data-type') === 'group') {
+					var child = findSelectableChild(block, e.target);
+					if (child) selectGroupChild(block, child);
+				}
+			}
 			else if (!selectionDrag) selectBlock(null);
 		});
 		canvas.addEventListener('mousedown', function(e) {
