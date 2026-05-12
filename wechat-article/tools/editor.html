@@ -2467,7 +2467,7 @@
 <link href="libs/media/media.css" rel="stylesheet">
 <script>
 	window.mediaPath = '../../media';
-	Vvveb.themeBaseUrl = 'demo/landing/';
+	Vvveb.themeBaseUrl = '';
 </script>
 <script src="libs/media/media.js"></script>
 	<!--
@@ -2502,14 +2502,18 @@
 
 
 <!-- sections-->
+<!-- demo sections removed 
 <script src="demo/landing/sections/sections.js"></script>
+-->
 <script src="libs/builder/sections-bootstrap4.js"></script>
 
 <!-- blocks-->
 <script src="libs/builder/blocks-bootstrap4.js"></script>
 
 <!-- styles-->
+<!-- demo styles removed
 <script src="demo/landing/styles/styles.js"></script>
+-->
 
 <!-- plugins -->
 
@@ -3006,21 +3010,28 @@ filterWechatSidePanelGroups();
 let pages = defaultPages;
 
 let firstPage = Object.keys(pages)[0];
-Vvveb.Builder.init(pages[firstPage]["url"], function () {
-	//load code after page is loaded here
+Vvveb.Builder.init('', function () {
+	// no-op: builder initialized without loading demo page
 });
 
 Vvveb.Gui.init();
 Vvveb.FileManager.init();
-Vvveb.SectionList.init();
-Vvveb.StyleList.init();
+// SectionList and StyleList try to load demo files - disabled
+// Vvveb.SectionList.init();
+// Vvveb.StyleList.init();
 Vvveb.TreeList.init();
 Vvveb.Breadcrumb.init();
 Vvveb.CssEditor.init();
 
 Vvveb.FileManager.addPages(pages);
-Vvveb.FileManager.loadPage(pages[firstPage]["name"]);
 Vvveb.Gui.toggleRightColumn(false);
+Vvveb.Breadcrumb.init();
+Vvveb.CssEditor.init();
+
+Vvveb.FileManager.addPages(pages);
+// Vvveb.FileManager.loadPage(pages[firstPage]["name"]);
+Vvveb.Gui.toggleRightColumn(false);
+Vvveb.Breadcrumb.init();
 Vvveb.Breadcrumb.init();
 </script>
 <script>

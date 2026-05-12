@@ -378,7 +378,7 @@ function sectionSeparatorProperties(name, title) {
 			return newElement;
 		},
 		data: {
-			url: Vvveb.baseUrl + "../../resources/svg/separators/{value}/index.html",
+			url: "", // SVG separators resources removed
 			clickElement:"li",
 			insertElement:"svg",
 			elements: 'Loading ...',
