@@ -73,6 +73,8 @@
 	.canvas-block:hover { outline: 1px dashed rgba(7, 193, 96, 0.65); outline-offset: 3px; }
 	.canvas-block.selected { outline: 2px solid var(--wechat-primary); outline-offset: 5px; z-index: 100; box-shadow: 0 12px 28px rgba(7, 193, 96, 0.13); }
 	.canvas-block.multi-selected { outline: 2px dashed #22c55e; outline-offset: 4px; box-shadow: 0 10px 24px rgba(34,197,94,0.10); }
+	.canvas-block[data-expanded="1"] { outline: 2px dashed #3b82f6 !important; outline-offset: 6px; }
+	.canvas-block[data-mini="1"] { outline: 1px solid rgba(59,130,246,0.5); background: rgba(59,130,246,0.04); border-radius: 4px; min-width: 30px; }
 	.canvas-block .resize-handle { position: absolute; background: #fff; border: 2px solid var(--wechat-primary); border-radius: 999px; z-index: 20; opacity: 0; width: 9px; height: 9px; box-shadow: 0 3px 8px rgba(7,193,96,0.28); }
 	.canvas-block:hover .resize-handle { opacity: 0.45; }
 	.canvas-block.selected .resize-handle { opacity: 1; }
@@ -4039,8 +4041,13 @@ function resizeMoveListener(event) {
 	top = Math.max(0, top);
 
 	target.style.width = width + 'px';
-	target.style.height = height + 'px';
-	target.style.aspectRatio = width + ' / ' + height;
+	if (target.getAttribute('data-type') === 'group') {
+		target.style.height = 'auto';
+		target.style.minHeight = '40px';
+	} else {
+		target.style.height = height + 'px';
+		target.style.aspectRatio = width + ' / ' + height;
+	}
 	target.style.left = left + 'px';
 	target.style.top = top + 'px';
 	syncBlockDataset(target);
@@ -4702,16 +4709,42 @@ function ungroupSelection() {
 	var moved = [];
 	groups.forEach(function(group) {
 		var gx = parseBlockNumber(group, 'left'), gy = parseBlockNumber(group, 'top');
-		Array.from(group.querySelectorAll(':scope > .canvas-block')).forEach(function(child) {
-			child.style.left = (gx + parseBlockNumber(child, 'left')) + 'px';
-			child.style.top = (gy + parseBlockNumber(child, 'top')) + 'px';
-			getCanvas().appendChild(child);
-			makeInteractable(child);
-			moved.push(child);
-		});
+		var canvasBlocks = group.querySelectorAll(':scope > .canvas-block');
+		if (canvasBlocks.length > 0) {
+			// Original: nested canvas blocks
+			Array.from(canvasBlocks).forEach(function(child) {
+				child.style.left = (gx + parseBlockNumber(child, 'left')) + 'px';
+				child.style.top = (gy + parseBlockNumber(child, 'top')) + 'px';
+				getCanvas().appendChild(child);
+				makeInteractable(child);
+				moved.push(child);
+			});
+		} else {
+			// Imported: nested <section> children
+			Array.from(group.children).forEach(function(child) {
+				if (child.tagName !== 'SECTION' || child.classList.contains('resize-handle')) return;
+				var block = document.createElement('div');
+				block.className = 'canvas-block';
+				block.id = getNextBlockId();
+				block.style.left = gx + 'px';
+				block.style.top = gy + 'px';
+				block.style.width = CANVAS_WIDTH + 'px';
+				block.style.height = 'auto';
+				block.style.minHeight = '40px';
+				block.setAttribute('data-type', child.getAttribute('data-wb-type') || 'cell');
+				block.setAttribute('data-role', inferRole(block.getAttribute('data-type')));
+				block.setAttribute('data-lock-ratio', '0');
+				block.innerHTML = child.outerHTML;
+				getCanvas().appendChild(block);
+				ensureBlockMetadata(block);
+				ensureResizeHandles(block);
+				makeInteractable(block);
+				moved.push(block);
+			});
+		}
 		group.remove();
 	});
-	setSelectedBlocks(moved, moved[moved.length - 1]);
+	if (moved.length) setSelectedBlocks(moved, moved[moved.length - 1]);
 	scheduleAutoSave();
 }
 
@@ -4794,6 +4827,56 @@ function applyUniformStyle() {
 
 function hideWechatContextMenu() { var menu = document.getElementById('wechat-context-menu'); if (menu) menu.style.display = 'none'; }
 
+function expandGroup() {
+	var block = selectedBlock;
+	if (!block || block.getAttribute('data-type') !== 'group') return;
+	if (block.getAttribute('data-expanded') === '1') return;
+	saveState();
+	// Save original innerHTML for collapse
+	block.setAttribute('data-original-html', block.innerHTML);
+	block.setAttribute('data-expanded', '1');
+	block.style.overflow = 'visible';
+	
+	var sections = block.querySelectorAll(':scope > section');
+	sections.forEach(function(sec, i) {
+		var rect = sec.getBoundingClientRect();
+		var blockRect = block.getBoundingClientRect();
+		var mini = document.createElement('div');
+		mini.className = 'canvas-block';
+		mini.style.position = 'absolute';
+		mini.style.left = (rect.left - blockRect.left) + 'px';
+		mini.style.top = (rect.top - blockRect.top) + 'px';
+		mini.style.width = rect.width + 'px';
+		mini.style.height = rect.height + 'px';
+		mini.style.minHeight = '20px';
+		mini.setAttribute('data-type', sec.getAttribute('data-wb-type') || 'cell');
+		mini.setAttribute('data-role', inferRole(mini.getAttribute('data-type')));
+		mini.setAttribute('data-lock-ratio', '0');
+		mini.setAttribute('data-mini', '1');
+		sec.style.display = 'none';
+		block.appendChild(mini);
+		ensureResizeHandles(mini);
+		makeInteractable(mini);
+	});
+	scheduleAutoSave();
+}
+
+function collapseGroup() {
+	var block = selectedBlock;
+	if (!block || block.getAttribute('data-expanded') !== '1') return;
+	saveState();
+	var original = block.getAttribute('data-original-html');
+	if (original) {
+		block.innerHTML = original;
+	}
+	block.removeAttribute('data-expanded');
+	block.removeAttribute('data-original-html');
+	block.style.overflow = '';
+	ensureResizeHandles(block);
+	makeInteractable(block);
+	scheduleAutoSave();
+}
+
 function runWechatEditAction(action) {
 	var actions = {
 		copySelection: copySelection,
@@ -4827,7 +4910,9 @@ function runWechatEditAction(action) {
 		distributeX: function(){ distributeSelection('x'); },
 		distributeY: function(){ distributeSelection('y'); },
 		matchWidth: function(){ matchSelectionSize('width'); },
-		matchHeight: function(){ matchSelectionSize('height'); }
+		matchHeight: function(){ matchSelectionSize('height'); },
+		expandGroup: expandGroup,
+		collapseGroup: collapseGroup
 	};
 	if (actions[action]) actions[action]();
 }
@@ -4839,7 +4924,7 @@ function showWechatContextMenu(x, y) {
 		menu.id = 'wechat-context-menu';
 		document.body.appendChild(menu);
 	}
-	menu.innerHTML = '<button data-action="copySelection">复制 <span>Ctrl+C</span></button><button data-action="pasteSelection">粘贴 <span>Ctrl+V</span></button><button data-action="duplicateSelection">克隆 <span>Ctrl+D</span></button><button data-action="deleteSelection">删除 <span>Del</span></button><div class="sep"></div><button data-action="alignLeft">左对齐</button><button data-action="alignCenter">水平居中</button><button data-action="alignRight">右对齐</button><button data-action="alignTop">顶部对齐</button><button data-action="alignMiddle">垂直居中</button><button data-action="alignBottom">底部对齐</button><div class="sep"></div><button data-action="groupSelection">组合</button><button data-action="ungroupSelection">取消组合</button><button data-action="mergeSelection">合并为组件</button><button data-action="saveSelectionAsComponent">保存为组件</button><div class="sep"></div><button data-action="copyStyle">复制样式</button><button data-action="pasteStyle">粘贴样式</button><button data-action="showShortcutsPanel">快捷键</button>';
+	menu.innerHTML = '<button data-action="copySelection">复制 <span>Ctrl+C</span></button><button data-action="pasteSelection">粘贴 <span>Ctrl+V</span></button><button data-action="duplicateSelection">克隆 <span>Ctrl+D</span></button><button data-action="deleteSelection">删除 <span>Del</span></button><div class="sep"></div><button data-action="alignLeft">左对齐</button><button data-action="alignCenter">水平居中</button><button data-action="alignRight">右对齐</button><button data-action="alignTop">顶部对齐</button><button data-action="alignMiddle">垂直居中</button><button data-action="alignBottom">底部对齐</button><div class="sep"></div><button data-action="groupSelection">组合</button><button data-action="ungroupSelection">取消组合</button><button data-action="expandGroup">展开组合</button><button data-action="collapseGroup">收起组合</button><button data-action="mergeSelection">合并为组件</button><button data-action="saveSelectionAsComponent">保存为组件</button><div class="sep"></div><button data-action="copyStyle">复制样式</button><button data-action="pasteStyle">粘贴样式</button><button data-action="showShortcutsPanel">快捷键</button>';
 	menu.querySelectorAll('button').forEach(function(btn) {
 		btn.onclick = function() {
 			var action = btn.getAttribute('data-action');
@@ -5741,6 +5826,19 @@ function importXiumiToCanvas(rawHtml) {
 	if (!rootWrapper) return;
 
 	var directChildren = Array.from(rootWrapper.children);
+	
+	// If root has only 1 child that's a group/wrapper, unwrap its children
+	if (directChildren.length === 1 && directChildren[0].tagName === 'SECTION') {
+		var wrapper = directChildren[0];
+		var wrapperType = wrapper.getAttribute('data-wb-type') || '';
+		if (wrapperType === 'group' || wrapperType === 'cell' || wrapperType === 'text' || wrapperType === 'flex-col') {
+			var inner = Array.from(wrapper.children).filter(function(c) { return c.tagName === 'SECTION'; });
+			if (inner.length > 1) {
+				directChildren = inner;
+			}
+		}
+	}
+	
 	var canvas = document.getElementById('block-canvas');
 	if (!canvas) return;
 
@@ -5761,32 +5859,34 @@ function importXiumiToCanvas(rawHtml) {
 		if (dataType === 'cell') {
 			if (child.querySelector('img') && !child.querySelector('p')) dataType = 'image';
 		}
-		block.setAttribute('data-type', dataType);
-		block.setAttribute('data-role', inferRole(dataType));
-		block.setAttribute('data-ai-note', '');
-		block.setAttribute('data-lock-ratio', dataType === 'image' ? '1' : '0');
+		block.setAttribute('data-type', 'group');
+		block.setAttribute('data-role', inferRole('group'));
+		block.setAttribute('data-ai-note', dataType);
+		block.setAttribute('data-lock-ratio', '0');
 		block.innerHTML = child.outerHTML;
 		canvas.appendChild(block);
 		ensureBlockMetadata(block);
 		ensureResizeHandles(block);
 		makeInteractable(block);
+		// Auto-height: remove fixed height, let content flow
+		block.style.height = 'auto';
+		block.style.minHeight = '40px';
 		blocks.push(block);
 	});
 
-	// Reposition after browser renders content
-	requestAnimationFrame(function() {
-		requestAnimationFrame(function() {
-			var top = 20;
-			blocks.forEach(function(block) {
-				block.style.top = top + 'px';
-				top += block.offsetHeight + BLOCK_GAP;
-			});
-			ensureCanvasHeight();
-			syncBlockIdCounter();
-			selectBlock(null);
-			scheduleAutoSave();
+	// Reposition after browser renders content (give time for layout)
+	setTimeout(function() {
+		var top = 20;
+		blocks.forEach(function(block) {
+			var h = block.scrollHeight || block.offsetHeight || 200;
+			block.style.top = top + 'px';
+			top += h + BLOCK_GAP;
 		});
-	});
+		ensureCanvasHeight();
+		syncBlockIdCounter();
+		selectBlock(null);
+		scheduleAutoSave();
+	}, 300);
 
 	return imported;
 }
