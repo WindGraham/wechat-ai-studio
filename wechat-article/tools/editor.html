@@ -4118,16 +4118,7 @@ function resizeMoveListener(event) {
 
 	target.style.width = width + 'px';
 	if (target.getAttribute('data-type') === 'group') {
-		target.style.height = 'auto';
-		target.style.minHeight = '40px';
-		// Sync child blocks width when group is resized
-		var groupChildren = target.querySelectorAll(':scope > .canvas-block');
-		groupChildren.forEach(function(child) {
-			child.style.width = width + 'px';
-			// Sync inner section width for each child
-			var childInner = child.querySelector(':scope > section');
-			if (childInner) childInner.style.width = width + 'px';
-		});
+		target.style.height = height + 'px';
 	} else {
 		target.style.height = height + 'px';
 		target.style.aspectRatio = width + ' / ' + height;
@@ -4762,36 +4753,19 @@ function groupSelection() {
 	var blocks = getSelectedBlocks();
 	if (blocks.length < 2) return;
 	saveState();
-	// Flatten nested groups: extract children from any selected group blocks
-	var flatBlocks = [];
-	blocks.forEach(function(block) {
-		if (block.getAttribute('data-type') === 'group') {
-			// Extract children from group, preserving their absolute positions
-			var gx = parseBlockNumber(block, 'left'), gy = parseBlockNumber(block, 'top');
-			Array.from(block.querySelectorAll(':scope > .canvas-block')).forEach(function(child) {
-				child.style.left = (gx + parseBlockNumber(child, 'left')) + 'px';
-				child.style.top = (gy + parseBlockNumber(child, 'top')) + 'px';
-				flatBlocks.push(child);
-			});
-		} else {
-			flatBlocks.push(block);
-		}
-	});
-	if (flatBlocks.length < 2) return;
-	var bounds = selectionBounds(flatBlocks);
+	var bounds = selectionBounds(blocks);
 	var group = document.createElement('div');
 	group.className = 'canvas-block';
 	group.id = getNextBlockId();
 	group.style.left = bounds.left + 'px';
 	group.style.top = bounds.top + 'px';
 	group.style.width = bounds.width + 'px';
-	group.style.height = 'auto';
-	group.style.minHeight = '40px';
+	group.style.height = bounds.height + 'px';
 	group.setAttribute('data-type', 'group');
 	group.setAttribute('data-role', 'group');
 	group.setAttribute('data-ai-note', '组合组件');
 	group.setAttribute('data-lock-ratio', '0');
-	flatBlocks.forEach(function(block) {
+	blocks.forEach(function(block) {
 		block.style.left = (parseBlockNumber(block, 'left') - bounds.left) + 'px';
 		block.style.top = (parseBlockNumber(block, 'top') - bounds.top) + 'px';
 		group.appendChild(block);
@@ -4812,7 +4786,7 @@ function ungroupSelection() {
 		var gx = parseBlockNumber(group, 'left'), gy = parseBlockNumber(group, 'top');
 		var canvasBlocks = group.querySelectorAll(':scope > .canvas-block');
 		if (canvasBlocks.length > 0) {
-			// Original: nested canvas blocks
+			// Move child blocks out of group, converting to absolute positions
 			Array.from(canvasBlocks).forEach(function(child) {
 				child.style.left = (gx + parseBlockNumber(child, 'left')) + 'px';
 				child.style.top = (gy + parseBlockNumber(child, 'top')) + 'px';
@@ -4820,30 +4794,6 @@ function ungroupSelection() {
 				ensureBlockMetadata(child);
 				makeInteractable(child);
 				moved.push(child);
-			});
-		} else {
-			// Imported: nested <section> children
-			Array.from(group.children).forEach(function(child) {
-				if (child.tagName !== 'SECTION' || child.classList.contains('resize-handle')) return;
-				var block = document.createElement('div');
-				block.className = 'canvas-block';
-				block.id = getNextBlockId();
-				block.style.left = gx + 'px';
-				block.style.top = gy + 'px';
-				// Preserve original width if available, otherwise use canvas width
-				var childWidth = child.style.width || child.getAttribute('data-flow-width');
-				block.style.width = childWidth ? childWidth : CANVAS_WIDTH + 'px';
-				block.style.height = 'auto';
-				block.style.minHeight = '40px';
-				block.setAttribute('data-type', child.getAttribute('data-wb-type') || 'cell');
-				block.setAttribute('data-role', inferRole(block.getAttribute('data-type')));
-				block.setAttribute('data-lock-ratio', '0');
-				block.innerHTML = child.outerHTML;
-				getCanvas().appendChild(block);
-				ensureBlockMetadata(block);
-				ensureResizeHandles(block);
-				makeInteractable(block);
-				moved.push(block);
 			});
 		}
 		group.remove();
