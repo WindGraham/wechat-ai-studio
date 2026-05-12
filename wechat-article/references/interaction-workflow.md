@@ -32,12 +32,12 @@ Only after the user has answered (or explicitly skipped by choosing from the opt
 
 ```text
 Do you want to arrange the layout yourself? You can:
-1. Open the visual drag-and-drop composer to place components
+1. Open the local visual editor to place and fine-tune components
 2. Upload a reference screenshot / template for me to match
 3. Let me decide the layout based on the content
 ```
 
-- Option 1 (composer) → launch `wechat-article/tools/layout-composer.html`; see `references/visual-layout-workflow.md`.
+- Option 1 (visual editor) → launch `wechat-article/tools/editor.html` through `wechat-article/tools/start-editor.py`; see `references/visual-layout-workflow.md` and `references/workbench-html-spec.md`.
 - Option 2 (reference screenshot) → follow the Reference Screenshot Workflow in SKILL.md.
 - Option 3 (AI decides) or no preference → proceed with AI-chosen layout.
 

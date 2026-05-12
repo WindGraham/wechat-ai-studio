@@ -6,6 +6,7 @@
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<meta name="referrer" content="no-referrer">
 
 	<meta name="description" content="">
 	<meta name="author" content="">
@@ -324,6 +325,7 @@
 						<button class="btn btn-outline-secondary px-2 wechat-action-secondary" onclick="exportLayoutJSON()" title="导出布局 JSON，供 AI 继续优化">
 							导出给 AI
 						</button>
+						<button class="btn btn-outline-warning px-2" onclick="showXiumiImportModal()">导入秀米</button>
 						<div class="wechat-edit-toolbar">
 							<button class="btn btn-outline-secondary btn-sm" onclick="duplicateSelection()" title="克隆选中组件 (Ctrl+D)">克隆</button>
 							<button class="btn btn-outline-secondary btn-sm" onclick="deleteSelection()" title="删除选中组件 (Delete)">删除</button>
@@ -5006,11 +5008,19 @@ function buildWechatHTML() {
 function showExportModal(out) {
 	var modal = document.createElement('div');
 	modal.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.6);z-index:10000;display:flex;align-items:center;justify-content:center;';
-	modal.innerHTML = '<div style="background:#fff;border-radius:12px;width:700px;max-width:95vw;max-height:85vh;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,0.3);"><div style="padding:14px 18px;border-bottom:1px solid #ddd;display:flex;justify-content:space-between;align-items:center;"><h3 style="margin:0;font-size:15px;">导出微信 HTML</h3><button id="close-export" style="background:none;border:none;font-size:22px;cursor:pointer;color:#999;">&times;</button></div><div style="padding:16px;flex:1;overflow:auto;"><textarea id="export-ta" readonly style="width:100%;height:420px;border:1px solid #ddd;border-radius:6px;padding:12px;font-family:monospace;font-size:11px;resize:vertical;outline:none;"></textarea></div><div style="padding:12px 18px;border-top:1px solid #ddd;display:flex;justify-content:flex-end;"><button id="copy-export" style="padding:8px 20px;background:#07c160;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:13px;">复制到剪贴板</button></div></div>';
+	modal.innerHTML = '<div style="background:#fff;border-radius:12px;width:700px;max-width:95vw;max-height:85vh;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,0.3);"><div style="padding:14px 18px;border-bottom:1px solid #ddd;display:flex;justify-content:space-between;align-items:center;"><h3 style="margin:0;font-size:15px;">导出微信 HTML</h3><button id="close-export" style="background:none;border:none;font-size:22px;cursor:pointer;color:#999;">&times;</button></div><div style="padding:16px;flex:1;overflow:auto;"><textarea id="export-ta" readonly style="width:100%;height:420px;border:1px solid #ddd;border-radius:6px;padding:12px;font-family:monospace;font-size:11px;resize:vertical;outline:none;"></textarea></div><div style="padding:12px 18px;border-top:1px solid #ddd;display:flex;gap:8px;justify-content:flex-end;"><button id="download-export" style="padding:8px 16px;background:#0f766e;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:13px;">下载文件</button><button id="copy-export" style="padding:8px 20px;background:#07c160;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:13px;">复制到剪贴板</button></div></div>';
 	document.body.appendChild(modal);
 	document.getElementById('export-ta').value = out;
 	document.getElementById('close-export').onclick = function() { modal.remove(); };
 	document.getElementById('copy-export').onclick = function() { navigator.clipboard.writeText(out); };
+	document.getElementById('download-export').onclick = function() {
+		var blob = new Blob([out], {type:'text/html;charset=utf-8'});
+		var url = URL.createObjectURL(blob);
+		var a = document.createElement('a');
+		a.href = url; a.download = 'wechat-article.html';
+		document.body.appendChild(a); a.click();
+		document.body.removeChild(a); URL.revokeObjectURL(url);
+	};
 	modal.addEventListener('click', function(e) { if (e.target === modal) modal.remove(); });
 }
 
@@ -5620,6 +5630,189 @@ function newPage() {
     renderWechatInspector(null);
     clearAutoSavedLayout();
   }
+}
+
+function classifyXiumiSection(style) {
+	var s = (style || '').toLowerCase();
+	var hasFlex = s.indexOf('display:flex') !== -1 || s.indexOf('display: flex') !== -1;
+	var hasInlineBlock = s.indexOf('display:inline-block') !== -1 || s.indexOf('display: inline-block') !== -1;
+	var hasGrid = s.indexOf('display:grid') !== -1 || s.indexOf('display: grid') !== -1;
+	if (hasFlex) {
+		var hasFlowRow = s.indexOf('flex-flow:row') !== -1 || s.indexOf('flex-flow: row') !== -1;
+		var hasFlowCol = s.indexOf('flex-flow:column') !== -1 || s.indexOf('flex-flow: column') !== -1;
+		if (hasFlowRow) return 'flex-row';
+		if (hasFlowCol) return 'flex-col';
+	}
+	if (hasGrid) return 'grid-overlay';
+	if (hasInlineBlock) return 'cell';
+	if (s.indexOf('position:static') !== -1 || s.indexOf('position: static') !== -1) return 'group';
+	if (s.indexOf('font-size') !== -1 || s.indexOf('text-align') !== -1 || s.indexOf('color') !== -1) return 'text';
+	return 'cell';
+}
+
+function importXiumiHTML(rawHtml) {
+	var parser = new DOMParser();
+	var doc = parser.parseFromString(rawHtml, 'text/html');
+
+	var forbidden = doc.querySelectorAll('svg, animate, animateTransform, foreignObject');
+	forbidden.forEach(function(el) { el.remove(); });
+
+	// Add referrerpolicy to all images for Xiumi hotlink protection bypass
+	doc.querySelectorAll('img').forEach(function(img) {
+		img.setAttribute('referrerpolicy', 'no-referrer');
+		img.setAttribute('crossorigin', 'anonymous');
+	});
+
+	var sections = doc.querySelectorAll('section');
+	var counts = {};
+
+	sections.forEach(function(sec) {
+		var style = sec.getAttribute('style') || '';
+		var type = classifyXiumiSection(style);
+
+		if (type === 'text') {
+			var fontSizeMatch = style.match(/font-size\s*:\s*(\d+)/);
+			if (fontSizeMatch && parseInt(fontSizeMatch[1], 10) >= 18) {
+				type = 'title';
+			}
+		}
+
+		if (type === 'cell') {
+			var hasBg = /background-color|background\s*:/.test(style);
+			var hasRadius = /border-radius/.test(style);
+			var hasPadding = /padding/.test(style);
+			var hasChildSections = sec.querySelectorAll('section').length > 0;
+			if (hasBg && hasRadius && hasPadding && hasChildSections) {
+				type = 'card';
+			}
+		}
+
+		if (type === 'cell') {
+			var heightMatch = style.match(/height\s*:\s*(\d+)/);
+			var hasBgColor = /background-color/.test(style);
+			if (heightMatch && parseInt(heightMatch[1], 10) <= 10 && hasBgColor) {
+				type = 'divider';
+			}
+		}
+
+		if (type === 'cell' && /border-radius\s*:\s*999px/.test(style)) {
+			type = 'badge';
+		}
+
+		if (type === 'cell' && sec.children.length === 0 && !sec.innerHTML.trim()) {
+			if (/height/.test(style) && !/background-color/.test(style)) {
+				type = 'spacer';
+			}
+		}
+
+		if (type === 'cell' && sec.querySelector('img') && !sec.querySelector('p')) {
+			type = 'image';
+		}
+
+		sec.setAttribute('data-wb-type', type);
+		counts[type] = (counts[type] || 0) + 1;
+	});
+
+	var rootSection = doc.body.querySelector(':scope > section');
+	var innerHtml = rootSection ? rootSection.innerHTML : doc.body.innerHTML.replace(/^&nbsp;/, '').replace(/<section/, '<section data-wb-type="card"');
+
+	var hasRootWbType = (innerHtml.indexOf('data-wb-type=') !== -1);
+	var result = '<section data-wb-root="1" data-wb-version="2.0" style="width:100%;max-width:375px;margin:0 auto;box-sizing:border-box;font-family:-apple-system,sans-serif;color:#333;font-size:15px;line-height:1.75;">' + innerHtml + '</section>';
+
+	return { html: result, counts: counts };
+}
+
+function importXiumiToCanvas(rawHtml) {
+	var imported = importXiumiHTML(rawHtml);
+	var parser = new DOMParser();
+	var doc = parser.parseFromString(imported.html, 'text/html');
+	var rootWrapper = doc.body.firstElementChild;
+	if (!rootWrapper) return;
+
+	var directChildren = Array.from(rootWrapper.children);
+	var canvas = document.getElementById('block-canvas');
+	if (!canvas) return;
+
+	saveState();
+
+	var top = 0;
+	directChildren.forEach(function(child) {
+		if (child.tagName !== 'SECTION') return;
+		var wbType = child.getAttribute('data-wb-type') || 'cell';
+		var block = document.createElement('div');
+		block.className = 'canvas-block';
+		block.id = getNextBlockId();
+		block.style.width = CANVAS_WIDTH + 'px';
+		block.style.left = '0px';
+		block.style.top = top + 'px';
+		var dataType = wbType;
+		if (dataType === 'cell') {
+			if (child.querySelector('img') && !child.querySelector('p')) dataType = 'image';
+		}
+		block.setAttribute('data-type', dataType);
+		block.setAttribute('data-role', inferRole(dataType));
+		block.setAttribute('data-ai-note', '');
+		block.setAttribute('data-lock-ratio', dataType === 'image' ? '1' : '0');
+		block.innerHTML = child.outerHTML;
+		canvas.appendChild(block);
+		ensureBlockMetadata(block);
+		ensureResizeHandles(block);
+		makeInteractable(block);
+		top += block.offsetHeight || 100;
+		top += BLOCK_GAP;
+	});
+
+	selectBlock(null);
+	ensureCanvasHeight();
+	scheduleAutoSave();
+	return imported;
+}
+
+function showXiumiImportModal() {
+	var modal = document.createElement('div');
+	modal.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.6);z-index:10000;display:flex;align-items:center;justify-content:center;';
+	modal.innerHTML = '<div style="background:#fff;border-radius:13px;width:660px;max-width:95vw;max-height:85vh;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,0.3);"><div style="padding:14px 18px;border-bottom:1px solid #e5e7eb;display:flex;justify-content:space-between;align-items:center;"><h3 style="margin:0;font-size:15px;">导入秀米 HTML 模板</h3><button id="close-xiumi-modal" style="background:none;border:none;font-size:22px;cursor:pointer;color:#999;">&times;</button></div><div style="padding:14px;flex:1;overflow:auto;"><div style="display:flex;gap:8px;align-items:center;margin-bottom:10px;"><input type="file" id="xiumi-file-input" accept=".html,.htm" style="display:none;"><button id="select-xiumi-file" style="padding:8px 16px;background:#f0f7ff;color:#1a73e8;border:1px solid #bae6fd;border-radius:9px;cursor:pointer;font-size:12px;font-weight:700;">选择 HTML 文件</button><span id="xiumi-file-name" style="font-size:11px;color:#6b7280;"></span></div><p style="font-size:12px;color:#6b7280;margin:0 0 8px;">或直接粘贴秀米 HTML 代码：</p><textarea id="xiumi-import-ta" placeholder="在此粘贴秀米 HTML..." style="width:100%;height:280px;border:1px solid #dce4df;border-radius:9px;padding:12px;font-family:monospace;font-size:11px;resize:vertical;outline:none;box-sizing:border-box;"></textarea><div id="xiumi-import-result" style="margin-top:10px;font-size:12px;color:#07c160;display:none;"></div></div><div style="padding:12px 18px;border-top:1px solid #e5e7eb;display:flex;gap:8px;justify-content:flex-end;"><button id="cancel-xiumi-modal" style="padding:8px 16px;background:#f3f4f6;color:#374151;border:1px solid #d1d5db;border-radius:9px;cursor:pointer;font-size:12px;">取消</button><button id="import-xiumi-btn" style="padding:8px 20px;background:linear-gradient(135deg,#07c160,#11d879);color:#fff;border:none;border-radius:9px;cursor:pointer;font-size:12px;font-weight:700;">导入到画布</button></div></div>';
+	document.body.appendChild(modal);
+
+	document.getElementById('close-xiumi-modal').onclick = function() { modal.remove(); };
+	document.getElementById('cancel-xiumi-modal').onclick = function() { modal.remove(); };
+
+	// File picker
+	document.getElementById('select-xiumi-file').onclick = function() { document.getElementById('xiumi-file-input').click(); };
+	document.getElementById('xiumi-file-input').onchange = function(e) {
+		var file = e.target.files[0];
+		if (!file) return;
+		document.getElementById('xiumi-file-name').textContent = file.name;
+		var reader = new FileReader();
+		reader.onload = function(ev) { document.getElementById('xiumi-import-ta').value = ev.target.result; };
+		reader.readAsText(file);
+	};
+
+	document.getElementById('import-xiumi-btn').onclick = function() {
+		var rawHtml = document.getElementById('xiumi-import-ta').value.trim();
+		if (!rawHtml) return;
+		try {
+			var result = importXiumiToCanvas(rawHtml);
+			if (!result) {
+				document.getElementById('xiumi-import-result').textContent = '导入失败：未找到有效的 section 结构。';
+				document.getElementById('xiumi-import-result').style.display = 'block';
+				document.getElementById('xiumi-import-result').style.color = '#be123c';
+				return;
+			}
+			var summary = [];
+			Object.keys(result.counts).forEach(function(k) { summary.push(k + ': ' + result.counts[k]); });
+			document.getElementById('xiumi-import-result').textContent = '导入成功！共 ' + Object.values(result.counts).reduce(function(a,b){return a+b;},0) + ' 个组件：' + summary.join('，');
+			document.getElementById('xiumi-import-result').style.display = 'block';
+			document.getElementById('xiumi-import-result').style.color = '#07c160';
+			setTimeout(function() { modal.remove(); }, 1500);
+		} catch (e) {
+			document.getElementById('xiumi-import-result').textContent = '导入出错：' + (e.message || e);
+			document.getElementById('xiumi-import-result').style.display = 'block';
+			document.getElementById('xiumi-import-result').style.color = '#be123c';
+		}
+	};
+	modal.addEventListener('click', function(e) { if (e.target === modal) modal.remove(); });
+	document.getElementById('xiumi-import-ta').focus();
 }
 </script>
 

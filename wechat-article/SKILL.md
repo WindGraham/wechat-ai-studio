@@ -25,7 +25,7 @@ Treat this skill as a mandatory checklist, not a suggestion. Do NOT skip steps t
 
 0. **Create todo list**: After reading the workflow and understanding the user's content, create a todo list that covers every phase and step below. Mark items as completed only after they are actually done. Do NOT skip steps.
 
-1. **Read required references**: Before generating ANY HTML, read `references/interaction-workflow.md` and `references/formatting-guide.md`.
+1. **Read required references**: Before generating ANY HTML, read `references/interaction-workflow.md` and `references/formatting-guide.md`. If the output will be opened in the local visual workbench, edited by AI again, or round-tripped between flow/canvas views, also read `references/workbench-html-spec.md` and generate Workbench HTML instead of arbitrary paste-only HTML.
 
 2. **Ask first-round style questions** (from `references/interaction-workflow.md`):
    - Color direction / theme
@@ -47,7 +47,7 @@ Treat this skill as a mandatory checklist, not a suggestion. Do NOT skip steps t
    2. Upload a reference screenshot / template for me to match
    3. Let me decide the layout based on the content
    ```
-   - Option 1 → launch `wechat-article/tools/layout-composer.html`; follow `references/visual-layout-workflow.md`.
+   - Option 1 → launch `wechat-article/tools/editor.html` through `wechat-article/tools/start-editor.py`; follow `references/visual-layout-workflow.md` and `references/workbench-html-spec.md`.
    - Option 2 → follow **Reference Screenshot Workflow** below.
    - Option 3 → proceed with AI-chosen layout; do not read `visual-layout-workflow.md`.
 
@@ -59,11 +59,21 @@ Treat this skill as a mandatory checklist, not a suggestion. Do NOT skip steps t
 
 6. **Initialize git in WORK directory**: Before generating HTML, `git init` in the AI's working directory (the actual project folder where the article is being built — NOT inside the skill directory). This ensures version control from the very first draft. Copy any needed scripts from `wechat-article/scripts/` to the working directory before running them. Never modify files inside the skill directory.
 
+6b. **Visual editor service (optional, when user wants browser-based layout control)**: If the user asks to visually edit, drag/drop, fine-tune layout, or use the embedded terminal, start the editor service in the background for the current WORK directory:
+   ```bash
+   python3 wechat-article/tools/start-editor.py --workspace "<WORK_DIR>" --no-browser
+   ```
+   - Tell the user to open `http://127.0.0.1:8080/editor.html`.
+   - The embedded terminal defaults to the user's shell, not `opencode`. If the user wants `opencode`, they can type `opencode` inside the browser terminal, or the AI may start the service with `--opencode` only when explicitly requested.
+   - The PTY cwd, file watcher, and `SAVE_FILE` / `LOAD_FILE` boundaries must be the provided `--workspace` directory.
+   - Keep the service running only while the visual editing task is active. Stop it when the task is complete, when the user asks to stop, or before ending the session if it was started by the AI.
+   - If ports are occupied, either stop stale editor services or choose alternate ports with `--http-port` and `--terminal-port`; when using a non-default terminal port, the launcher will open the correct `?terminalPort=` URL.
+
 ### Phase 1: Layout & Generation
 
 7. **Preflight local images**: Upload local images to appropriate host; leave already-public HTTPS URLs unchanged. See Image Upload Workflow below.
 
-8. **Generate HTML**: Choose layout blocks that fit user preferences and content. Do not default to a long opening image unless the user asked for it. Apply WeChat constraints from `references/wechat-rules.md`. Use basic capabilities first; add refined layout blocks only when they improve the result. See `references/refined-layout-blocks.md`.
+8. **Generate HTML**: Choose layout blocks that fit user preferences and content. Do not default to a long opening image unless the user asked for it. Apply WeChat constraints from `references/wechat-rules.md`. Use basic capabilities first; add refined layout blocks only when they improve the result. See `references/refined-layout-blocks.md`. For visual-editor or AI-round-trip drafts, emit the editable Workbench HTML contract from `references/workbench-html-spec.md`; compile/clean it to final WeChat HTML only at delivery.
 
 9. **Background color handling** (per `references/background-color-guide.md`):
    - Root container: no `background-color` (WeChat forces white)
@@ -319,8 +329,9 @@ Instead of duplicating patterns here, use the reference files organized by capab
 | Decorative patterns (dividers, shapes, transforms) | `references/decorative-patterns.md` | Adding visual flourishes |
 | Background color / dark theme handling | `references/background-color-guide.md` | Colored backgrounds, dark themes |
 | Inline-block layout safety | `references/inline-block-safety.md` | Multi-column layouts |
+| Workbench HTML protocol | `references/workbench-html-spec.md` | Local visual editor, AI round-trip, flow/canvas editing |
 | SVG compatibility | `references/svg-compatibility.md` | User explicitly requests SVG effects |
-| Visual layout composer | `references/visual-layout-workflow.md` | User chooses drag-and-drop composer |
+| Visual editor workflow | `references/visual-layout-workflow.md` | User chooses browser-based visual editing |
 
 ---
 
@@ -395,13 +406,14 @@ Full compatibility matrix in `references/svg-compatibility.md`.
 5. Read `references/image-url-workflow.md` — whenever local images are involved
 6. Read `references/refined-layout-blocks.md` — structural patterns (headers, cards, image grids)
 7. Read `references/decorative-patterns.md` — decorative patterns (dividers, shapes, transforms)
-7. Read `references/screenshot-check.md` — before presenting draft as ready
-10. Read `references/background-color-guide.md` — colored backgrounds or dark themes
-11. Read `references/inline-block-safety.md` — multi-column layouts
-12. Read `references/self-check-workflow.md` — mandatory 3-round self-check before delivery
-11. Read `references/generation-checklist.md` — before returning final HTML
-12. Read `references/svg-compatibility.md` — only when user explicitly requests SVG effects
-13. Read `references/visual-layout-workflow.md` — only when user chooses drag-and-drop composer
+8. Read `references/screenshot-check.md` — before presenting draft as ready
+9. Read `references/background-color-guide.md` — colored backgrounds or dark themes
+10. Read `references/inline-block-safety.md` — multi-column layouts
+11. Read `references/self-check-workflow.md` — mandatory 3-round self-check before delivery
+12. Read `references/workbench-html-spec.md` — when using the visual editor, AI round-trip drafts, or flow/canvas editing
+13. Read `references/generation-checklist.md` — before returning final HTML
+14. Read `references/svg-compatibility.md` — only when user explicitly requests SVG effects
+15. Read `references/visual-layout-workflow.md` — only when user chooses browser-based visual editing
 
 ---
 
