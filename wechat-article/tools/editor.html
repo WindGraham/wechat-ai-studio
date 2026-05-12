@@ -4784,16 +4784,43 @@ function ungroupSelection() {
 	var moved = [];
 	groups.forEach(function(group) {
 		var gx = parseBlockNumber(group, 'left'), gy = parseBlockNumber(group, 'top');
-		var canvasBlocks = group.querySelectorAll(':scope > .canvas-block');
-		if (canvasBlocks.length > 0) {
+		// Get all direct children that are canvas blocks
+		var children = Array.from(group.children).filter(function(child) {
+			return child.classList && child.classList.contains('canvas-block');
+		});
+		if (children.length > 0) {
 			// Move child blocks out of group, converting to absolute positions
-			Array.from(canvasBlocks).forEach(function(child) {
+			children.forEach(function(child) {
 				child.style.left = (gx + parseBlockNumber(child, 'left')) + 'px';
 				child.style.top = (gy + parseBlockNumber(child, 'top')) + 'px';
 				getCanvas().appendChild(child);
 				ensureBlockMetadata(child);
 				makeInteractable(child);
 				moved.push(child);
+			});
+		} else {
+			// If no canvas-block children, try to create blocks from section children
+			var sections = Array.from(group.children).filter(function(child) {
+				return child.tagName === 'SECTION' && !child.classList.contains('resize-handle');
+			});
+			sections.forEach(function(section) {
+				var block = document.createElement('div');
+				block.className = 'canvas-block';
+				block.id = getNextBlockId();
+				block.style.left = gx + 'px';
+				block.style.top = gy + 'px';
+				block.style.width = CANVAS_WIDTH + 'px';
+				block.style.height = 'auto';
+				block.style.minHeight = '40px';
+				block.setAttribute('data-type', 'cell');
+				block.setAttribute('data-role', 'content-card');
+				block.setAttribute('data-lock-ratio', '0');
+				block.appendChild(section);
+				getCanvas().appendChild(block);
+				ensureBlockMetadata(block);
+				ensureResizeHandles(block);
+				makeInteractable(block);
+				moved.push(block);
 			});
 		}
 		group.remove();
