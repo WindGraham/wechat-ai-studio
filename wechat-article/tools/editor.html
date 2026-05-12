@@ -5734,8 +5734,9 @@ function importXiumiToCanvas(rawHtml) {
 	if (!canvas) return;
 
 	saveState();
+	canvas.innerHTML = '';
 
-	var top = 0;
+	var blocks = [];
 	directChildren.forEach(function(child) {
 		if (child.tagName !== 'SECTION') return;
 		var wbType = child.getAttribute('data-wb-type') || 'cell';
@@ -5744,7 +5745,7 @@ function importXiumiToCanvas(rawHtml) {
 		block.id = getNextBlockId();
 		block.style.width = CANVAS_WIDTH + 'px';
 		block.style.left = '0px';
-		block.style.top = top + 'px';
+		block.style.top = '0px';
 		var dataType = wbType;
 		if (dataType === 'cell') {
 			if (child.querySelector('img') && !child.querySelector('p')) dataType = 'image';
@@ -5758,13 +5759,24 @@ function importXiumiToCanvas(rawHtml) {
 		ensureBlockMetadata(block);
 		ensureResizeHandles(block);
 		makeInteractable(block);
-		top += block.offsetHeight || 100;
-		top += BLOCK_GAP;
+		blocks.push(block);
 	});
 
-	selectBlock(null);
-	ensureCanvasHeight();
-	scheduleAutoSave();
+	// Reposition after browser renders content
+	requestAnimationFrame(function() {
+		requestAnimationFrame(function() {
+			var top = 20;
+			blocks.forEach(function(block) {
+				block.style.top = top + 'px';
+				top += block.offsetHeight + BLOCK_GAP;
+			});
+			ensureCanvasHeight();
+			syncBlockIdCounter();
+			selectBlock(null);
+			scheduleAutoSave();
+		});
+	});
+
 	return imported;
 }
 
@@ -5782,9 +5794,24 @@ function showXiumiImportModal() {
 	document.getElementById('xiumi-file-input').onchange = function(e) {
 		var file = e.target.files[0];
 		if (!file) return;
-		document.getElementById('xiumi-file-name').textContent = file.name;
 		var reader = new FileReader();
-		reader.onload = function(ev) { document.getElementById('xiumi-import-ta').value = ev.target.result; };
+		reader.onload = function(ev) {
+			var rawHtml = ev.target.result;
+			try {
+				var result = importXiumiToCanvas(rawHtml);
+				if (result) {
+					var total = Object.values(result.counts).reduce(function(a,b){return a+b;},0);
+					document.getElementById('xiumi-import-result').textContent = '已导入 ' + file.name + '（' + total + ' 个组件）';
+					document.getElementById('xiumi-import-result').style.display = 'block';
+					document.getElementById('xiumi-import-result').style.color = '#07c160';
+					setTimeout(function() { modal.remove(); }, 1200);
+				}
+			} catch (err) {
+				document.getElementById('xiumi-import-result').textContent = '导入出错：' + (err.message || err);
+				document.getElementById('xiumi-import-result').style.display = 'block';
+				document.getElementById('xiumi-import-result').style.color = '#be123c';
+			}
+		};
 		reader.readAsText(file);
 	};
 
