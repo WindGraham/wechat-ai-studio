@@ -4910,9 +4910,7 @@ function runWechatEditAction(action) {
 		distributeX: function(){ distributeSelection('x'); },
 		distributeY: function(){ distributeSelection('y'); },
 		matchWidth: function(){ matchSelectionSize('width'); },
-		matchHeight: function(){ matchSelectionSize('height'); },
-		expandGroup: expandGroup,
-		collapseGroup: collapseGroup
+		matchHeight: function(){ matchSelectionSize('height'); }
 	};
 	if (actions[action]) actions[action]();
 }
@@ -4924,7 +4922,12 @@ function showWechatContextMenu(x, y) {
 		menu.id = 'wechat-context-menu';
 		document.body.appendChild(menu);
 	}
-	menu.innerHTML = '<button data-action="copySelection">复制 <span>Ctrl+C</span></button><button data-action="pasteSelection">粘贴 <span>Ctrl+V</span></button><button data-action="duplicateSelection">克隆 <span>Ctrl+D</span></button><button data-action="deleteSelection">删除 <span>Del</span></button><div class="sep"></div><button data-action="alignLeft">左对齐</button><button data-action="alignCenter">水平居中</button><button data-action="alignRight">右对齐</button><button data-action="alignTop">顶部对齐</button><button data-action="alignMiddle">垂直居中</button><button data-action="alignBottom">底部对齐</button><div class="sep"></div><button data-action="groupSelection">组合</button><button data-action="ungroupSelection">取消组合</button><button data-action="expandGroup">展开组合</button><button data-action="collapseGroup">收起组合</button><button data-action="mergeSelection">合并为组件</button><button data-action="saveSelectionAsComponent">保存为组件</button><div class="sep"></div><button data-action="copyStyle">复制样式</button><button data-action="pasteStyle">粘贴样式</button><button data-action="showShortcutsPanel">快捷键</button>';
+	var selCount = getSelectedBlocks().length;
+	if (selCount >= 2) {
+		menu.innerHTML = '<button data-action="groupSelection">组合</button><button data-action="ungroupSelection">取消组合</button><div class="sep"></div><button data-action="deleteSelection">删除 <span>Del</span></button>';
+	} else {
+		menu.innerHTML = '<button data-action="duplicateSelection">克隆 <span>Ctrl+D</span></button><button data-action="deleteSelection">删除 <span>Del</span></button><div class="sep"></div><button data-action="alignLeft">左对齐</button><button data-action="alignCenter">水平居中</button><button data-action="alignRight">右对齐</button><button data-action="alignTop">顶部对齐</button><button data-action="alignMiddle">垂直居中</button><button data-action="alignBottom">底部对齐</button><div class="sep"></div><button data-action="ungroupSelection">取消组合</button><div class="sep"></div><button data-action="copyStyle">复制样式</button><button data-action="pasteStyle">粘贴样式</button>';
+	}
 	menu.querySelectorAll('button').forEach(function(btn) {
 		btn.onclick = function() {
 			var action = btn.getAttribute('data-action');
@@ -4932,9 +4935,30 @@ function showWechatContextMenu(x, y) {
 			hideWechatContextMenu();
 		};
 	});
-	menu.style.left = Math.min(x, window.innerWidth - 210) + 'px';
-	menu.style.top = Math.min(y, window.innerHeight - 420) + 'px';
+	
+	// Position: measure after render, place outside canvas
 	menu.style.display = 'block';
+	menu.style.visibility = 'hidden';
+	menu.style.left = '0px';
+	menu.style.top = '0px';
+	requestAnimationFrame(function() {
+		var mw = menu.offsetWidth;
+		var mh = menu.offsetHeight;
+		var canvas = document.getElementById('block-canvas');
+		if (canvas) {
+			var cr = canvas.getBoundingClientRect();
+			var leftSpace = cr.left - 8;
+			var rightSpace = window.innerWidth - cr.right - 8;
+			var menuX = leftSpace >= mw + 8 ? cr.left - mw - 8 : (rightSpace >= mw + 8 ? cr.right + 8 : Math.max(8, window.innerWidth - mw - 8));
+			var menuY = Math.max(8, Math.min(y, window.innerHeight - mh - 8));
+		} else {
+			var menuX = Math.max(8, Math.min(x, window.innerWidth - mw - 8));
+			var menuY = Math.max(8, Math.min(y, window.innerHeight - mh - 8));
+		}
+		menu.style.left = menuX + 'px';
+		menu.style.top = menuY + 'px';
+		menu.style.visibility = '';
+	});
 }
 
 function addBlock(type) {
@@ -4954,7 +4978,9 @@ document.addEventListener('DOMContentLoaded', function() {
 	if (canvas) {
 		canvas.addEventListener('click', function(e) {
 			if (suppressCanvasClick) { e.preventDefault(); return; }
+			hideWechatContextMenu();
 			const block = e.target.closest('.canvas-block');
+			if (block && (e.ctrlKey || e.metaKey)) { toggleBlockSelection(block); return; }
 			if (block && e.shiftKey) toggleBlockSelection(block);
 			else if (block) selectBlock(block);
 			else if (!selectionDrag) selectBlock(null);
