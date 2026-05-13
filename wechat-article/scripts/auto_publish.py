@@ -5,6 +5,7 @@ import requests
 import json
 import re
 import os
+import tempfile
 
 DRAFT_ID_FILE = ".wechat_draft_id"
 DIGEST_MAX_LENGTH = 120
@@ -55,29 +56,68 @@ def upload_content_image(access_token, image_url):
     response = requests.get(image_url)
     if response.status_code != 200:
         return None
-    
-    with open("/tmp/content_img.jpg", "wb") as f:
-        f.write(response.content)
-    
-    url = f"https://api.weixin.qq.com/cgi-bin/media/uploadimg?access_token={access_token}"
-    with open("/tmp/content_img.jpg", "rb") as f:
-        files = {"media": f}
-        response = requests.post(url, files=files)
-        data = response.json()
-    
-    return data.get("url")
+
+    suffix = os.path.splitext(image_url.split("?", 1)[0])[1] or ".jpg"
+    with tempfile.NamedTemporaryFile(suffix=suffix, delete=False) as tmp:
+        tmp.write(response.content)
+        tmp_path = tmp.name
+
+    try:
+        url = f"https://api.weixin.qq.com/cgi-bin/media/uploadimg?access_token={access_token}"
+        with open(tmp_path, "rb") as f:
+            files = {"media": f}
+            response = requests.post(url, files=files)
+            data = response.json()
+        return data.get("url")
+    finally:
+        try:
+            os.unlink(tmp_path)
+        except OSError:
+            pass
 
 def process_html_images(access_token, html_content):
-    """Replace all image URLs with WeChat CDN URLs"""
-    img_pattern = r'<img[^>]+src="([^"]+)"'
-    urls = re.findall(img_pattern, html_content)
-    
-    for original_url in urls:
-        if original_url.startswith("http") and "mmbiz.qpic.cn" not in original_url:
-            wechat_url = upload_content_image(access_token, original_url)
-            if wechat_url:
-                html_content = html_content.replace(original_url, wechat_url)
-    
+    """Replace HTML img src and SVG image href URLs with WeChat CDN URLs."""
+    def replace_url_parts(prefix, url, suffix, original):
+        url = (url or "").strip()
+        normalized = url.lower()
+        if not url:
+            return original
+        if normalized.startswith("data:") or normalized.startswith("file:") or normalized.startswith("//"):
+            raise ValueError(f"Unsupported embedded/local image URL for WeChat API publish: {url[:40]}")
+        if normalized.startswith(("http://", "https://")) and "mmbiz.qpic.cn" not in normalized:
+            wechat_url = upload_content_image(access_token, url)
+            if not wechat_url:
+                raise ValueError(f"Failed to upload content image to WeChat CDN: {url}")
+            return f"{prefix}{wechat_url}{suffix}"
+        return original
+
+    def replace_url(match):
+        prefix, url, suffix = match.groups()
+        return replace_url_parts(prefix, url, suffix, match.group(0))
+
+    html_content = re.sub(
+        r'(<img\b[^>]*?\ssrc\s*=\s*["\'])([^"\']+)(["\'])',
+        replace_url,
+        html_content,
+        flags=re.IGNORECASE,
+    )
+
+    def replace_svg_xlink(match):
+        before, quote, url, suffix = match.groups()
+        return replace_url_parts(before + "href=" + quote, url, suffix, match.group(0))
+
+    html_content = re.sub(
+        r'(<image\b[^>]*?\s)xlink:href\s*=\s*(["\'])([^"\']+)(["\'])',
+        replace_svg_xlink,
+        html_content,
+        flags=re.IGNORECASE,
+    )
+    html_content = re.sub(
+        r'(<image\b[^>]*?\shref\s*=\s*["\'])([^"\']+)(["\'])',
+        replace_url,
+        html_content,
+        flags=re.IGNORECASE,
+    )
     return html_content
 
 def create_or_update_draft(access_token, title, content, thumb_source, author, digest=None, media_id=None):

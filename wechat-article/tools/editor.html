@@ -73,8 +73,11 @@
 	.canvas-block:hover { outline: 1px dashed rgba(7, 193, 96, 0.65); outline-offset: 3px; }
 	.canvas-block.selected { outline: 2px solid var(--wechat-primary); outline-offset: 5px; z-index: 100; box-shadow: 0 12px 28px rgba(7, 193, 96, 0.13); }
 	.canvas-block.multi-selected { outline: 2px dashed #22c55e; outline-offset: 4px; box-shadow: 0 10px 24px rgba(34,197,94,0.10); }
-	.canvas-block[data-expanded="1"] { outline: 2px dashed #3b82f6 !important; outline-offset: 6px; }
-	.canvas-block[data-mini="1"] { outline: 1px solid rgba(59,130,246,0.5); background: rgba(59,130,246,0.04); border-radius: 4px; min-width: 30px; }
+	#block-canvas.flow-mode { position: relative; display: block; padding: 0; }
+	#block-canvas.flow-mode .canvas-block { position: relative !important; left: auto !important; top: auto !important; transform: none !important; cursor: default; user-select: text; touch-action: auto; }
+	#block-canvas.flow-mode .canvas-block:hover { outline-color: rgba(59,130,246,0.55); }
+	#block-canvas.flow-mode .canvas-block .resize-handle { display: none !important; }
+	#block-canvas.flow-mode #wechat-selection-box { display: none !important; }
 	.canvas-block .resize-handle { position: absolute; background: #fff; border: 2px solid var(--wechat-primary); border-radius: 999px; z-index: 20; opacity: 0; width: 9px; height: 9px; box-shadow: 0 3px 8px rgba(7,193,96,0.28); }
 	.canvas-block:hover .resize-handle { opacity: 0.45; }
 	.canvas-block.selected .resize-handle { opacity: 1; }
@@ -290,8 +293,14 @@
 
 				<div class="btn-group me-3 wechat-toolbar-main" role="group">
 					<button class="btn btn-light" title="开启/关闭自由拖拽布局" id="designer-mode-btn"
-						data-bs-toggle="button" aria-pressed="false" data-vvveb-action="setDesignerMode" onclick="toggleMode(this)">
-						<i class="la la-hand-rock"></i> 自由布局
+						data-bs-toggle="button" aria-pressed="true" data-vvveb-action="setDesignerMode" onclick="toggleWorkbenchMode(this)">
+						<i class="la la-hand-rock"></i> 自由画布
+					</button>
+					<button class="btn btn-light" title="切换到文档流编辑" id="flow-mode-btn" onclick="setWorkbenchMode('flow')">
+						文档流
+					</button>
+					<button class="btn btn-light" title="递归打散所有选中的组合/行容器" onclick="deepUngroupSelection()">
+						完全解组
 					</button>
 
 					<button class="btn btn-light" title="隐藏编辑面板，预览文章效果" id="preview-btn" type="button" data-bs-toggle="button"
@@ -3105,12 +3114,13 @@ let undoStack = [];
 let redoStack = [];
 const MAX_UNDO = 50;
 let streamMode = true;
+let currentWorkbenchMode = 'canvas';
 const CANVAS_WIDTH = 375;
 const BLOCK_GAP = 20;
 const MIN_BLOCK_WIDTH = 50;
 const MIN_BLOCK_HEIGHT = 20;
 const AUTO_SAVE_KEY = 'wechat-editor-layout-state-v1';
-const WORKBENCH_VERSION = '0.1';
+const WORKBENCH_VERSION = '2.0';
 const SNAP_THRESHOLD = 3;
 const SIDE_SNAP_DISTANCE = 30;
 let autoSaveTimer = null;
@@ -3147,6 +3157,33 @@ function getBlockContentElement(block) {
 	return block.querySelector(':scope > :not(.resize-handle)') || block;
 }
 
+function normalizeWorkbenchType(type) {
+	return {
+		paragraph: 'text',
+		row: 'flex-row',
+		columns: 'flex-row',
+		gallery: 'images',
+		stats: 'card',
+		steps: 'card',
+		quote: 'text',
+		decoration: 'cell',
+		raw: 'cell',
+		'raw-html': 'cell',
+		component: 'card',
+		'double-column': 'flex-row',
+		'three-images': 'images',
+		blockquote: 'text',
+		'boxed-title': 'title',
+		'circle-decor': 'cell',
+		banner: 'card',
+		'feature-card': 'card',
+		'step-list': 'card',
+		'quote-card': 'text',
+		'cta-button': 'card',
+		'stat-row': 'card'
+	}[type] || type || 'cell';
+}
+
 function inferRole(type) {
 	return {
 		title: 'section-title',
@@ -3166,37 +3203,20 @@ function inferRole(type) {
 		'quote-card': 'pull-quote',
 		'cta-button': 'cta',
 		'stat-row': 'stat-row',
-		'flex-row': 'flex-row'
+		'flex-row': 'flex-row',
+		'flex-col': 'flex-col',
+		group: 'group',
+		cell: 'content-card'
 	}[type] || 'custom-block';
 }
 
 function getWorkbenchType(type) {
-	return {
-		title: 'title',
-		text: 'paragraph',
-		card: 'card',
-		component: 'card',
-		image: 'image',
-		divider: 'divider',
-		'double-column': 'row',
-		blockquote: 'quote',
-		'boxed-title': 'title',
-		'circle-decor': 'decoration',
-		'three-images': 'gallery',
-		group: 'group',
-		'flex-row': 'flex-row',
-		banner: 'banner',
-		'feature-card': 'card',
-		'step-list': 'steps',
-		'quote-card': 'quote',
-		'cta-button': 'cta',
-		'stat-row': 'stats'
-	}[type] || 'raw-html';
+	return normalizeWorkbenchType(type);
 }
 
 function getDefaultLayoutForType(type) {
 	if (type === 'double-column' || type === 'three-images' || type === 'flex-row' || type === 'stat-row') return 'row';
-	if (type === 'group') return 'group';
+	if (type === 'group' || type === 'flex-col') return 'group';
 	return 'stack';
 }
 
@@ -3217,10 +3237,15 @@ function syncWorkbenchBlockMetadata(block) {
 	if (!block || !block.classList || !block.classList.contains('canvas-block')) return;
 	var type = block.getAttribute('data-type') || (block.querySelector('img') ? 'image' : 'custom');
 	var bounds = getBlockBounds(block);
+	var wbType = getWorkbenchType(type);
 	block.setAttribute('data-wx-block', '1');
+	block.setAttribute('data-wb-block', '1');
 	block.setAttribute('data-id', block.getAttribute('data-id') || block.id || getNextBlockId());
-	block.setAttribute('data-wx-type', getWorkbenchType(type));
+	block.setAttribute('data-wx-type', wbType);
+	block.setAttribute('data-wb-id', block.getAttribute('data-wb-id') || block.getAttribute('data-id'));
+	block.setAttribute('data-wb-type', wbType);
 	if (!block.getAttribute('data-layout')) block.setAttribute('data-layout', getDefaultLayoutForType(type));
+	if (!block.getAttribute('data-wb-layout')) block.setAttribute('data-wb-layout', block.getAttribute('data-layout'));
 	block.setAttribute('data-flow-order', String(Math.max(0, bounds.y)));
 	if (!block.getAttribute('data-flow-align')) block.setAttribute('data-flow-align', getDefaultFlowAlign(type));
 	block.setAttribute('data-flow-width', Math.min(CANVAS_WIDTH, bounds.width || CANVAS_WIDTH) + 'px');
@@ -3236,7 +3261,10 @@ function syncWorkbenchDocumentMetadata() {
 	if (!canvas) return;
 	canvas.setAttribute('data-wx-workbench', '1');
 	canvas.setAttribute('data-wx-version', WORKBENCH_VERSION);
-	canvas.setAttribute('data-mode', 'canvas');
+	canvas.setAttribute('data-wb-root', '1');
+	canvas.setAttribute('data-wb-version', WORKBENCH_VERSION);
+	canvas.setAttribute('data-mode', currentWorkbenchMode);
+	canvas.setAttribute('data-wb-mode', currentWorkbenchMode);
 	var previousBottom = 0;
 	Array.from(canvas.querySelectorAll(':scope > .canvas-block')).sort(function(a, b) {
 		return parseBlockNumber(a, 'top') - parseBlockNumber(b, 'top');
@@ -3254,7 +3282,8 @@ function syncWorkbenchDocumentMetadata() {
 
 function ensureBlockMetadata(block) {
 	if (!block) return;
-	var type = block.getAttribute('data-type') || (block.querySelector('img') ? 'image' : 'custom');
+	var type = block.getAttribute('data-type') || block.getAttribute('data-wb-type') || (block.querySelector('img') ? 'image' : 'custom');
+	if (type === 'paragraph') type = 'text';
 	block.setAttribute('data-type', type);
 	if (!block.getAttribute('data-role')) block.setAttribute('data-role', inferRole(type));
 	if (!block.hasAttribute('data-ai-note')) block.setAttribute('data-ai-note', '');
@@ -3546,7 +3575,11 @@ function ensureResizeHandles(element) {
 function getCanvasState() {
 	const canvas = document.getElementById('block-canvas');
 	syncWorkbenchDocumentMetadata();
-	return canvas ? canvas.innerHTML : '';
+	return canvas ? JSON.stringify({
+		version: 2,
+		mode: currentWorkbenchMode,
+		canvasHtml: canvas.innerHTML
+	}) : '';
 }
 
 function syncBlockIdCounter() {
@@ -3561,8 +3594,22 @@ function syncBlockIdCounter() {
 function restoreCanvasState(state) {
 	const canvas = document.getElementById('block-canvas');
 	if (!canvas) return;
-	canvas.innerHTML = state;
+	var mode = 'canvas';
+	var html = state || '';
+	try {
+		var parsed = JSON.parse(state);
+		if (parsed && typeof parsed === 'object' && parsed.canvasHtml != null) {
+			html = parsed.canvasHtml;
+			mode = parsed.mode === 'flow' ? 'flow' : 'canvas';
+		}
+	} catch (_) {
+		mode = canvas.getAttribute('data-wb-mode') === 'flow' ? 'flow' : 'canvas';
+	}
+	canvas.innerHTML = html;
 	selectedBlock = null;
+	currentWorkbenchMode = mode;
+	canvas.classList.toggle('flow-mode', mode === 'flow');
+	streamMode = mode !== 'flow';
 	canvas.querySelectorAll('.canvas-block').forEach(function(block) { ensureBlockMetadata(block); makeInteractable(block); });
 	syncBlockIdCounter();
 	ensureCanvasHeight();
@@ -3606,7 +3653,7 @@ function scheduleAutoSave() {
 		try {
 			localStorage.setItem(AUTO_SAVE_KEY, JSON.stringify({
 				savedAt: new Date().toISOString(),
-				canvasHtml: getCanvasState(),
+				state: getCanvasState(),
 				layout: buildLayoutJSON()
 			}));
 		} catch (err) {
@@ -3622,7 +3669,8 @@ function restoreAutoSavedLayout() {
 		var raw = localStorage.getItem(AUTO_SAVE_KEY);
 		if (!raw) return;
 		var data = JSON.parse(raw);
-		if (data && data.canvasHtml) restoreCanvasState(data.canvasHtml);
+		if (data && data.state) restoreCanvasState(data.state);
+		else if (data && data.canvasHtml) restoreCanvasState(data.canvasHtml);
 	} catch (err) {
 		console.warn('Unable to restore auto-saved layout', err);
 	}
@@ -3630,6 +3678,109 @@ function restoreAutoSavedLayout() {
 
 function clearAutoSavedLayout() {
 	localStorage.removeItem(AUTO_SAVE_KEY);
+}
+
+function getSortedTopLevelBlocks() {
+	var canvas = getCanvas();
+	if (!canvas) return [];
+	return Array.from(canvas.querySelectorAll(':scope > .canvas-block')).sort(function(a, b) {
+		var ay = Number(a.getAttribute('data-flow-order')) || parseBlockNumber(a, 'top');
+		var by = Number(b.getAttribute('data-flow-order')) || parseBlockNumber(b, 'top');
+		return ay - by;
+	});
+}
+
+function captureCanvasLayoutMetadata() {
+	getSortedTopLevelBlocks().forEach(function(block) {
+		var bounds = getBlockBounds(block);
+		block.setAttribute('data-canvas-x', String(bounds.x));
+		block.setAttribute('data-canvas-y', String(bounds.y));
+		block.setAttribute('data-canvas-w', String(bounds.width));
+		block.setAttribute('data-canvas-h', String(bounds.height));
+	});
+}
+
+function applyFlowLayoutFromCanvas() {
+	var previousBottom = 0;
+	getSortedTopLevelBlocks().forEach(function(block, index) {
+		ensureBlockMetadata(block);
+		var top = parseBlockNumber(block, 'top');
+		var left = Math.max(0, parseBlockNumber(block, 'left'));
+		var width = Math.min(CANVAS_WIDTH, Math.round(block.offsetWidth || parseFloat(block.style.width) || CANVAS_WIDTH));
+		var right = Math.max(0, CANVAS_WIDTH - left - width);
+		var gap = Math.max(0, top - previousBottom);
+		block.setAttribute('data-flow-order', String((index + 1) * 10));
+		block.setAttribute('data-flow-width', width + 'px');
+		block.setAttribute('data-flow-margin', gap + 'px ' + right + 'px 0 ' + left + 'px');
+		block.style.width = width + 'px';
+		block.style.margin = block.getAttribute('data-flow-margin');
+		block.style.position = 'relative';
+		block.style.transform = '';
+		previousBottom = Math.max(previousBottom, top + Math.round(block.offsetHeight || parseFloat(block.style.height) || 0));
+	});
+}
+
+function captureFlowLayoutAsCanvas() {
+	var canvas = getCanvas();
+	if (!canvas) return;
+	var canvasRect = canvas.getBoundingClientRect();
+	getSortedTopLevelBlocks().forEach(function(block) {
+		var rect = block.getBoundingClientRect();
+		var x = Math.round(rect.left - canvasRect.left + canvas.scrollLeft);
+		var y = Math.round(rect.top - canvasRect.top + canvas.scrollTop);
+		var w = Math.round(rect.width || parseFloat(block.style.width) || CANVAS_WIDTH);
+		var h = Math.round(rect.height || parseFloat(block.style.height) || MIN_BLOCK_HEIGHT);
+		block.setAttribute('data-canvas-x', String(x));
+		block.setAttribute('data-canvas-y', String(y));
+		block.setAttribute('data-canvas-w', String(w));
+		block.setAttribute('data-canvas-h', String(h));
+		block.style.left = clamp(x, 0, CANVAS_WIDTH - Math.min(w, CANVAS_WIDTH)) + 'px';
+		block.style.top = Math.max(0, y) + 'px';
+		block.style.width = Math.min(w, CANVAS_WIDTH) + 'px';
+		if (h > 0) block.style.height = h + 'px';
+		block.style.margin = '';
+		block.style.position = 'absolute';
+	});
+}
+
+function setWorkbenchMode(mode) {
+	mode = mode === 'flow' ? 'flow' : 'canvas';
+	if (mode === currentWorkbenchMode) return;
+	var canvas = getCanvas();
+	if (!canvas) return;
+	saveState();
+	if (currentWorkbenchMode === 'flow' && mode === 'canvas') {
+		captureFlowLayoutAsCanvas();
+		canvas.classList.remove('flow-mode');
+		streamMode = true;
+	} else if (mode === 'flow') {
+		captureCanvasLayoutMetadata();
+		applyFlowLayoutFromCanvas();
+		canvas.classList.add('flow-mode');
+		streamMode = false;
+	} else {
+		canvas.classList.remove('flow-mode');
+		streamMode = true;
+	}
+	currentWorkbenchMode = mode;
+	syncWorkbenchDocumentMetadata();
+	document.querySelectorAll('#block-canvas .canvas-block').forEach(function(block) {
+		makeInteractable(block);
+	});
+	var canvasBtn = document.getElementById('designer-mode-btn');
+	var flowBtn = document.getElementById('flow-mode-btn');
+	if (canvasBtn) {
+		canvasBtn.classList.toggle('active', mode === 'canvas');
+		canvasBtn.setAttribute('aria-pressed', mode === 'canvas' ? 'true' : 'false');
+		canvasBtn.innerHTML = mode === 'canvas' ? '<i class="la la-hand-rock"></i> 自由画布' : '<i class="la la-hand-rock"></i> 切回自由';
+	}
+	if (flowBtn) flowBtn.classList.toggle('active', mode === 'flow');
+	ensureCanvasHeight();
+	scheduleAutoSave();
+}
+
+function toggleWorkbenchMode(btn) {
+	setWorkbenchMode(currentWorkbenchMode === 'canvas' ? 'flow' : 'canvas');
 }
 
 function ensureWechatInspector() {
@@ -3720,14 +3871,17 @@ function bindWechatInspector(panel, block) {
 				selectedBlock = null;
 				renderWechatInspector(null);
 			} else if (action === 'duplicate') {
+				var canvas = getCanvas();
+				if (!canvas) return;
 				var clone = block.cloneNode(true);
 				clone.id = getNextBlockId();
 				clone.removeAttribute('data-id');
 				clone.style.left = (parseBlockNumber(block, 'left') + 12) + 'px';
 				clone.style.top = (parseBlockNumber(block, 'top') + 12) + 'px';
-				getCanvas().appendChild(clone);
+				canvas.appendChild(clone);
 				ensureBlockMetadata(clone);
 				makeInteractable(clone);
+				rebindChildrenInteractable(clone);
 				selectBlock(clone);
 			} else if (action === 'center') {
 				block.style.left = Math.round((CANVAS_WIDTH - block.offsetWidth) / 2) + 'px';
@@ -4140,6 +4294,30 @@ function resizeMoveListener(event) {
 function makeInteractable(element) {
 	if (typeof interact === 'undefined') {
 		console.warn('Interact.js is not loaded; canvas drag/resize is disabled.');
+		return;
+	}
+	if (currentWorkbenchMode === 'flow') {
+		if (element._interactable) {
+			interact(element).unset();
+			element._interactable = false;
+		}
+		element.querySelectorAll(':scope > .resize-handle').forEach(function(h) { h.remove(); });
+		return;
+	}
+	var parentGroup = element.parentElement && element.parentElement.closest('.canvas-block[data-type="group"], .canvas-block[data-type="flex-row"], .canvas-block[data-type="flex-col"]');
+	if (parentGroup) {
+		// Nested inside a group: downgrade any top-level interact.js bindings, remove resize handles, then bind only selection events
+		if (element._interactable) {
+			interact(element).unset();
+			element._interactable = false;
+		}
+		element.querySelectorAll(':scope > .resize-handle').forEach(function(h) { h.remove(); });
+		if (!element._wechatNativeEventsBound) {
+			element.addEventListener('mousedown', function(e) { e.stopPropagation(); });
+			element.addEventListener('touchstart', function(e) { e.stopPropagation(); }, { passive: true });
+			element.addEventListener('contextmenu', function(e) { e.preventDefault(); if (getSelectedBlocks().indexOf(element) === -1) selectBlock(element); showWechatContextMenu(e.clientX, e.clientY); });
+			element._wechatNativeEventsBound = true;
+		}
 		return;
 	}
 	ensureResizeHandles(element);
@@ -4570,16 +4748,26 @@ function bindWechatCatalog() {
 	renderWechatCatalog();
 }
 
+function rebindChildrenInteractable(container) {
+	container.querySelectorAll('.canvas-block').forEach(function(child) {
+		ensureBlockMetadata(child);
+		makeInteractable(child);
+	});
+}
+
 function cloneBlock(block, dx, dy) {
+	var canvas = getCanvas();
+	if (!canvas) return null;
 	var clone = block.cloneNode(true);
 	clone.id = getNextBlockId();
 	clone.removeAttribute('data-id');
 	clone.classList.remove('selected', 'multi-selected');
 	clone.style.left = (parseBlockNumber(block, 'left') + (dx || 12)) + 'px';
 	clone.style.top = (parseBlockNumber(block, 'top') + (dy || 12)) + 'px';
-	getCanvas().appendChild(clone);
+	canvas.appendChild(clone);
 	ensureBlockMetadata(clone);
 	makeInteractable(clone);
+	rebindChildrenInteractable(clone);
 	return clone;
 }
 
@@ -4589,6 +4777,8 @@ function copySelection() {
 
 function pasteSelection() {
 	if (!clipboardBlocks.length) return;
+	var canvas = getCanvas();
+	if (!canvas) return;
 	saveState();
 	var pasted = clipboardBlocks.map(function(block) {
 		var clone = block.cloneNode(true);
@@ -4597,9 +4787,10 @@ function pasteSelection() {
 		clone.classList.remove('selected', 'multi-selected');
 		clone.style.left = (parseBlockNumber(block, 'left') + 18) + 'px';
 		clone.style.top = (parseBlockNumber(block, 'top') + 18) + 'px';
-		getCanvas().appendChild(clone);
+		canvas.appendChild(clone);
 		ensureBlockMetadata(clone);
 		makeInteractable(clone);
+		rebindChildrenInteractable(clone);
 		return clone;
 	});
 	setSelectedBlocks(pasted, pasted[pasted.length - 1]);
@@ -4752,6 +4943,8 @@ function pasteStyle() {
 function groupSelection() {
 	var blocks = getSelectedBlocks();
 	if (blocks.length < 2) return;
+	var canvas = getCanvas();
+	if (!canvas) return;
 	saveState();
 	var bounds = selectionBounds(blocks);
 	var group = document.createElement('div');
@@ -4770,67 +4963,149 @@ function groupSelection() {
 		block.style.top = (parseBlockNumber(block, 'top') - bounds.top) + 'px';
 		group.appendChild(block);
 	});
-	getCanvas().appendChild(group);
+	canvas.appendChild(group);
 	ensureBlockMetadata(group);
 	makeInteractable(group);
+	rebindChildrenInteractable(group);
 	selectBlock(group);
 	scheduleAutoSave();
 }
 
 function ungroupSelection() {
-	var groups = getSelectedBlocks().filter(function(block) { return block.getAttribute('data-type') === 'group'; });
+	var canvas = getCanvas();
+	if (!canvas) return;
+	var groups = getSelectedBlocks().filter(function(block) {
+		var t = block.getAttribute('data-type');
+		return t === 'group' || t === 'flex-row' || t === 'flex-col';
+	});
 	if (!groups.length) return;
 	saveState();
 	var moved = [];
 	groups.forEach(function(group) {
 		var gx = parseBlockNumber(group, 'left'), gy = parseBlockNumber(group, 'top');
-		// Get all direct children that are canvas blocks
 		var children = Array.from(group.children).filter(function(child) {
 			return child.classList && child.classList.contains('canvas-block');
 		});
+			var isFlexRow = group.getAttribute('data-type') === 'flex-row';
 		if (children.length > 0) {
-			// Move child blocks out of group, converting to absolute positions
-			children.forEach(function(child) {
-				child.style.left = (gx + parseBlockNumber(child, 'left')) + 'px';
-				child.style.top = (gy + parseBlockNumber(child, 'top')) + 'px';
-				getCanvas().appendChild(child);
+			if (!isFlexRow) {
+				children.sort(function(a, b) { return parseBlockNumber(a, 'top') - parseBlockNumber(b, 'top'); });
+			}
+			// Pre-record visual offsets before any DOM mutation (flex-row layout recomputes on removal)
+			var offsets = children.map(function(child) {
+				return { child: child, left: child.offsetLeft, top: child.offsetTop };
+			});
+			offsets.forEach(function(item) {
+				var child = item.child;
+				if (isFlexRow) {
+					child.style.left = (gx + item.left) + 'px';
+					child.style.top  = (gy + item.top) + 'px';
+				} else {
+					child.style.left = (gx + parseBlockNumber(child, 'left')) + 'px';
+					child.style.top  = (gy + parseBlockNumber(child, 'top')) + 'px';
+				}
+				child.style.position = 'absolute';
+				child.style.flex = '';
+				child.style.display = '';
+				child.style.verticalAlign = '';
+				canvas.appendChild(child);
 				ensureBlockMetadata(child);
 				makeInteractable(child);
 				moved.push(child);
 			});
 		} else {
-			// If no canvas-block children, try to create blocks from section children
 			var sections = Array.from(group.children).filter(function(child) {
 				return child.tagName === 'SECTION' && !child.classList.contains('resize-handle');
 			});
+			var offsetY = 0;
 			sections.forEach(function(section) {
 				var block = document.createElement('div');
 				block.className = 'canvas-block';
 				block.id = getNextBlockId();
 				block.style.left = gx + 'px';
-				block.style.top = gy + 'px';
+				block.style.top = (gy + offsetY) + 'px';
 				block.style.width = CANVAS_WIDTH + 'px';
 				block.style.height = 'auto';
 				block.style.minHeight = '40px';
-				block.setAttribute('data-type', 'cell');
-				block.setAttribute('data-role', 'content-card');
+				var sectionType = section.getAttribute('data-wb-type') || 'component';
+				if (sectionType === 'cell') sectionType = 'component';
+				block.setAttribute('data-type', sectionType);
+				block.setAttribute('data-role', inferRole(sectionType));
 				block.setAttribute('data-lock-ratio', '0');
 				block.appendChild(section);
-				getCanvas().appendChild(block);
+				canvas.appendChild(block);
 				ensureBlockMetadata(block);
 				ensureResizeHandles(block);
 				makeInteractable(block);
 				moved.push(block);
+				offsetY += (block.offsetHeight || 100) + BLOCK_GAP;
 			});
 		}
 		group.remove();
 	});
 	if (moved.length) setSelectedBlocks(moved, moved[moved.length - 1]);
+	ensureCanvasHeight();
+	scheduleAutoSave();
+}
+
+function deepUngroupSelection() {
+	var canvas = getCanvas();
+	if (!canvas) return;
+	var initial = getSelectedBlocks();
+	if (!initial.length) {
+		initial = Array.from(canvas.querySelectorAll(':scope > .canvas-block')).filter(function(block) {
+			var t = block.getAttribute('data-type');
+			return t === 'group' || t === 'flex-row' || t === 'flex-col';
+		});
+	}
+	var pending = initial.filter(function(block) {
+		var t = block.getAttribute('data-type');
+		return t === 'group' || t === 'flex-row' || t === 'flex-col';
+	});
+	if (!pending.length) return;
+	saveState();
+	var finalMoved = [];
+	var movedSet = new Set();
+	var guard = 0;
+	setSelectedBlocks(pending, pending[0]);
+	while (guard < 50) {
+		guard += 1;
+		var groups = getSelectedBlocks().filter(function(block) {
+			var t = block.getAttribute('data-type');
+			return t === 'group' || t === 'flex-row' || t === 'flex-col';
+		});
+		if (!groups.length) break;
+		ungroupSelection();
+		var moved = getSelectedBlocks();
+		moved.forEach(function(block) {
+			var t = block.getAttribute('data-type');
+			if (t !== 'group' && t !== 'flex-row' && t !== 'flex-col') movedSet.add(block);
+		});
+		finalMoved = Array.from(movedSet);
+		var nested = moved.filter(function(block) {
+			var t = block.getAttribute('data-type');
+			return t === 'group' || t === 'flex-row' || t === 'flex-col';
+		});
+		if (!nested.length) break;
+		setSelectedBlocks(nested, nested[0]);
+	}
+	var remaining = Array.from(canvas.querySelectorAll(':scope > .canvas-block')).filter(function(block) {
+		var t = block.getAttribute('data-type');
+		return t !== 'group' && t !== 'flex-row' && t !== 'flex-col';
+	}).sort(function(a, b) { return parseBlockNumber(a, 'top') - parseBlockNumber(b, 'top'); });
+	finalMoved = finalMoved.filter(function(block) { return block && block.parentElement === canvas; })
+		.sort(function(a, b) { return parseBlockNumber(a, 'top') - parseBlockNumber(b, 'top'); });
+	setSelectedBlocks(finalMoved.length ? finalMoved : remaining, (finalMoved[0] || remaining[0] || null));
+	ensureCanvasHeight();
 	scheduleAutoSave();
 }
 
 function mergeSelection() {
 	var blocks = getSelectedBlocks();
+	blocks = blocks.filter(function(b) {
+		var t = b.getAttribute('data-type');
+		return t !== 'group' && t !== 'flex-row' && t !== 'flex-col';
+	});
 	if (blocks.length < 2) return;
 	saveState();
 	var bounds = selectionBounds(blocks);
@@ -4850,7 +5125,52 @@ function mergeSelection() {
 	scheduleAutoSave();
 }
 
-function splitSelection() { ungroupSelection(); }
+function splitSelection() {
+	var canvas = getCanvas();
+	if (!canvas) return;
+	var blocks = getSelectedBlocks();
+	if (!blocks.length) return;
+	blocks = blocks.filter(function(b) {
+		var t = b.getAttribute('data-type');
+		return t !== 'group' && t !== 'flex-row' && t !== 'flex-col';
+	});
+	if (!blocks.length) return;
+	saveState();
+	var moved = [];
+	blocks.forEach(function(block) {
+		var sections = block.querySelectorAll(':scope > section');
+		if (sections.length < 2) return;
+		var bx = parseBlockNumber(block, 'left');
+		var by = parseBlockNumber(block, 'top');
+		var offsetY = 0;
+		sections.forEach(function(section) {
+			var newBlock = document.createElement('div');
+			newBlock.className = 'canvas-block';
+			newBlock.id = getNextBlockId();
+			newBlock.style.left = bx + 'px';
+			newBlock.style.top = (by + offsetY) + 'px';
+			newBlock.style.width = CANVAS_WIDTH + 'px';
+			newBlock.style.height = 'auto';
+			newBlock.style.minHeight = '40px';
+			var sectionType = section.getAttribute('data-wb-type') || 'component';
+			if (sectionType === 'cell') sectionType = 'component';
+			newBlock.setAttribute('data-type', sectionType);
+			newBlock.setAttribute('data-role', inferRole(sectionType));
+			newBlock.setAttribute('data-lock-ratio', '0');
+			newBlock.appendChild(section);
+			canvas.appendChild(newBlock);
+			ensureBlockMetadata(newBlock);
+			ensureResizeHandles(newBlock);
+			makeInteractable(newBlock);
+			moved.push(newBlock);
+			offsetY += (newBlock.offsetHeight || 100) + BLOCK_GAP;
+		});
+		block.remove();
+	});
+	if (moved.length) setSelectedBlocks(moved, moved[moved.length - 1]);
+	ensureCanvasHeight();
+	scheduleAutoSave();
+}
 
 function saveSelectionAsComponent() {
 	var blocks = getSelectedBlocks();
@@ -4917,55 +5237,7 @@ function applyUniformStyle() {
 
 function hideWechatContextMenu() { var menu = document.getElementById('wechat-context-menu'); if (menu) menu.style.display = 'none'; }
 
-function expandGroup() {
-	var block = selectedBlock;
-	if (!block || block.getAttribute('data-type') !== 'group') return;
-	if (block.getAttribute('data-expanded') === '1') return;
-	saveState();
-	// Save original innerHTML for collapse
-	block.setAttribute('data-original-html', block.innerHTML);
-	block.setAttribute('data-expanded', '1');
-	block.style.overflow = 'visible';
-	
-	var sections = block.querySelectorAll(':scope > section');
-	sections.forEach(function(sec, i) {
-		var rect = sec.getBoundingClientRect();
-		var blockRect = block.getBoundingClientRect();
-		var mini = document.createElement('div');
-		mini.className = 'canvas-block';
-		mini.style.position = 'absolute';
-		mini.style.left = (rect.left - blockRect.left) + 'px';
-		mini.style.top = (rect.top - blockRect.top) + 'px';
-		mini.style.width = rect.width + 'px';
-		mini.style.height = rect.height + 'px';
-		mini.style.minHeight = '20px';
-		mini.setAttribute('data-type', sec.getAttribute('data-wb-type') || 'cell');
-		mini.setAttribute('data-role', inferRole(mini.getAttribute('data-type')));
-		mini.setAttribute('data-lock-ratio', '0');
-		mini.setAttribute('data-mini', '1');
-		sec.style.display = 'none';
-		block.appendChild(mini);
-		ensureResizeHandles(mini);
-		makeInteractable(mini);
-	});
-	scheduleAutoSave();
-}
 
-function collapseGroup() {
-	var block = selectedBlock;
-	if (!block || block.getAttribute('data-expanded') !== '1') return;
-	saveState();
-	var original = block.getAttribute('data-original-html');
-	if (original) {
-		block.innerHTML = original;
-	}
-	block.removeAttribute('data-expanded');
-	block.removeAttribute('data-original-html');
-	block.style.overflow = '';
-	ensureResizeHandles(block);
-	makeInteractable(block);
-	scheduleAutoSave();
-}
 
 function runWechatEditAction(action) {
 	var actions = {
@@ -5013,11 +5285,48 @@ function showWechatContextMenu(x, y) {
 		document.body.appendChild(menu);
 	}
 	var selCount = getSelectedBlocks().length;
+	var html = '';
 	if (selCount >= 2) {
-		menu.innerHTML = '<button data-action="groupSelection">组合</button><button data-action="ungroupSelection">取消组合</button><div class="sep"></div><button data-action="deleteSelection">删除 <span>Del</span></button>';
+		html += '<button data-action="groupSelection">组合</button>';
+		var hasGroup = getSelectedBlocks().some(function(b) {
+			var t = b.getAttribute('data-type');
+			return t === 'group' || t === 'flex-row' || t === 'flex-col';
+		});
+		if (hasGroup) html += '<button data-action="ungroupSelection">取消组合</button>';
+		html += '<div class="sep"></div>';
+		html += '<button data-action="alignLeft">左对齐</button>';
+		html += '<button data-action="alignCenter">水平居中</button>';
+		html += '<button data-action="alignRight">右对齐</button>';
+		html += '<button data-action="alignTop">顶部对齐</button>';
+		html += '<button data-action="alignMiddle">垂直居中</button>';
+		html += '<button data-action="alignBottom">底部对齐</button>';
+		html += '<div class="sep"></div>';
+		html += '<button data-action="distributeX">水平分布</button>';
+		html += '<button data-action="distributeY">垂直分布</button>';
+		html += '<button data-action="matchWidth">等宽</button>';
+		html += '<button data-action="matchHeight">等高</button>';
+		html += '<div class="sep"></div>';
+		html += '<button data-action="deleteSelection">删除 <span>Del</span></button>';
 	} else {
-		menu.innerHTML = '<button data-action="duplicateSelection">克隆 <span>Ctrl+D</span></button><button data-action="deleteSelection">删除 <span>Del</span></button><div class="sep"></div><button data-action="alignLeft">左对齐</button><button data-action="alignCenter">水平居中</button><button data-action="alignRight">右对齐</button><button data-action="alignTop">顶部对齐</button><button data-action="alignMiddle">垂直居中</button><button data-action="alignBottom">底部对齐</button><div class="sep"></div><button data-action="ungroupSelection">取消组合</button><div class="sep"></div><button data-action="copyStyle">复制样式</button><button data-action="pasteStyle">粘贴样式</button>';
+		html += '<button data-action="duplicateSelection">克隆 <span>Ctrl+D</span></button>';
+		html += '<button data-action="deleteSelection">删除 <span>Del</span></button>';
+		html += '<div class="sep"></div>';
+		html += '<button data-action="alignLeft">左对齐</button>';
+		html += '<button data-action="alignCenter">水平居中</button>';
+		html += '<button data-action="alignRight">右对齐</button>';
+		html += '<button data-action="alignTop">顶部对齐</button>';
+		html += '<button data-action="alignMiddle">垂直居中</button>';
+		html += '<button data-action="alignBottom">底部对齐</button>';
+		var isGroup = selectedBlock && ((selectedBlock.getAttribute('data-type') === 'group') || (selectedBlock.getAttribute('data-type') === 'flex-row'));
+		if (isGroup) {
+			html += '<div class="sep"></div>';
+			html += '<button data-action="ungroupSelection">取消组合</button>';
+		}
+		html += '<div class="sep"></div>';
+		html += '<button data-action="copyStyle">复制样式</button>';
+		html += '<button data-action="pasteStyle">粘贴样式</button>';
 	}
+	menu.innerHTML = html;
 	menu.querySelectorAll('button').forEach(function(btn) {
 		btn.onclick = function() {
 			var action = btn.getAttribute('data-action');
@@ -5095,14 +5404,16 @@ function createFlexRowGroup(block1, block2) {
 		cell.style.position = 'relative';
 		cell.style.left = '0px';
 		cell.style.top = '0px';
-		cell.style.display = 'inline-block';
+		cell.style.flex = '0 0 48%';
 		cell.style.width = '48%';
-		cell.style.verticalAlign = 'top';
 		cell.style.boxSizing = 'border-box';
+		cell.style.display = '';
+		cell.style.verticalAlign = '';
 		group.appendChild(cell);
 	});
 
-	getCanvas().appendChild(group);
+	canvas.appendChild(group);
+	rebindChildrenInteractable(group);
 	ensureBlockMetadata(group);
 	makeInteractable(group);
 	selectBlock(group);
@@ -5143,9 +5454,8 @@ function addColumns(n) {
 		cell.style.position = 'relative';
 		cell.style.left = '0px';
 		cell.style.top = '0px';
-		cell.style.display = 'inline-block';
+		cell.style.flex = '0 0 ' + columnWidth + '%';
 		cell.style.width = columnWidth + '%';
-		cell.style.verticalAlign = 'top';
 		cell.style.boxSizing = 'border-box';
 		cell.style.minHeight = '80px';
 		cell.style.background = '#f8faf9';
@@ -5156,11 +5466,10 @@ function addColumns(n) {
 		cell.setAttribute('data-role', 'body-text');
 		cell.setAttribute('data-lock-ratio', '0');
 		ensureBlockMetadata(cell);
-		ensureResizeHandles(cell);
-		makeInteractable(cell);
 		group.appendChild(cell);
+		makeInteractable(cell);
 	}
-	getCanvas().appendChild(group);
+	canvas.appendChild(group);
 	ensureBlockMetadata(group);
 	makeInteractable(group);
 	selectBlock(group);
@@ -5178,33 +5487,7 @@ function addBlock(type) {
 	createCanvasBlock(template, { type: type, width: CANVAS_WIDTH, allowEmptyImages: type === 'image' });
 }
 
-function findSelectableChild(block, target) {
-	// Walk up from target to find the deepest content container
-	// Content containers: sections without child sections, or p/img/span itself
-	var el = target;
-	while (el && el !== block) {
-		// If this is a section with no child sections (leaf content section), or p/img/span
-		if (el.tagName === 'SECTION') {
-			var childSections = el.querySelectorAll(':scope > section').length;
-			if (childSections === 0) return el;
-		}
-		if (el.tagName === 'P' || el.tagName === 'IMG') return el;
-		el = el.parentElement;
-	}
-	return null;
-}
 
-function selectGroupChild(block, child) {
-	// Clear previous child selection
-	block.querySelectorAll('[data-wb-child-selected]').forEach(function(c) {
-		c.removeAttribute('data-wb-child-selected');
-		c.style.outline = '';
-	});
-	child.setAttribute('data-wb-child-selected', '1');
-	child.style.outline = '2px solid #3b82f6';
-	child.style.outlineOffset = '2px';
-	block.setAttribute('data-selected-child', '1');
-}
 
 document.addEventListener('DOMContentLoaded', function() {
 	const canvas = document.getElementById('block-canvas');
@@ -5215,17 +5498,15 @@ document.addEventListener('DOMContentLoaded', function() {
 		canvas.addEventListener('click', function(e) {
 			if (suppressCanvasClick) { e.preventDefault(); return; }
 			hideWechatContextMenu();
-			const block = e.target.closest('.canvas-block');
+			var block = e.target.closest('.canvas-block');
+			// If clicked inside a group/flex-row, select the parent container instead of the child
+			if (block) {
+				var parentGroup = block.parentElement && block.parentElement.closest('.canvas-block[data-type="group"], .canvas-block[data-type="flex-row"], .canvas-block[data-type="flex-col"]');
+				if (parentGroup) block = parentGroup;
+			}
 			if (block && (e.ctrlKey || e.metaKey)) { toggleBlockSelection(block); return; }
 			if (block && e.shiftKey) toggleBlockSelection(block);
-			else if (block) {
-				selectBlock(block);
-				// If group, try to select inner child element
-				if (block.getAttribute('data-type') === 'group') {
-					var child = findSelectableChild(block, e.target);
-					if (child) selectGroupChild(block, child);
-				}
-			}
+			else if (block) { selectBlock(block); }
 			else if (!selectionDrag) selectBlock(null);
 		});
 		canvas.addEventListener('mousedown', function(e) {
@@ -5298,6 +5579,14 @@ function cleanWorkbenchExportNode(node) {
 		el.removeAttribute('id');
 		el.removeAttribute('data-x');
 		el.removeAttribute('data-y');
+		['position', 'left', 'top', 'transform', 'aspectRatio'].forEach(function(prop) {
+			el.style[prop] = '';
+		});
+	});
+	[node].concat(Array.from(node.querySelectorAll('*'))).forEach(function(el) {
+		Array.from(el.attributes || []).forEach(function(attr) {
+			if (attr.name.toLowerCase().indexOf('data-wx-') === 0) el.removeAttribute(attr.name);
+		});
 	});
 	return node;
 }
@@ -5307,7 +5596,7 @@ function stripWorkbenchAttributes(node) {
 	all.forEach(function(el) {
 		Array.from(el.attributes || []).forEach(function(attr) {
 			var name = attr.name.toLowerCase();
-			if (name === 'data-id' || name === 'data-type' || name === 'data-layout' || name === 'data-source' || name === 'data-risk' || name === 'data-role' || name === 'data-ai-note' || name === 'data-lock-ratio' || name === 'data-catalog-id' || name === 'data-source-provider' || name === 'data-license-status' || name === 'data-wechat-compat' || name === 'data-external-asset' || name === 'data-x' || name === 'data-y' || name.indexOf('data-wx-') === 0 || name.indexOf('data-flow-') === 0 || name.indexOf('data-canvas-') === 0 || name.indexOf('data-layer-') === 0 || name.indexOf('data-overlap-') === 0) {
+			if (name === 'data-id' || name === 'data-type' || name === 'data-layout' || name === 'data-source' || name === 'data-risk' || name === 'data-role' || name === 'data-ai-note' || name === 'data-lock-ratio' || name === 'data-catalog-id' || name === 'data-source-provider' || name === 'data-license-status' || name === 'data-wechat-compat' || name === 'data-external-asset' || name === 'data-x' || name === 'data-y' || name.indexOf('data-wb-') === 0 || name.indexOf('data-wx-') === 0 || name.indexOf('data-flow-') === 0 || name.indexOf('data-canvas-') === 0 || name.indexOf('data-layer-') === 0 || name.indexOf('data-overlap-') === 0) {
 				el.removeAttribute(attr.name);
 			}
 		});
@@ -5324,7 +5613,7 @@ function cleanWechatExportNode(node) {
 function copyWorkbenchAttributes(source, target) {
 	Array.from(source.attributes || []).forEach(function(attr) {
 		var name = attr.name.toLowerCase();
-		if (name === 'data-id' || name === 'data-type' || name === 'data-role' || name === 'data-ai-note' || name === 'data-lock-ratio' || name === 'data-layout' || name === 'data-source' || name === 'data-risk' || name === 'data-catalog-id' || name === 'data-source-provider' || name === 'data-license-status' || name === 'data-wechat-compat' || name === 'data-external-asset' || name.indexOf('data-wx-') === 0 || name.indexOf('data-flow-') === 0 || name.indexOf('data-canvas-') === 0) {
+		if (name === 'data-id' || name === 'data-type' || name === 'data-role' || name === 'data-ai-note' || name === 'data-lock-ratio' || name === 'data-layout' || name === 'data-wb-layout' || name === 'data-source' || name === 'data-risk' || name === 'data-catalog-id' || name === 'data-source-provider' || name === 'data-license-status' || name === 'data-wechat-compat' || name === 'data-external-asset' || name.indexOf('data-wb-') === 0 || name.indexOf('data-flow-') === 0 || name.indexOf('data-canvas-') === 0) {
 			target.setAttribute(attr.name, attr.value);
 		}
 	});
@@ -5341,13 +5630,15 @@ function buildWorkbenchHTML() {
 		ensureBlockMetadata(block);
 		var node = document.createElement('section');
 		copyWorkbenchAttributes(block, node);
-		node.setAttribute('data-wx-block', '1');
+		node.setAttribute('data-wb-block', '1');
+		node.setAttribute('data-wb-id', block.getAttribute('data-wb-id') || block.getAttribute('data-id') || block.id);
+		node.setAttribute('data-wb-type', block.getAttribute('data-wb-type') || getWorkbenchType(block.getAttribute('data-type') || 'cell'));
 		node.style.cssText = 'margin:' + (block.getAttribute('data-flow-margin') || '0') + ';width:' + (block.getAttribute('data-flow-width') || '100%') + ';box-sizing:border-box;';
 		var clone = cleanWorkbenchExportNode(block.cloneNode(true));
 		node.innerHTML = clone.innerHTML.trim();
 		return node.outerHTML;
 	}).join('\n');
-	return '<section data-wx-workbench="1" data-wx-version="' + WORKBENCH_VERSION + '" data-mode="canvas" style="width:100%;max-width:375px;margin-left:auto;margin-right:auto;text-align:center;box-sizing:border-box;">\n' + html + '\n</section>';
+	return '<section data-wb-root="1" data-wb-version="' + WORKBENCH_VERSION + '" data-wb-mode="' + currentWorkbenchMode + '" style="width:100%;max-width:375px;margin-left:auto;margin-right:auto;text-align:center;box-sizing:border-box;">\n' + html + '\n</section>';
 }
 
 function cleanBlockForExport(block) {
@@ -5371,17 +5662,49 @@ function cleanBlockForExport(block) {
 
 function extractGroupContent(groupBlock) {
 	var result = '';
-	var childBlocks = Array.from(groupBlock.querySelectorAll(':scope > .canvas-block'));
-	childBlocks.sort(function(a, b) { return (parseFloat(a.style.top)||0) - (parseFloat(b.style.top)||0); });
-	childBlocks.forEach(function(child) {
-		if (child.getAttribute('data-type') === 'group') {
-			// Recursively extract nested group content
-			result += extractGroupContent(child);
-		} else {
-			var clone = cleanBlockForExport(child);
-			result += clone.innerHTML.trim() + '\n';
-		}
+	var childBlocks = Array.from(groupBlock.children).filter(function(child) {
+		return child.classList && child.classList.contains('canvas-block');
 	});
+	// Fallback for imported groups that contain <section> children directly
+	if (!childBlocks.length) {
+		childBlocks = Array.from(groupBlock.querySelectorAll(':scope > section'));
+	}
+	var isFlexRow = groupBlock.getAttribute('data-type') === 'flex-row';
+	if (isFlexRow) {
+		childBlocks.sort(function(a, b) { return (a.offsetLeft || 0) - (b.offsetLeft || 0); });
+		var row = document.createElement('section');
+		row.style.cssText = 'text-align:center;font-size:0;box-sizing:border-box;width:100%;';
+		var rowHtml = '';
+		childBlocks.forEach(function(child) {
+			var width = child.style && child.style.width ? child.style.width : '';
+			if (!width || /px$/.test(width)) {
+				var computedWidth = child.offsetWidth || parseFloat(width) || Math.floor(CANVAS_WIDTH / Math.max(1, childBlocks.length));
+				width = Math.max(1, Math.min(100, (computedWidth / CANVAS_WIDTH) * 100)).toFixed(2).replace(/\.?0+$/, '') + '%';
+			}
+			var cell = document.createElement('section');
+			cell.style.cssText = 'display:inline-block;width:' + width + ';vertical-align:top;box-sizing:border-box;font-size:15px;';
+			if (child.classList && child.classList.contains('canvas-block')) {
+				var clone = cleanBlockForExport(child.cloneNode(true));
+				cell.innerHTML = clone.innerHTML.trim();
+			} else {
+				var sectionClone = cleanWechatExportNode(child.cloneNode(true));
+				cell.innerHTML = sectionClone.outerHTML;
+			}
+			rowHtml += cell.outerHTML + '\n';
+		});
+		row.innerHTML = rowHtml;
+		result += row.outerHTML + '\n';
+	} else {
+		childBlocks.sort(function(a, b) { return (parseFloat(a.style.top)||0) - (parseFloat(b.style.top)||0); });
+		childBlocks.forEach(function(child) {
+			if (child.classList && child.classList.contains('canvas-block') && (child.getAttribute('data-type') === 'group' || child.getAttribute('data-type') === 'flex-row')) {
+				result += extractGroupContent(child);
+			} else {
+				var clone = cleanBlockForExport(child.cloneNode(true));
+				result += clone.innerHTML.trim() + '\n';
+			}
+		});
+	}
 	return result;
 }
 
@@ -5394,7 +5717,7 @@ function buildWechatHTML() {
 	var html = '';
 	blocks.forEach(function(b) {
 		// Handle group blocks: extract child sections directly (recursively)
-		if (b.getAttribute('data-type') === 'group') {
+		if (b.getAttribute('data-type') === 'group' || b.getAttribute('data-type') === 'flex-row') {
 			html += extractGroupContent(b);
 		} else {
 			var clone = cleanBlockForExport(b);
@@ -5453,8 +5776,8 @@ function exportLayoutJSON() {
 	showTextModal('导出给 AI', JSON.stringify(buildLayoutJSON(), null, 2), 'wechat-workbench-layout.json');
 }
 
-function runWechatCompatibilityCheck() {
-	var html = buildWechatHTML();
+function validateWechatHtml(html, mode) {
+	mode = mode || 'manual-paste';
 	var issues = [];
 	var checks = [
 		{ name: 'script 标签', regex: /<script\b/i, severity: 'error' },
@@ -5463,13 +5786,44 @@ function runWechatCompatibilityCheck() {
 		{ name: 'position:absolute/fixed', regex: /position\s*:\s*(absolute|fixed)/i, severity: 'warn' },
 		{ name: '外部 class 依赖', regex: /\sclass\s*=/i, severity: 'warn' },
 		{ name: 'flex 布局', regex: /display\s*:\s*flex/i, severity: 'warn' },
+		{ name: 'grid 布局', regex: /display\s*:\s*grid/i, severity: 'error' },
+		{ name: 'CSS 动画/过渡', regex: /(animation|transition)\s*:/i, severity: 'warn' },
 		{ name: '空图片地址', regex: /<img[^>]+src=["']\s*["']/i, severity: 'error' },
 		{ name: '非 HTTPS 图片', regex: /<img[^>]+src=["'](?!https:\/\/)[^"']+/i, severity: 'warn' },
-		{ name: 'SVG 图片外链', regex: /<img[^>]+src=["'][^"']+\.svg(?:[?#][^"']*)?["']/i, severity: 'warn' }
+		{ name: 'SVG 图片外链', regex: /<img[^>]+src=["'][^"']+\.svg(?:[?#][^"']*)?["']/i, severity: 'warn' },
+		{ name: 'SVG foreignObject', regex: /<foreignObject\b/i, severity: 'error' },
+		{ name: 'SVG filter/fe* 滤镜', regex: /<(filter|fe[A-Z][A-Za-z]*)\b/i, severity: 'error' },
+		{ name: 'SVG gradient/stop', regex: /<(linearGradient|radialGradient|stop)\b/i, severity: 'error' },
+		{ name: 'SVG clipPath/textPath/mask', regex: /<(clipPath|textPath|mask)\b/i, severity: 'error' },
+		{ name: 'SVG xlink:href', regex: /\sxlink:href\s*=/i, severity: 'error' },
+		{ name: 'SVG/CSS matrix 或 3D transform', regex: /(matrix\s*\(|rotate[XYZ]\s*\(|perspective\s*\()/i, severity: 'error' },
+		{ name: 'Data URI/Base64 资源', regex: /(src|href)=["']data:/i, severity: 'error' },
+		{ name: 'SVG 内联 style/class/id', regex: /<svg[\s\S]*?(\sstyle\s*=|\sclass\s*=|\sid\s*=)/i, severity: 'warn' }
 	];
 	checks.forEach(function(check) {
 		if (check.regex.test(html)) issues.push({ severity: check.severity, message: check.name });
 	});
+	var parser = new DOMParser();
+	var doc = parser.parseFromString(html, 'text/html');
+	doc.querySelectorAll('svg image').forEach(function(img, index) {
+		var href = img.getAttribute('href') || img.getAttribute('xlink:href') || '';
+		if (!href) issues.push({ severity: 'error', message: 'SVG image #' + (index + 1) + ' 缺少 href' });
+		else if (!/^https:\/\//i.test(href)) issues.push({ severity: 'error', message: 'SVG image #' + (index + 1) + ' 不是 HTTPS 资源' });
+		else if (mode === 'api-draft' && href.indexOf('mmbiz.qpic.cn') === -1) issues.push({ severity: 'error', message: 'API 发布模式下 SVG image 必须使用微信 CDN：' + href });
+	});
+	doc.querySelectorAll('img').forEach(function(img, index) {
+		var src = img.getAttribute('src') || '';
+		if (mode === 'api-draft' && src && src.indexOf('mmbiz.qpic.cn') === -1) {
+			issues.push({ severity: 'warn', message: 'API 发布模式下 HTML 图片建议先转微信 CDN：img #' + (index + 1) });
+		}
+	});
+	return issues;
+}
+
+function runWechatCompatibilityCheck(mode) {
+	mode = mode || 'manual-paste';
+	var html = buildWechatHTML();
+	var issues = validateWechatHtml(html, mode);
 	collectLayoutComponents().forEach(function(comp) {
 		if (comp.bounds.x < 0 || comp.bounds.x + comp.bounds.width > CANVAS_WIDTH) issues.push({ severity: 'error', message: comp.id + ' 超出 375px 画布宽度' });
 		if (comp.type === 'image' && comp.content.images.some(function(img) { return !img.src; })) issues.push({ severity: 'error', message: comp.id + ' 图片 URL 为空' });
@@ -5921,19 +6275,7 @@ function togglePreview() {
 }
 
 function toggleMode(btn) {
-  if (btn) {
-    var pressed = btn.getAttribute('aria-pressed') === 'true';
-    streamMode = pressed;
-    btn.setAttribute('aria-pressed', streamMode ? 'false' : 'true');
-    btn.classList.toggle('active', !streamMode);
-  } else {
-    streamMode = !streamMode;
-  }
-  var blocks = document.querySelectorAll('#block-canvas .canvas-block');
-  blocks.forEach(function(b) {
-    makeInteractable(b);
-  });
-  ensureCanvasHeight();
+  toggleWorkbenchMode(btn);
 }
 
 function treeListRight() {
@@ -6067,7 +6409,8 @@ function importXiumiHTML(rawHtml) {
 
 	sections.forEach(function(sec) {
 		var style = sec.getAttribute('style') || '';
-		var type = classifyXiumiSection(style);
+		var type = sec.getAttribute('data-wb-type') || sec.getAttribute('data-wx-type') || classifyXiumiSection(style);
+		type = normalizeWorkbenchType(type);
 
 		if (type === 'text') {
 			var fontSizeMatch = style.match(/font-size\s*:\s*(\d+)/);
@@ -6162,11 +6505,18 @@ function importXiumiToCanvas(rawHtml) {
 		if (dataType === 'cell') {
 			if (child.querySelector('img') && !child.querySelector('p')) dataType = 'image';
 		}
-		block.setAttribute('data-type', 'group');
-		block.setAttribute('data-role', inferRole('group'));
+		dataType = normalizeWorkbenchType(dataType);
+		var hasChildSections = child.querySelectorAll(':scope > section').length > 0;
+		var blockType = hasChildSections && dataType === 'cell' ? 'group' : dataType;
+		block.setAttribute('data-type', blockType);
+		block.setAttribute('data-role', inferRole(blockType));
 		block.setAttribute('data-ai-note', dataType);
 		block.setAttribute('data-lock-ratio', '0');
 		block.innerHTML = child.outerHTML;
+		copyWorkbenchAttributes(child, block);
+		block.setAttribute('data-type', blockType);
+		block.setAttribute('data-role', inferRole(blockType));
+		block.setAttribute('data-wb-type', getWorkbenchType(blockType));
 		canvas.appendChild(block);
 		ensureBlockMetadata(block);
 		ensureResizeHandles(block);
