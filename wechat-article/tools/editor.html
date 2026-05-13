@@ -6677,12 +6677,14 @@ function importXiumiHTML(rawHtml) {
 		counts[type] = (counts[type] || 0) + 1;
 	});
 
-	var directSections = doc.body.querySelectorAll(':scope > section');
+	var bodyChildren = Array.from(doc.body.children).filter(function(c) {
+		return c.tagName !== 'SCRIPT' && c.tagName !== 'STYLE' && c.tagName !== 'META' && c.tagName !== 'LINK';
+	});
 	var innerHtml;
-	if (directSections.length === 1) {
-		innerHtml = directSections[0].innerHTML;
-	} else if (directSections.length > 1) {
-		innerHtml = Array.from(directSections).map(function(sec) { return sec.outerHTML; }).join('\n');
+	if (bodyChildren.length === 1) {
+		innerHtml = bodyChildren[0].innerHTML;
+	} else if (bodyChildren.length > 1) {
+		innerHtml = bodyChildren.map(function(c) { return c.outerHTML; }).join('\n');
 	} else {
 		innerHtml = doc.body.innerHTML.replace(/^&nbsp;/, '').replace(/<section/, '<section data-wb-type="card"');
 	}
