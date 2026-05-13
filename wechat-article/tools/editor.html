@@ -3131,6 +3131,24 @@ let autoSaveTimer = null;
 let snapToSideBlock = null;
 let currentDragBlock = null;
 
+var WECHAT_EDITOR_LOG = {
+	enabled: true,
+	level: 'info',
+	_levels: {error:0, warn:1, info:2, debug:3},
+	log: function(level, tag, msg, data) {
+		if (!this.enabled) return;
+		if (this._levels[level] > this._levels[this.level]) return;
+		var prefix = '[WECHAT][' + level.toUpperCase() + '][' + tag + ']';
+		if (data !== undefined) console.log(prefix, msg, data);
+		else console.log(prefix, msg);
+	},
+	error: function(tag, msg, data) { this.log('error', tag, msg, data); },
+	warn:  function(tag, msg, data) { this.log('warn',  tag, msg, data); },
+	info:  function(tag, msg, data) { this.log('info',  tag, msg, data); },
+	debug: function(tag, msg, data) { this.log('debug', tag, msg, data); }
+};
+
+
 function getResizeHandles() {
 	return ['top-left', 'top-center', 'top-right', 'center-left', 'center-right', 'bottom-left', 'bottom-center', 'bottom-right']
 		.map(function(cls) { return '<div class="resize-handle ' + cls + '"></div>'; })
@@ -3500,6 +3518,8 @@ function getSelectedBlocks() {
 }
 
 function setSelectedBlocks(blocks, primary) {
+	WECHAT_EDITOR_LOG.info('SELECT', 'setSelectedBlocks called', {blocks:blocks,primary:primary});
+
 	document.querySelectorAll('#block-canvas .canvas-block.selected, #block-canvas .canvas-block.multi-selected').forEach(function(block) {
 		block.classList.remove('selected', 'multi-selected');
 	});
@@ -3695,6 +3715,8 @@ function getSortedTopLevelBlocks() {
 }
 
 function captureCanvasLayoutMetadata() {
+	WECHAT_EDITOR_LOG.info('MODE', 'captureCanvasLayoutMetadata called');
+
 	getSortedTopLevelBlocks().forEach(function(block) {
 		var bounds = getBlockBounds(block);
 		block.setAttribute('data-canvas-x', String(bounds.x));
@@ -3705,6 +3727,8 @@ function captureCanvasLayoutMetadata() {
 }
 
 function applyFlowLayoutFromCanvas() {
+	WECHAT_EDITOR_LOG.info('MODE', 'applyFlowLayoutFromCanvas called');
+
 	var previousBottom = 0;
 	getSortedTopLevelBlocks().forEach(function(block, index) {
 		ensureBlockMetadata(block);
@@ -3727,6 +3751,8 @@ function applyFlowLayoutFromCanvas() {
 }
 
 function captureFlowLayoutAsCanvas() {
+	WECHAT_EDITOR_LOG.info('MODE', 'captureFlowLayoutAsCanvas called');
+
 	var canvas = getCanvas();
 	if (!canvas) return;
 	var canvasRect = canvas.getBoundingClientRect();
@@ -3757,6 +3783,8 @@ function captureFlowLayoutAsCanvas() {
 }
 
 function setWorkbenchMode(mode) {
+	WECHAT_EDITOR_LOG.info('MODE', 'setWorkbenchMode called', {mode:mode});
+
 	mode = mode === 'flow' ? 'flow' : 'canvas';
 	if (mode === currentWorkbenchMode) return;
 	var canvas = getCanvas();
@@ -3794,6 +3822,8 @@ function setWorkbenchMode(mode) {
 }
 
 function toggleWorkbenchMode(btn) {
+	WECHAT_EDITOR_LOG.info('MODE', 'toggleWorkbenchMode called', {btn:btn});
+
 	setWorkbenchMode(currentWorkbenchMode === 'canvas' ? 'flow' : 'canvas');
 }
 
@@ -3821,6 +3851,8 @@ function normalizeCssLength(val, defaultVal) {
 }
 
 function renderWechatInspector(block) {
+	WECHAT_EDITOR_LOG.info('INSPECTOR', 'renderWechatInspector called', {block:block});
+
 	var panel = ensureWechatInspector();
 	if (!panel) return;
 	if (!block) {
@@ -3902,6 +3934,7 @@ function bindWechatInspector(panel, block) {
 	panel.querySelectorAll('[data-inspector-action]').forEach(function(btn) {
 		btn.addEventListener('click', function() {
 			var action = btn.getAttribute('data-inspector-action');
+			WECHAT_EDITOR_LOG.info('INSPECTOR', 'inspector action triggered', {action: action, blockType: block.getAttribute('data-type')});
 			saveState();
 			if (action === 'delete') {
 				block.remove();
@@ -3966,6 +3999,8 @@ function bindWechatInspector(panel, block) {
 }
 
 function applyInspectorValue(block, input, live) {
+	WECHAT_EDITOR_LOG.info('INSPECTOR', 'applyInspectorValue called', {block:block,input:input,live:live});
+
 	if (!block) return;
 	var key = input.getAttribute('data-inspector-key');
 	var value = input.value;
@@ -3973,6 +4008,7 @@ function applyInspectorValue(block, input, live) {
 	var img = block.querySelector('img');
 	var textTarget = block.querySelector('p, h1, h2, h3, h4, h5, h6, blockquote') || content;
 	if (!live) saveState();
+	WECHAT_EDITOR_LOG.info('INSPECTOR', 'applyInspectorValue', {key: key, value: value, mode: currentWorkbenchMode});
 	if (key === 'x') {
 		if (currentWorkbenchMode === 'flow') return;
 		block.style.left = clamp(parseInt(value, 10) || 0, 0, CANVAS_WIDTH - block.offsetWidth) + 'px';
@@ -4015,6 +4051,8 @@ function applyInspectorValue(block, input, live) {
 }
 
 function selectBlock(block) {
+	WECHAT_EDITOR_LOG.info('SELECT', 'selectBlock called', {block:block});
+
 	if (block) ensureBlockMetadata(block);
 	setSelectedBlocks(block ? [block] : [], block || null);
 	if (block && block.getAttribute('data-type') === 'flex-col' && currentWorkbenchMode !== 'flow') {
@@ -4060,6 +4098,8 @@ function rectsIntersect(a, b) {
 }
 
 function updateSelectionDrag(event) {
+	WECHAT_EDITOR_LOG.info('SELECT', 'updateSelectionDrag called', {event:event});
+
 	if (!selectionDrag) return;
 	var point = canvasPointFromEvent(event);
 	var left = Math.min(selectionDrag.startX, point.x);
@@ -4226,6 +4266,8 @@ function applySnap(target, left, top) {
 }
 
 function dragMoveListener(event) {
+	WECHAT_EDITOR_LOG.info('INTERACT', 'dragMoveListener called', {event:event});
+
 	const target = event.target;
 	const canvas = getCanvas();
 	currentDragBlock = target;
@@ -4394,6 +4436,8 @@ function resizeMoveListener(event) {
 }
 
 function makeInteractable(element) {
+	WECHAT_EDITOR_LOG.info('INTERACT', 'makeInteractable called', {element:element});
+
 	if (typeof interact === 'undefined') {
 		console.warn('Interact.js is not loaded; canvas drag/resize is disabled.');
 		return;
@@ -5046,6 +5090,8 @@ function pasteStyle() {
 }
 
 function groupSelection() {
+	WECHAT_EDITOR_LOG.info('GROUP', 'groupSelection called');
+
 	var blocks = getSelectedBlocks();
 	if (blocks.length < 2) return;
 	var canvas = getCanvas();
@@ -5077,6 +5123,8 @@ function groupSelection() {
 }
 
 function ungroupSelection() {
+	WECHAT_EDITOR_LOG.info('GROUP', 'ungroupSelection called');
+
 	var canvas = getCanvas();
 	if (!canvas) return;
 	var groups = getSelectedBlocks().filter(function(block) {
@@ -5091,6 +5139,7 @@ function ungroupSelection() {
 		var children = Array.from(group.children).filter(function(child) {
 			return child.classList && child.classList.contains('canvas-block');
 		});
+			WECHAT_EDITOR_LOG.info('GROUP', 'ungroupSelection processing group', {type: group.getAttribute('data-type'), children: children.length});
 			var isFlexRow = group.getAttribute('data-type') === 'flex-row';
 			var isFlexCol = group.getAttribute('data-type') === 'flex-col';
 		if (children.length > 0) {
@@ -5158,6 +5207,8 @@ function ungroupSelection() {
 }
 
 function deepUngroupSelection() {
+	WECHAT_EDITOR_LOG.info('GROUP', 'deepUngroupSelection called');
+
 	var canvas = getCanvas();
 	if (!canvas) return;
 	var initial = getSelectedBlocks();
@@ -5470,6 +5521,8 @@ function showWechatContextMenu(x, y) {
 }
 
 function createFlexRowGroup(block1, block2) {
+	WECHAT_EDITOR_LOG.info('FLEX', 'createFlexRowGroup called', {block1:block1,block2:block2});
+
 	var canvas = getCanvas();
 	if (!canvas || !block1 || !block2 || block1 === block2) return;
 	var b1Left = parseBlockNumber(block1, 'left');
@@ -5537,6 +5590,8 @@ function getFlexColChildren(col) {
 }
 
 function addChildToFlexCol(col, html) {
+	WECHAT_EDITOR_LOG.info('FLEX_COL', 'addChildToFlexCol called', {col:col});
+
 	var child = document.createElement('div');
 	child.className = 'canvas-block';
 	child.id = getNextBlockId();
@@ -5553,6 +5608,8 @@ function addChildToFlexCol(col, html) {
 }
 
 function removeSelectedFlexColChild() {
+	WECHAT_EDITOR_LOG.info('FLEX_COL', 'removeSelectedFlexColChild called');
+
 	var selected = getSelectedBlocks();
 	if (!selected.length) return;
 	var target = selected.find(function(block) {
@@ -5567,6 +5624,8 @@ function removeSelectedFlexColChild() {
 }
 
 function moveFlexColChild(col, fromIndex, toIndex) {
+	WECHAT_EDITOR_LOG.info('FLEX_COL', 'moveFlexColChild called', {col:col,fromIndex:fromIndex,toIndex:toIndex});
+
 	var children = getFlexColChildren(col);
 	if (fromIndex < 0 || fromIndex >= children.length) return;
 	if (toIndex < 0 || toIndex >= children.length) return;
@@ -5579,12 +5638,16 @@ function moveFlexColChild(col, fromIndex, toIndex) {
 }
 
 function equalizeFlexColChildren(col) {
+	WECHAT_EDITOR_LOG.info('FLEX_COL', 'equalizeFlexColChildren called', {col:col});
+
 	getFlexColChildren(col).forEach(function(child) {
 		child.style.flex = '1 1 0%';
 	});
 }
 
 function ensureFlexColChildEditing(col) {
+	WECHAT_EDITOR_LOG.info('FLEX_COL', 'ensureFlexColChildEditing called', {col:col});
+
 	if (typeof interact === 'undefined') return;
 	getFlexColChildren(col).forEach(function(child) {
 		if (child._flexColInteractable) {
@@ -5636,6 +5699,8 @@ function ensureFlexColChildEditing(col) {
 }
 
 function addColumns(n) {
+	WECHAT_EDITOR_LOG.info('FLEX', 'addColumns called', {n:n});
+
 	var canvas = getCanvas();
 	if (!canvas) return;
 	n = parseInt(n, 10) || 2;
@@ -5834,6 +5899,8 @@ function copyWorkbenchAttributes(source, target) {
 }
 
 function buildWorkbenchHTML() {
+	WECHAT_EDITOR_LOG.info('EXPORT', 'buildWorkbenchHTML called');
+
 	syncWorkbenchDocumentMetadata();
 	var canvas = getCanvas();
 	if (!canvas) return '';
@@ -5931,6 +5998,8 @@ function extractGroupContent(groupBlock) {
 }
 
 function buildWechatHTML() {
+	WECHAT_EDITOR_LOG.info('EXPORT', 'buildWechatHTML called');
+
 	syncWorkbenchDocumentMetadata();
 	var canvas = document.getElementById('block-canvas');
 	if (!canvas) return '';
@@ -6614,6 +6683,8 @@ function classifyXiumiSection(style) {
 }
 
 function importXiumiHTML(rawHtml) {
+	WECHAT_EDITOR_LOG.info('IMPORT', 'importXiumiHTML called', {rawHtml:rawHtml});
+
 	var parser = new DOMParser();
 	var doc = parser.parseFromString(rawHtml, 'text/html');
 
@@ -6702,6 +6773,8 @@ function getFlexRowCells(row) {
 }
 
 function addColumnToFlexRow(row, html) {
+	WECHAT_EDITOR_LOG.info('FLEX_ROW', 'addColumnToFlexRow called', {row:row});
+
 	var cells = getFlexRowCells(row);
 	var cell = document.createElement('div');
 	cell.className = 'canvas-block';
@@ -6724,6 +6797,8 @@ function addColumnToFlexRow(row, html) {
 }
 
 function moveFlexRowColumn(row, fromIndex, toIndex) {
+	WECHAT_EDITOR_LOG.info('FLEX_ROW', 'moveFlexRowColumn called', {row:row,fromIndex:fromIndex,toIndex:toIndex});
+
 	var cells = getFlexRowCells(row);
 	if (fromIndex < 0 || fromIndex >= cells.length) return;
 	if (toIndex < 0 || toIndex >= cells.length) return;
@@ -6736,12 +6811,16 @@ function moveFlexRowColumn(row, fromIndex, toIndex) {
 }
 
 function removeFlexRowColumn(row, index) {
+	WECHAT_EDITOR_LOG.info('FLEX_ROW', 'removeFlexRowColumn called', {row:row,index:index});
+
 	var cells = getFlexRowCells(row);
 	if (index < 0 || index >= cells.length) return;
 	cells[index].remove();
 }
 
 function equalizeFlexRowColumns(row) {
+	WECHAT_EDITOR_LOG.info('FLEX_ROW', 'equalizeFlexRowColumns called', {row:row});
+
 	var cells = getFlexRowCells(row);
 	var width = Math.floor(100 / Math.max(1, cells.length));
 	cells.forEach(function(cell) {
@@ -6800,6 +6879,8 @@ function hydrateWorkbenchSection(section) {
 }
 
 function groupSideBySideRowsForFlow() {
+	WECHAT_EDITOR_LOG.info('MODE', 'groupSideBySideRowsForFlow called');
+
 	var canvas = getCanvas();
 	if (!canvas) return;
 	var blocks = getSortedTopLevelBlocks();
@@ -6836,6 +6917,8 @@ function groupSideBySideRowsForFlow() {
 }
 
 function importXiumiToCanvas(rawHtml) {
+	WECHAT_EDITOR_LOG.info('IMPORT', 'importXiumiToCanvas called', {rawHtml:rawHtml});
+
 	console.log('[IMPORT] rawHtml length:', rawHtml ? rawHtml.length : 0);
 	var isWorkbenchHTML = rawHtml.indexOf('data-wb-root="1"') !== -1 || rawHtml.indexOf("data-wb-root='1'") !== -1;
 	console.log('[IMPORT] isWorkbenchHTML:', isWorkbenchHTML);
@@ -6921,6 +7004,7 @@ function importXiumiToCanvas(rawHtml) {
 
 	// Reposition after browser renders content (give time for layout)
 	console.log('[IMPORT] blocks created:', blocks.length);
+	WECHAT_EDITOR_LOG.info('IMPORT', 'importXiumiToCanvas result', {blocks: blocks.length, isWorkbench: isWorkbenchHTML, counts: imported.counts});
 	setTimeout(function() {
 		console.log('[IMPORT] repositioning', blocks.length, 'blocks');
 		var top = 20;
@@ -6939,6 +7023,8 @@ function importXiumiToCanvas(rawHtml) {
 }
 
 function showXiumiImportModal() {
+	WECHAT_EDITOR_LOG.info('IMPORT', 'showXiumiImportModal called');
+
 	var modal = document.createElement('div');
 	modal.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.6);z-index:10000;display:flex;align-items:center;justify-content:center;';
 	modal.innerHTML = '<div style="background:#fff;border-radius:13px;width:660px;max-width:95vw;max-height:85vh;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,0.3);"><div style="padding:14px 18px;border-bottom:1px solid #e5e7eb;display:flex;justify-content:space-between;align-items:center;"><h3 style="margin:0;font-size:15px;">导入秀米 HTML 模板</h3><button id="close-xiumi-modal" style="background:none;border:none;font-size:22px;cursor:pointer;color:#999;">&times;</button></div><div style="padding:14px;flex:1;overflow:auto;"><div style="display:flex;gap:8px;align-items:center;margin-bottom:10px;"><input type="file" id="xiumi-file-input" accept=".html,.htm" style="display:none;"><button id="select-xiumi-file" style="padding:8px 16px;background:#f0f7ff;color:#1a73e8;border:1px solid #bae6fd;border-radius:9px;cursor:pointer;font-size:12px;font-weight:700;">选择 HTML 文件</button><span id="xiumi-file-name" style="font-size:11px;color:#6b7280;"></span></div><p style="font-size:12px;color:#6b7280;margin:0 0 8px;">或直接粘贴秀米 HTML 代码：</p><textarea id="xiumi-import-ta" placeholder="在此粘贴秀米 HTML..." style="width:100%;height:280px;border:1px solid #dce4df;border-radius:9px;padding:12px;font-family:monospace;font-size:11px;resize:vertical;outline:none;box-sizing:border-box;"></textarea><div id="xiumi-import-result" style="margin-top:10px;font-size:12px;color:#07c160;display:none;"></div></div><div style="padding:12px 18px;border-top:1px solid #e5e7eb;display:flex;gap:8px;justify-content:flex-end;"><button id="cancel-xiumi-modal" style="padding:8px 16px;background:#f3f4f6;color:#374151;border:1px solid #d1d5db;border-radius:9px;cursor:pointer;font-size:12px;">取消</button><button id="import-xiumi-btn" style="padding:8px 20px;background:linear-gradient(135deg,#07c160,#11d879);color:#fff;border:none;border-radius:9px;cursor:pointer;font-size:12px;font-weight:700;">导入到画布</button></div></div>';
@@ -6965,7 +7051,8 @@ function showXiumiImportModal() {
 					setTimeout(function() { modal.remove(); }, 1200);
 				}
 			} catch (err) {
-				document.getElementById('xiumi-import-result').textContent = '导入出错：' + (err.message || err);
+				WECHAT_EDITOR_LOG.error('IMPORT', 'importXiumiToCanvas error', err);
+			document.getElementById('xiumi-import-result').textContent = '导入出错：' + (err.message || err);
 				document.getElementById('xiumi-import-result').style.display = 'block';
 				document.getElementById('xiumi-import-result').style.color = '#be123c';
 			}
