@@ -6834,12 +6834,17 @@ function groupSideBySideRowsForFlow() {
 }
 
 function importXiumiToCanvas(rawHtml) {
+	console.log('[IMPORT] rawHtml length:', rawHtml ? rawHtml.length : 0);
 	var isWorkbenchHTML = rawHtml.indexOf('data-wb-root="1"') !== -1 || rawHtml.indexOf("data-wb-root='1'") !== -1;
+	console.log('[IMPORT] isWorkbenchHTML:', isWorkbenchHTML);
 	var imported = importXiumiHTML(rawHtml);
+	console.log('[IMPORT] imported.html length:', imported.html ? imported.html.length : 0);
+	console.log('[IMPORT] imported.counts:', JSON.stringify(imported.counts));
 	var parser = new DOMParser();
 	var doc = parser.parseFromString(imported.html, 'text/html');
 	var rootWrapper = doc.body.firstElementChild;
-	if (!rootWrapper) return;
+	console.log('[IMPORT] rootWrapper:', rootWrapper ? rootWrapper.tagName : 'null');
+	if (!rootWrapper) { console.error('[IMPORT] rootWrapper is null'); return; }
 
 	var directChildren = Array.from(rootWrapper.children);
 	
@@ -6860,9 +6865,12 @@ function importXiumiToCanvas(rawHtml) {
 
 	saveState();
 	canvas.innerHTML = '';
+	console.log('[IMPORT] directChildren count:', directChildren.length);
+	console.log('[IMPORT] directChildren tags:', directChildren.map(function(c){return c.tagName;}).join(','));
 	var blocks = [];
 	directChildren.forEach(function(child) {
-		if (child.tagName !== 'SECTION') return;
+		console.log('[IMPORT] processing child:', child.tagName, 'data-wb-type:', child.getAttribute('data-wb-type'));
+		if (child.tagName !== 'SECTION') { console.log('[IMPORT] skipping non-section'); return; }
 		var block;
 		if (isWorkbenchHTML) {
 			block = hydrateWorkbenchSection(child);
@@ -6910,7 +6918,9 @@ function importXiumiToCanvas(rawHtml) {
 	});
 
 	// Reposition after browser renders content (give time for layout)
+	console.log('[IMPORT] blocks created:', blocks.length);
 	setTimeout(function() {
+		console.log('[IMPORT] repositioning', blocks.length, 'blocks');
 		var top = 20;
 		blocks.forEach(function(block) {
 			var h = block.scrollHeight || block.offsetHeight || 200;
