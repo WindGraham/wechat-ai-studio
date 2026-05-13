@@ -3133,6 +3133,7 @@ let currentDragBlock = null;
 
 var WECHAT_EDITOR_LOG = {
 	enabled: true,
+	remote: true,
 	level: 'info',
 	_levels: {error:0, warn:1, info:2, debug:3},
 	log: function(level, tag, msg, data) {
@@ -3141,12 +3142,46 @@ var WECHAT_EDITOR_LOG = {
 		var prefix = '[WECHAT][' + level.toUpperCase() + '][' + tag + ']';
 		if (data !== undefined) console.log(prefix, msg, data);
 		else console.log(prefix, msg);
+		if (this.remote) {
+			this._sendRemote(level, tag, msg, data);
+		}
+	},
+	_sendRemote: function(level, tag, msg, data) {
+		try {
+			var payload = JSON.stringify({
+				level: level,
+				tag: tag,
+				message: msg,
+				data: data !== undefined ? data : null,
+				timestamp: new Date().toLocaleTimeString()
+			});
+			fetch('/api/log', {
+				method: 'POST',
+				headers: {'Content-Type': 'application/json'},
+				body: payload,
+				keepalive: true
+			}).catch(function() {});
+		} catch (e) {}
 	},
 	error: function(tag, msg, data) { this.log('error', tag, msg, data); },
 	warn:  function(tag, msg, data) { this.log('warn',  tag, msg, data); },
 	info:  function(tag, msg, data) { this.log('info',  tag, msg, data); },
 	debug: function(tag, msg, data) { this.log('debug', tag, msg, data); }
 };
+
+function saveEditorSnapshot(label) {
+	try {
+		var canvas = document.getElementById('block-canvas');
+		if (!canvas) return;
+		var html = canvas.innerHTML;
+		fetch('/api/snapshot', {
+			method: 'POST',
+			headers: {'Content-Type': 'application/json'},
+			body: JSON.stringify({html: html, label: label || 'snapshot'}),
+			keepalive: true
+		}).catch(function() {});
+	} catch (e) {}
+}
 
 
 function getResizeHandles() {
@@ -3806,6 +3841,7 @@ function setWorkbenchMode(mode) {
 	}
 	currentWorkbenchMode = mode;
 	syncWorkbenchDocumentMetadata();
+	saveEditorSnapshot('mode-' + mode);
 	document.querySelectorAll('#block-canvas .canvas-block').forEach(function(block) {
 		makeInteractable(block);
 	});
@@ -5204,6 +5240,7 @@ function ungroupSelection() {
 	if (moved.length) setSelectedBlocks(moved, moved[moved.length - 1]);
 	ensureCanvasHeight();
 	scheduleAutoSave();
+	saveEditorSnapshot('ungroup');
 }
 
 function deepUngroupSelection() {
@@ -5258,6 +5295,7 @@ function deepUngroupSelection() {
 	setSelectedBlocks(finalMoved.length ? finalMoved : remaining, (finalMoved[0] || remaining[0] || null));
 	ensureCanvasHeight();
 	scheduleAutoSave();
+	saveEditorSnapshot('deep-ungroup');
 }
 
 function mergeSelection() {
@@ -5580,6 +5618,7 @@ function createFlexRowGroup(block1, block2) {
 	makeInteractable(group);
 	selectBlock(group);
 	scheduleAutoSave();
+	saveEditorSnapshot('create-flexrow');
 	return group;
 }
 
@@ -5754,6 +5793,7 @@ function addColumns(n) {
 	selectBlock(group);
 	ensureCanvasHeight();
 	scheduleAutoSave();
+	saveEditorSnapshot('add-columns');
 	return group;
 }
 
@@ -5917,6 +5957,7 @@ function buildWorkbenchHTML() {
 		node.innerHTML = clone.innerHTML.trim();
 		return node.outerHTML;
 	}).join('\n');
+	saveEditorSnapshot('export-workbench');
 	return '<section data-wb-root="1" data-wb-version="' + WORKBENCH_VERSION + '" data-wb-mode="' + currentWorkbenchMode + '" style="width:100%;max-width:375px;margin-left:auto;margin-right:auto;text-align:center;box-sizing:border-box;">\n' + html + '\n</section>';
 }
 
@@ -6015,6 +6056,7 @@ function buildWechatHTML() {
 			html += clone.innerHTML.trim() + '\n';
 		}
 	});
+	saveEditorSnapshot('export-wechat');
 	return '<section style="width:100%;max-width:375px;margin-left:auto;margin-right:auto;text-align:center;box-sizing:border-box;">\n' + html.trim() + '\n</section>';
 }
 
@@ -7005,6 +7047,7 @@ function importXiumiToCanvas(rawHtml) {
 	// Reposition after browser renders content (give time for layout)
 	console.log('[IMPORT] blocks created:', blocks.length);
 	WECHAT_EDITOR_LOG.info('IMPORT', 'importXiumiToCanvas result', {blocks: blocks.length, isWorkbench: isWorkbenchHTML, counts: imported.counts});
+	saveEditorSnapshot('import');
 	setTimeout(function() {
 		console.log('[IMPORT] repositioning', blocks.length, 'blocks');
 		var top = 20;

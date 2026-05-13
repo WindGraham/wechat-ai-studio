@@ -31,13 +31,29 @@ class WechatEditorHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
         self.workspace = (workspace or Path.cwd()).resolve()
         self.project_data_dir = self.workspace / ".wechat-ai-publisher"
         self.local_images_dir = self.project_data_dir / "local-images"
+        self.logs_dir = self.project_data_dir / "logs"
+        self.snapshots_dir = self.project_data_dir / "snapshots"
+        self.logs_dir.mkdir(parents=True, exist_ok=True)
+        self.snapshots_dir.mkdir(parents=True, exist_ok=True)
         super().__init__(*args, directory=directory, **kwargs)
 
     def do_GET(self) -> None:
         if self.path.split("?", 1)[0] == "/local-images.json":
             self._send_local_images_index()
             return
+        if self.path.split("?", 1)[0] == "/api/logs/latest":
+            self._send_latest_logs()
+            return
         super().do_GET()
+
+    def do_POST(self) -> None:
+        if self.path.split("?", 1)[0] == "/api/log":
+            self._receive_log()
+            return
+        if self.path.split("?", 1)[0] == "/api/snapshot":
+            self._receive_snapshot()
+            return
+        self.send_error(404, "Not Found")
 
     def translate_path(self, path: str) -> str:
         request_path = path.split("?", 1)[0].split("#", 1)[0]
@@ -72,6 +88,79 @@ class WechatEditorHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
         self.send_header("Content-Length", str(len(payload)))
         self.end_headers()
         self.wfile.write(payload)
+
+    def _read_post_body(self) -> bytes:
+        content_length = int(self.headers.get("Content-Length", 0))
+        return self.rfile.read(content_length) if content_length > 0 else b""
+
+    def _receive_log(self) -> None:
+        try:
+            body = self._read_post_body()
+            data = json.loads(body.decode("utf-8"))
+            level = data.get("level", "info")
+            tag = data.get("tag", "UNKNOWN")
+            message = data.get("message", "")
+            extra = data.get("data", "")
+            timestamp = data.get("timestamp", time.strftime("%H:%M:%S"))
+            log_line = f"[{timestamp}][{level.upper()}][{tag}] {message}"
+            if extra:
+                log_line += f" | {json.dumps(extra, ensure_ascii=False)}"
+            log_line += "\n"
+            log_file = self.logs_dir / f"editor-{time.strftime('%Y-%m-%d')}.log"
+            with open(log_file, "a", encoding="utf-8") as f:
+                f.write(log_line)
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json")
+            self.end_headers()
+            self.wfile.write(b'{"ok":true}')
+        except Exception as e:
+            self.send_response(500)
+            self.send_header("Content-Type", "application/json")
+            self.end_headers()
+            self.wfile.write(json.dumps({"ok": false, "error": str(e)}).encode("utf-8"))
+
+    def _receive_snapshot(self) -> None:
+        try:
+            body = self._read_post_body()
+            data = json.loads(body.decode("utf-8"))
+            html = data.get("html", "")
+            label = data.get("label", "snapshot")
+            filename = f"{label}-{time.strftime('%Y%m%d-%H%M%S')}.html"
+            filepath = self.snapshots_dir / filename
+            with open(filepath, "w", encoding="utf-8") as f:
+                f.write(html)
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json")
+            self.end_headers()
+            self.wfile.write(json.dumps({"ok": True, "file": str(filename)}).encode("utf-8"))
+        except Exception as e:
+            self.send_response(500)
+            self.send_header("Content-Type", "application/json")
+            self.end_headers()
+            self.wfile.write(json.dumps({"ok": False, "error": str(e)}).encode("utf-8"))
+
+    def _send_latest_logs(self) -> None:
+        try:
+            log_file = self.logs_dir / f"editor-{time.strftime('%Y-%m-%d')}.log"
+            if not log_file.exists():
+                self.send_response(200)
+                self.send_header("Content-Type", "text/plain; charset=utf-8")
+                self.end_headers()
+                self.wfile.write(b"No logs yet.")
+                return
+            content = log_file.read_text(encoding="utf-8")
+            # Return last 200 lines
+            lines = content.splitlines()
+            output = "\n".join(lines[-200:]) if len(lines) > 200 else content
+            self.send_response(200)
+            self.send_header("Content-Type", "text/plain; charset=utf-8")
+            self.end_headers()
+            self.wfile.write(output.encode("utf-8"))
+        except Exception as e:
+            self.send_response(500)
+            self.send_header("Content-Type", "text/plain")
+            self.end_headers()
+            self.wfile.write(str(e).encode("utf-8"))
 
 
 def parse_args() -> argparse.Namespace:
