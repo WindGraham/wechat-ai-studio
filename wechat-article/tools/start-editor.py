@@ -95,9 +95,67 @@ def port_is_free(host: str, port: int) -> bool:
         return sock.connect_ex((probe_host, port)) != 0
 
 
+def kill_process_on_port(port: int) -> bool:
+    """Kill any process listening on *port*. Return True if something was killed."""
+    killed = False
+    # Try lsof first (most common on macOS/Linux)
+    try:
+        result = subprocess.run(
+            ["lsof", "-ti", f":{port}"],
+            capture_output=True, text=True, timeout=2
+        )
+        if result.returncode == 0:
+            for line in result.stdout.strip().splitlines():
+                pid = line.strip()
+                if pid.isdigit():
+                    try:
+                        os.kill(int(pid), signal.SIGTERM)
+                        killed = True
+                    except (OSError, ProcessLookupError):
+                        pass
+    except (subprocess.TimeoutExpired, FileNotFoundError):
+        pass
+
+    if killed:
+        time.sleep(0.6)
+        # Check again — if still occupied, SIGKILL
+        try:
+            result = subprocess.run(
+                ["lsof", "-ti", f":{port}"],
+                capture_output=True, text=True, timeout=2
+            )
+            if result.returncode == 0:
+                for line in result.stdout.strip().splitlines():
+                    pid = line.strip()
+                    if pid.isdigit():
+                        try:
+                            os.kill(int(pid), signal.SIGKILL)
+                        except (OSError, ProcessLookupError):
+                            pass
+        except (subprocess.TimeoutExpired, FileNotFoundError):
+            pass
+        return True
+
+    # Fallback: fuser (Linux only)
+    try:
+        subprocess.run(
+            ["fuser", "-k", f"{port}/tcp"],
+            capture_output=True, timeout=2
+        )
+        return True
+    except (subprocess.TimeoutExpired, FileNotFoundError):
+        pass
+
+    return False
+
+
 def require_free_port(host: str, port: int, label: str) -> None:
     if not port_is_free(host, port):
-        raise SystemExit(f"{label} port {port} is already in use. Choose another port or stop the existing service.")
+        print(f"{label} port {port} is already in use. Trying to stop the existing process...")
+        if kill_process_on_port(port):
+            time.sleep(0.5)
+        if not port_is_free(host, port):
+            raise SystemExit(f"{label} port {port} is still in use after attempting to stop. Choose another port or stop it manually.")
 
 
 def editor_url(host: str, http_port: int, terminal_port: int) -> str:

@@ -6677,11 +6677,17 @@ function importXiumiHTML(rawHtml) {
 		counts[type] = (counts[type] || 0) + 1;
 	});
 
-	var rootSection = doc.body.querySelector(':scope > section');
-	var innerHtml = rootSection ? rootSection.innerHTML : doc.body.innerHTML.replace(/^&nbsp;/, '').replace(/<section/, '<section data-wb-type="card"');
+	var directSections = doc.body.querySelectorAll(':scope > section');
+	var innerHtml;
+	if (directSections.length === 1) {
+		innerHtml = directSections[0].innerHTML;
+	} else if (directSections.length > 1) {
+		innerHtml = Array.from(directSections).map(function(sec) { return sec.outerHTML; }).join('\n');
+	} else {
+		innerHtml = doc.body.innerHTML.replace(/^&nbsp;/, '').replace(/<section/, '<section data-wb-type="card"');
+	}
 
-	var hasRootWbType = (innerHtml.indexOf('data-wb-type=') !== -1);
-	var result = '<section data-wb-root="1" data-wb-version="2.0" style="width:100%;max-width:375px;margin:0 auto;box-sizing:border-box;font-family:-apple-system,sans-serif;color:#333;font-size:15px;line-height:1.75;">' + innerHtml + '</section>';
+	var result = '<section style="width:100%;max-width:375px;margin:0 auto;box-sizing:border-box;font-family:-apple-system,sans-serif;color:#333;font-size:15px;line-height:1.75;">' + innerHtml + '</section>';
 
 	return { html: result, counts: counts };
 }
@@ -6828,6 +6834,7 @@ function groupSideBySideRowsForFlow() {
 }
 
 function importXiumiToCanvas(rawHtml) {
+	var isWorkbenchHTML = rawHtml.indexOf('data-wb-root="1"') !== -1 || rawHtml.indexOf("data-wb-root='1'") !== -1;
 	var imported = importXiumiHTML(rawHtml);
 	var parser = new DOMParser();
 	var doc = parser.parseFromString(imported.html, 'text/html');
@@ -6853,8 +6860,6 @@ function importXiumiToCanvas(rawHtml) {
 
 	saveState();
 	canvas.innerHTML = '';
-
-	var isWorkbenchHTML = rootWrapper.getAttribute('data-wb-root') === '1';
 	var blocks = [];
 	directChildren.forEach(function(child) {
 		if (child.tagName !== 'SECTION') return;
