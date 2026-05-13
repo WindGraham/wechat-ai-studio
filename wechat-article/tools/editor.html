@@ -74,7 +74,7 @@
 	.canvas-block.selected { outline: 2px solid var(--wechat-primary); outline-offset: 5px; z-index: 100; box-shadow: 0 12px 28px rgba(7, 193, 96, 0.13); }
 	.canvas-block.multi-selected { outline: 2px dashed #22c55e; outline-offset: 4px; box-shadow: 0 10px 24px rgba(34,197,94,0.10); }
 	#block-canvas.flow-mode { position: relative; display: block; padding: 0; }
-	#block-canvas.flow-mode .canvas-block { position: relative !important; left: auto !important; top: auto !important; transform: none !important; cursor: default; user-select: text; touch-action: auto; }
+	#block-canvas.flow-mode > .canvas-block { position: relative !important; left: auto !important; top: auto !important; transform: none !important; cursor: default; user-select: text; touch-action: auto; }
 	#block-canvas.flow-mode .canvas-block:hover { outline-color: rgba(59,130,246,0.55); }
 	#block-canvas.flow-mode .canvas-block .resize-handle { display: none !important; }
 	#block-canvas.flow-mode #wechat-selection-box { display: none !important; }
@@ -3121,6 +3121,10 @@ const MIN_BLOCK_WIDTH = 50;
 const MIN_BLOCK_HEIGHT = 20;
 const AUTO_SAVE_KEY = 'wechat-editor-layout-state-v1';
 const WORKBENCH_VERSION = '2.0';
+var globalFlowStyles = {
+	blockGap: '20px',
+	align: 'center'
+};
 const SNAP_THRESHOLD = 3;
 const SIDE_SNAP_DISTANCE = 30;
 let autoSaveTimer = null;
@@ -3716,6 +3720,8 @@ function applyFlowLayoutFromCanvas() {
 		block.style.margin = block.getAttribute('data-flow-margin');
 		block.style.position = 'relative';
 		block.style.transform = '';
+		block.style.left = '';
+		block.style.top = '';
 		previousBottom = Math.max(previousBottom, top + Math.round(block.offsetHeight || parseFloat(block.style.height) || 0));
 	});
 }
@@ -3740,6 +3746,13 @@ function captureFlowLayoutAsCanvas() {
 		if (h > 0) block.style.height = h + 'px';
 		block.style.margin = '';
 		block.style.position = 'absolute';
+		block.querySelectorAll('.canvas-block').forEach(function(child) {
+			child.style.position = '';
+			child.style.flex = '';
+			child.style.left = '';
+			child.style.top = '';
+			child.style.width = '';
+		});
 	});
 }
 
@@ -3755,6 +3768,7 @@ function setWorkbenchMode(mode) {
 		streamMode = true;
 	} else if (mode === 'flow') {
 		captureCanvasLayoutMetadata();
+		groupSideBySideRowsForFlow();
 		applyFlowLayoutFromCanvas();
 		canvas.classList.add('flow-mode');
 		streamMode = false;
@@ -3798,6 +3812,14 @@ function escapeAttrValue(value) {
 	return String(value == null ? '' : value).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
+function normalizeCssLength(val, defaultVal) {
+	if (!val && defaultVal) return defaultVal;
+	val = String(val).trim();
+	if (!val) return defaultVal || '0';
+	if (/^\d+$/.test(val)) return val + 'px';
+	return val;
+}
+
 function renderWechatInspector(block) {
 	var panel = ensureWechatInspector();
 	if (!panel) return;
@@ -3808,22 +3830,34 @@ function renderWechatInspector(block) {
 	ensureBlockMetadata(block);
 	var bounds = getBlockBounds(block);
 	var type = block.getAttribute('data-type') || 'custom';
+	var isFlexCol = type === 'flex-col';
 	var role = block.getAttribute('data-role') || inferRole(type);
 	var note = block.getAttribute('data-ai-note') || '';
 	var img = block.querySelector('img');
 	var content = getBlockContentElement(block);
+	var isFlow = currentWorkbenchMode === 'flow';
+	var textTarget = block.querySelector('p, h1, h2, h3, h4, h5, h6, blockquote') || content;
+	var letterSpacing = textTarget ? textTarget.style.letterSpacing || '' : '';
+	var lineHeight = textTarget ? textTarget.style.lineHeight || '' : '';
+	var textIndent = textTarget ? textTarget.style.textIndent || '' : '';
+	var marginTop = block.style.marginTop || '';
+	var marginBottom = block.style.marginBottom || '';
+	var objectPosition = img ? img.style.objectPosition || '' : '';
 	panel.innerHTML = '<h6>微信精调：' + escapeAttrValue(type) + '</h6>' +
 		'<label>AI 识别角色</label><input data-inspector-key="role" value="' + escapeAttrValue(role) + '">' +
 		'<div class="inspector-grid">' +
-		'<div><label>左距</label><input type="number" data-inspector-key="x" value="' + bounds.x + '"></div>' +
-		'<div><label>上距</label><input type="number" data-inspector-key="y" value="' + bounds.y + '"></div>' +
+		(isFlow ? '' : '<div><label>左距</label><input type="number" data-inspector-key="x" value="' + bounds.x + '"></div>') +
+		(isFlow ? '' : '<div><label>上距</label><input type="number" data-inspector-key="y" value="' + bounds.y + '"></div>') +
 		'<div><label>宽度</label><input type="number" data-inspector-key="width" value="' + bounds.width + '"></div>' +
 		'<div><label>高度</label><input type="number" data-inspector-key="height" value="' + bounds.height + '"></div>' +
 		'</div>' +
 		'<label>尺寸比例</label><select data-inspector-key="lockRatio"><option value="1"' + (block.getAttribute('data-lock-ratio') === '1' ? ' selected' : '') + '>锁定</option><option value="0"' + (block.getAttribute('data-lock-ratio') !== '1' ? ' selected' : '') + '>自由</option></select>' +
-		(img ? '<label>图片地址</label><input data-inspector-key="imageSrc" value="' + escapeAttrValue(img.getAttribute('src') || '') + '"><label>图片裁切</label><select data-inspector-key="objectFit"><option value="cover"' + ((img.style.objectFit || 'cover') === 'cover' ? ' selected' : '') + '>填充裁切</option><option value="contain"' + (img.style.objectFit === 'contain' ? ' selected' : '') + '>完整显示</option></select>' : '') +
+		(img ? '<label>图片地址</label><input data-inspector-key="imageSrc" value="' + escapeAttrValue(img.getAttribute('src') || '') + '"><label>图片裁切</label><select data-inspector-key="objectFit"><option value="cover"' + ((img.style.objectFit || 'cover') === 'cover' ? ' selected' : '') + '>填充裁切</option><option value="contain"' + (img.style.objectFit === 'contain' ? ' selected' : '') + '>完整显示</option></select><label>图片位置</label><input data-inspector-key="objectPosition" value="' + escapeAttrValue(objectPosition) + '" placeholder="center">' : '') +
 		'<label>文字</label><textarea data-inspector-key="text">' + escapeAttrValue(getBlockText(block)) + '</textarea>' +
 		'<div class="inspector-grid">' +
+		'<div><label>字距</label><input data-inspector-key="letterSpacing" value="' + escapeAttrValue(letterSpacing) + '" placeholder="0px"></div>' +
+		'<div><label>行距</label><input data-inspector-key="lineHeight" value="' + escapeAttrValue(lineHeight) + '" placeholder="1.5"></div>' +
+		'<div><label>首行缩进</label><input data-inspector-key="textIndent" value="' + escapeAttrValue(textIndent) + '" placeholder="0px"></div>' +
 		'<div><label>背景</label><input data-inspector-key="backgroundColor" value="' + escapeAttrValue(content ? content.style.backgroundColor || '' : '') + '" placeholder="#f8f9fa"></div>' +
 		'<div><label>文字颜色</label><input data-inspector-key="color" value="' + escapeAttrValue(content ? content.style.color || '' : '') + '" placeholder="#333"></div>' +
 		'<div><label>圆角</label><input data-inspector-key="borderRadius" value="' + escapeAttrValue((img && img.style.borderRadius) || (content && content.style.borderRadius) || '') + '" placeholder="12px"></div>' +
@@ -3831,8 +3865,11 @@ function renderWechatInspector(block) {
 		'<div><label>边框</label><input data-inspector-key="border" value="' + escapeAttrValue(content ? content.style.border || '' : '') + '" placeholder="1px solid #d8f0e3"></div>' +
 		'<div><label>阴影</label><input data-inspector-key="boxShadow" value="' + escapeAttrValue(content ? content.style.boxShadow || '' : '') + '" placeholder="0 8px 24px rgba(0,0,0,.08)"></div>' +
 		'</div>' +
+		(isFlow ? '<div class="inspector-section"><label>间距精调</label><div class="inspector-grid"><div><label>上边距</label><input data-inspector-key="marginTop" value="' + escapeAttrValue(marginTop) + '" placeholder="0px"></div><div><label>下边距</label><input data-inspector-key="marginBottom" value="' + escapeAttrValue(marginBottom) + '" placeholder="0px"></div></div></div>' : '') +
+		(isFlow && block === getCanvas().querySelector('.canvas-block') ? '<div class="inspector-section"><label>全局文档流样式</label><div class="inspector-grid"><div><label>全局块间距</label><input data-inspector-key="globalBlockGap" value="' + escapeAttrValue(globalFlowStyles.blockGap) + '"></div><div><label>全局对齐</label><select data-inspector-key="globalAlign"><option value="left"' + (globalFlowStyles.align === 'left' ? ' selected' : '') + '>左对齐</option><option value="center"' + (globalFlowStyles.align === 'center' ? ' selected' : '') + '>居中</option><option value="right"' + (globalFlowStyles.align === 'right' ? ' selected' : '') + '>右对齐</option></select></div></div></div>' : '') +
+		(isFlexCol ? '<div class="inspector-section"><label>flex-col 操作</label><div class="inspector-actions"><button type="button" data-inspector-action="addFlexColChildAbove">上方添加</button><button type="button" data-inspector-action="addFlexColChildBelow">下方添加</button><button type="button" data-inspector-action="removeFlexColChild">删除子项</button><button type="button" data-inspector-action="moveFlexColChildUp">上移</button><button type="button" data-inspector-action="moveFlexColChildDown">下移</button><button type="button" data-inspector-action="equalizeFlexColChildren">均分高度</button></div></div>' : '') +
 		'<label>给 AI 的排版说明</label><textarea data-inspector-key="aiNote" placeholder="例如：这张图压住下方卡片，做海报感">' + escapeAttrValue(note) + '</textarea>' +
-		'<div class="inspector-actions"><button type="button" data-inspector-action="center">居中</button><button type="button" data-inspector-action="duplicate">复制</button><button type="button" class="danger" data-inspector-action="delete">删除</button></div>';
+		'<div class="inspector-actions">' + (isFlow ? '' : '<button type="button" data-inspector-action="center">居中</button>') + '<button type="button" data-inspector-action="duplicate">复制</button><button type="button" class="danger" data-inspector-action="delete">删除</button></div>';
 	bindWechatInspector(panel, block);
 }
 
@@ -3876,16 +3913,51 @@ function bindWechatInspector(panel, block) {
 				var clone = block.cloneNode(true);
 				clone.id = getNextBlockId();
 				clone.removeAttribute('data-id');
-				clone.style.left = (parseBlockNumber(block, 'left') + 12) + 'px';
-				clone.style.top = (parseBlockNumber(block, 'top') + 12) + 'px';
-				canvas.appendChild(clone);
+				if (currentWorkbenchMode === 'flow') {
+					clone.style.position = 'relative';
+					clone.style.left = '';
+					clone.style.top = '';
+					clone.style.margin = normalizeCssLength(globalFlowStyles.blockGap, '20px') + ' 0 0 0';
+					canvas.insertBefore(clone, block.nextSibling);
+				} else {
+					clone.style.left = (parseBlockNumber(block, 'left') + 12) + 'px';
+					clone.style.top = (parseBlockNumber(block, 'top') + 12) + 'px';
+					canvas.appendChild(clone);
+				}
 				ensureBlockMetadata(clone);
 				makeInteractable(clone);
 				rebindChildrenInteractable(clone);
 				selectBlock(clone);
 			} else if (action === 'center') {
+				if (currentWorkbenchMode === 'flow') return;
 				block.style.left = Math.round((CANVAS_WIDTH - block.offsetWidth) / 2) + 'px';
 				selectBlock(block);
+			} else if (action === 'addFlexColChildAbove') {
+				var child = addChildToFlexCol(block, '<section style="padding:12px;"><p>新内容</p></section>');
+				var children = getFlexColChildren(block);
+				if (children.length > 1) {
+					block.insertBefore(child, children[children.length - 2]);
+				}
+				selectBlock(child);
+			} else if (action === 'addFlexColChildBelow') {
+				var child = addChildToFlexCol(block, '<section style="padding:12px;"><p>新内容</p></section>');
+				selectBlock(child);
+			} else if (action === 'removeFlexColChild') {
+				removeSelectedFlexColChild();
+			} else if (action === 'moveFlexColChildUp') {
+				var sel = getSelectedBlocks()[0];
+				if (sel && sel.parentElement === block) {
+					var idx = getFlexColChildren(block).indexOf(sel);
+					if (idx > 0) moveFlexColChild(block, idx, idx - 1);
+				}
+			} else if (action === 'moveFlexColChildDown') {
+				var sel = getSelectedBlocks()[0];
+				if (sel && sel.parentElement === block) {
+					var idx = getFlexColChildren(block).indexOf(sel);
+					if (idx >= 0 && idx < getFlexColChildren(block).length - 1) moveFlexColChild(block, idx, idx + 1);
+				}
+			} else if (action === 'equalizeFlexColChildren') {
+				equalizeFlexColChildren(block);
 			}
 			ensureCanvasHeight();
 			scheduleAutoSave();
@@ -3899,10 +3971,15 @@ function applyInspectorValue(block, input, live) {
 	var value = input.value;
 	var content = getBlockContentElement(block);
 	var img = block.querySelector('img');
+	var textTarget = block.querySelector('p, h1, h2, h3, h4, h5, h6, blockquote') || content;
 	if (!live) saveState();
-	if (key === 'x') block.style.left = clamp(parseInt(value, 10) || 0, 0, CANVAS_WIDTH - block.offsetWidth) + 'px';
-	else if (key === 'y') block.style.top = Math.max(0, parseInt(value, 10) || 0) + 'px';
-	else if (key === 'width') block.style.width = clamp(parseInt(value, 10) || block.offsetWidth, MIN_BLOCK_WIDTH, CANVAS_WIDTH) + 'px';
+	if (key === 'x') {
+		if (currentWorkbenchMode === 'flow') return;
+		block.style.left = clamp(parseInt(value, 10) || 0, 0, CANVAS_WIDTH - block.offsetWidth) + 'px';
+	} else if (key === 'y') {
+		if (currentWorkbenchMode === 'flow') return;
+		block.style.top = Math.max(0, parseInt(value, 10) || 0) + 'px';
+	} else if (key === 'width') block.style.width = clamp(parseInt(value, 10) || block.offsetWidth, MIN_BLOCK_WIDTH, CANVAS_WIDTH) + 'px';
 	else if (key === 'height') block.style.height = Math.max(MIN_BLOCK_HEIGHT, parseInt(value, 10) || block.offsetHeight) + 'px';
 	else if (key === 'role') block.setAttribute('data-role', value);
 	else if (key === 'aiNote') block.setAttribute('data-ai-note', value);
@@ -3916,6 +3993,7 @@ function applyInspectorValue(block, input, live) {
 		img.setAttribute('src', value);
 	}
 	else if (key === 'objectFit' && img) img.style.objectFit = value;
+	else if (key === 'objectPosition' && img) img.style.objectPosition = value;
 	else if (key === 'text') updateBlockText(block, value);
 	else if (key === 'backgroundColor' && content) content.style.backgroundColor = value;
 	else if (key === 'color' && content) content.style.color = value;
@@ -3923,6 +4001,13 @@ function applyInspectorValue(block, input, live) {
 	else if (key === 'opacity' && content) content.style.opacity = value;
 	else if (key === 'border' && content) content.style.border = value;
 	else if (key === 'boxShadow' && content) content.style.boxShadow = value;
+	else if (key === 'letterSpacing' && textTarget) textTarget.style.letterSpacing = value;
+	else if (key === 'lineHeight' && textTarget) textTarget.style.lineHeight = value;
+	else if (key === 'textIndent' && textTarget) textTarget.style.textIndent = value;
+	else if (key === 'marginTop') block.style.marginTop = value;
+	else if (key === 'marginBottom') block.style.marginBottom = value;
+	else if (key === 'globalBlockGap') { globalFlowStyles.blockGap = value; }
+	else if (key === 'globalAlign') { globalFlowStyles.align = value; }
 	syncWorkbenchBlockMetadata(block);
 	ensureCanvasHeight();
 	updateSelectionBox(block);
@@ -3932,6 +4017,9 @@ function applyInspectorValue(block, input, live) {
 function selectBlock(block) {
 	if (block) ensureBlockMetadata(block);
 	setSelectedBlocks(block ? [block] : [], block || null);
+	if (block && block.getAttribute('data-type') === 'flex-col' && currentWorkbenchMode !== 'flow') {
+		ensureFlexColChildEditing(block);
+	}
 	if (!block && typeof Vvveb !== 'undefined' && Vvveb.Builder) {
 		Vvveb.Builder.selectedEl = null;
 		if (Vvveb.Builder.selectNode) Vvveb.Builder.selectNode(false);
@@ -3985,11 +4073,25 @@ function updateSelectionDrag(event) {
 	box.style.width = (right - left) + 'px';
 	box.style.height = (bottom - top) + 'px';
 	var selected = Array.from(getCanvas().querySelectorAll(':scope > .canvas-block')).filter(function(block) {
+		var blockLeft, blockTop, blockRight, blockBottom;
+		if (currentWorkbenchMode === 'flow') {
+			var rect = block.getBoundingClientRect();
+			var canvasRect = getCanvas().getBoundingClientRect();
+			blockLeft = rect.left - canvasRect.left + getCanvas().scrollLeft;
+			blockTop = rect.top - canvasRect.top + getCanvas().scrollTop;
+			blockRight = blockLeft + rect.width;
+			blockBottom = blockTop + rect.height;
+		} else {
+			blockLeft = parseBlockNumber(block, 'left');
+			blockTop = parseBlockNumber(block, 'top');
+			blockRight = blockLeft + block.offsetWidth;
+			blockBottom = blockTop + block.offsetHeight;
+		}
 		return rectsIntersect({ left: left, top: top, right: right, bottom: bottom }, {
-			left: parseBlockNumber(block, 'left'),
-			top: parseBlockNumber(block, 'top'),
-			right: parseBlockNumber(block, 'left') + block.offsetWidth,
-			bottom: parseBlockNumber(block, 'top') + block.offsetHeight
+			left: blockLeft,
+			top: blockTop,
+			right: blockRight,
+			bottom: blockBottom
 		});
 	});
 	if (selectionDrag.additive) selected = Array.from(new Set(selectionDrag.initial.concat(selected)));
@@ -4307,11 +4409,14 @@ function makeInteractable(element) {
 	var parentGroup = element.parentElement && element.parentElement.closest('.canvas-block[data-type="group"], .canvas-block[data-type="flex-row"], .canvas-block[data-type="flex-col"]');
 	if (parentGroup) {
 		// Nested inside a group: downgrade any top-level interact.js bindings, remove resize handles, then bind only selection events
-		if (element._interactable) {
+		var isFlexColChild = parentGroup.getAttribute('data-type') === 'flex-col';
+		if (element._interactable && !isFlexColChild) {
 			interact(element).unset();
 			element._interactable = false;
 		}
-		element.querySelectorAll(':scope > .resize-handle').forEach(function(h) { h.remove(); });
+		if (!isFlexColChild) {
+			element.querySelectorAll(':scope > .resize-handle').forEach(function(h) { h.remove(); });
+		}
 		if (!element._wechatNativeEventsBound) {
 			element.addEventListener('mousedown', function(e) { e.stopPropagation(); });
 			element.addEventListener('touchstart', function(e) { e.stopPropagation(); }, { passive: true });
@@ -4987,6 +5092,7 @@ function ungroupSelection() {
 			return child.classList && child.classList.contains('canvas-block');
 		});
 			var isFlexRow = group.getAttribute('data-type') === 'flex-row';
+			var isFlexCol = group.getAttribute('data-type') === 'flex-col';
 		if (children.length > 0) {
 			if (!isFlexRow) {
 				children.sort(function(a, b) { return parseBlockNumber(a, 'top') - parseBlockNumber(b, 'top'); });
@@ -5000,11 +5106,14 @@ function ungroupSelection() {
 				if (isFlexRow) {
 					child.style.left = (gx + item.left) + 'px';
 					child.style.top  = (gy + item.top) + 'px';
+				} else if (isFlexCol) {
+					child.style.left = gx + 'px';
+					child.style.top  = (gy + item.top) + 'px';
 				} else {
 					child.style.left = (gx + parseBlockNumber(child, 'left')) + 'px';
 					child.style.top  = (gy + parseBlockNumber(child, 'top')) + 'px';
 				}
-				child.style.position = 'absolute';
+				child.style.position = currentWorkbenchMode === 'flow' ? 'relative' : 'absolute';
 				child.style.flex = '';
 				child.style.display = '';
 				child.style.verticalAlign = '';
@@ -5421,6 +5530,111 @@ function createFlexRowGroup(block1, block2) {
 	return group;
 }
 
+function getFlexColChildren(col) {
+	return Array.from(col.children).filter(function(child) {
+		return child.classList && child.classList.contains('canvas-block');
+	});
+}
+
+function addChildToFlexCol(col, html) {
+	var child = document.createElement('div');
+	child.className = 'canvas-block';
+	child.id = getNextBlockId();
+	child.style.position = 'relative';
+	child.style.width = '100%';
+	child.style.minHeight = '40px';
+	child.setAttribute('data-type', 'component');
+	child.setAttribute('data-role', 'custom-block');
+	child.innerHTML = html || '<section style="padding:12px;"><p>新内容</p></section>';
+	col.appendChild(child);
+	ensureBlockMetadata(child);
+	makeInteractable(child);
+	return child;
+}
+
+function removeSelectedFlexColChild() {
+	var selected = getSelectedBlocks();
+	if (!selected.length) return;
+	var target = selected.find(function(block) {
+		var parent = block.parentElement;
+		return parent && parent.getAttribute('data-type') === 'flex-col';
+	});
+	if (!target) return;
+	saveState();
+	target.remove();
+	renderWechatInspector(null);
+	scheduleAutoSave();
+}
+
+function moveFlexColChild(col, fromIndex, toIndex) {
+	var children = getFlexColChildren(col);
+	if (fromIndex < 0 || fromIndex >= children.length) return;
+	if (toIndex < 0 || toIndex >= children.length) return;
+	var child = children[fromIndex];
+	var ref = children[toIndex];
+	if (fromIndex < toIndex) {
+		ref = ref.nextSibling;
+	}
+	col.insertBefore(child, ref);
+}
+
+function equalizeFlexColChildren(col) {
+	getFlexColChildren(col).forEach(function(child) {
+		child.style.flex = '1 1 0%';
+	});
+}
+
+function ensureFlexColChildEditing(col) {
+	if (typeof interact === 'undefined') return;
+	getFlexColChildren(col).forEach(function(child) {
+		if (child._flexColInteractable) {
+			interact(child).unset();
+			child._flexColInteractable = false;
+		}
+	});
+	var dragIndex = -1;
+	var dropIndex = -1;
+	interact(col).dropzone({
+		accept: '.canvas-block',
+		ondragenter: function(event) {
+			var target = event.relatedTarget;
+			if (target.parentElement !== col) return;
+			dragIndex = getFlexColChildren(col).indexOf(target);
+		},
+		ondrop: function(event) {
+			var target = event.relatedTarget;
+			if (target.parentElement !== col || dragIndex < 0) return;
+			var children = getFlexColChildren(col);
+			dropIndex = children.indexOf(target);
+			if (dragIndex !== dropIndex) {
+				moveFlexColChild(col, dragIndex, dropIndex);
+			}
+			dragIndex = -1;
+			dropIndex = -1;
+		}
+	});
+	getFlexColChildren(col).forEach(function(child) {
+		interact(child).draggable({
+			axis: 'y',
+			listeners: {
+				start: function() { saveState(); },
+				move: function(event) {
+					var target = event.target;
+					var y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy;
+					target.setAttribute('data-y', y);
+					target.style.transform = 'translateY(' + y + 'px)';
+				},
+				end: function(event) {
+					var target = event.target;
+					target.setAttribute('data-y', 0);
+					target.style.transform = '';
+				}
+			}
+		});
+		child._flexColInteractable = true;
+	});
+}
+
 function addColumns(n) {
 	var canvas = getCanvas();
 	if (!canvas) return;
@@ -5623,9 +5837,7 @@ function buildWorkbenchHTML() {
 	syncWorkbenchDocumentMetadata();
 	var canvas = getCanvas();
 	if (!canvas) return '';
-	var blocks = Array.from(canvas.querySelectorAll(':scope > .canvas-block')).sort(function(a, b) {
-		return parseBlockNumber(a, 'top') - parseBlockNumber(b, 'top');
-	});
+	var blocks = getSortedTopLevelBlocks();
 	var html = blocks.map(function(block) {
 		ensureBlockMetadata(block);
 		var node = document.createElement('section');
@@ -5670,6 +5882,7 @@ function extractGroupContent(groupBlock) {
 		childBlocks = Array.from(groupBlock.querySelectorAll(':scope > section'));
 	}
 	var isFlexRow = groupBlock.getAttribute('data-type') === 'flex-row';
+	var isFlexCol = groupBlock.getAttribute('data-type') === 'flex-col';
 	if (isFlexRow) {
 		childBlocks.sort(function(a, b) { return (a.offsetLeft || 0) - (b.offsetLeft || 0); });
 		var row = document.createElement('section');
@@ -5694,10 +5907,19 @@ function extractGroupContent(groupBlock) {
 		});
 		row.innerHTML = rowHtml;
 		result += row.outerHTML + '\n';
+	} else if (isFlexCol) {
+		childBlocks.forEach(function(child) {
+			if (child.classList && child.classList.contains('canvas-block') && (['group','flex-row','flex-col'].indexOf(child.getAttribute('data-type')) !== -1)) {
+				result += extractGroupContent(child);
+			} else {
+				var clone = cleanBlockForExport(child.cloneNode(true));
+				result += clone.innerHTML.trim() + '\n';
+			}
+		});
 	} else {
 		childBlocks.sort(function(a, b) { return (parseFloat(a.style.top)||0) - (parseFloat(b.style.top)||0); });
 		childBlocks.forEach(function(child) {
-			if (child.classList && child.classList.contains('canvas-block') && (child.getAttribute('data-type') === 'group' || child.getAttribute('data-type') === 'flex-row')) {
+			if (child.classList && child.classList.contains('canvas-block') && (['group','flex-row','flex-col'].indexOf(child.getAttribute('data-type')) !== -1)) {
 				result += extractGroupContent(child);
 			} else {
 				var clone = cleanBlockForExport(child.cloneNode(true));
@@ -5717,7 +5939,7 @@ function buildWechatHTML() {
 	var html = '';
 	blocks.forEach(function(b) {
 		// Handle group blocks: extract child sections directly (recursively)
-		if (b.getAttribute('data-type') === 'group' || b.getAttribute('data-type') === 'flex-row') {
+		if (['group','flex-row','flex-col'].indexOf(b.getAttribute('data-type')) !== -1) {
 			html += extractGroupContent(b);
 		} else {
 			var clone = cleanBlockForExport(b);
@@ -6464,6 +6686,147 @@ function importXiumiHTML(rawHtml) {
 	return { html: result, counts: counts };
 }
 
+
+function getFlexRowCells(row) {
+	return Array.from(row.children).filter(function(child) {
+		return child.classList && child.classList.contains('canvas-block');
+	});
+}
+
+function addColumnToFlexRow(row, html) {
+	var cells = getFlexRowCells(row);
+	var cell = document.createElement('div');
+	cell.className = 'canvas-block';
+	cell.id = getNextBlockId();
+	cell.style.position = 'relative';
+	cell.style.left = '0px';
+	cell.style.top = '0px';
+	cell.style.flex = '0 0 ' + Math.floor(100 / (cells.length + 1)) + '%';
+	cell.style.width = Math.floor(100 / (cells.length + 1)) + '%';
+	cell.style.boxSizing = 'border-box';
+	cell.style.minHeight = '80px';
+	cell.innerHTML = html || '<section style="padding:12px;"><p>新列</p></section>';
+	cell.setAttribute('data-type', 'component');
+	cell.setAttribute('data-role', 'custom-block');
+	cell.setAttribute('data-lock-ratio', '0');
+	row.appendChild(cell);
+	ensureBlockMetadata(cell);
+	makeInteractable(cell);
+	return cell;
+}
+
+function moveFlexRowColumn(row, fromIndex, toIndex) {
+	var cells = getFlexRowCells(row);
+	if (fromIndex < 0 || fromIndex >= cells.length) return;
+	if (toIndex < 0 || toIndex >= cells.length) return;
+	var cell = cells[fromIndex];
+	var ref = cells[toIndex];
+	if (fromIndex < toIndex) {
+		ref = ref.nextSibling;
+	}
+	row.insertBefore(cell, ref);
+}
+
+function removeFlexRowColumn(row, index) {
+	var cells = getFlexRowCells(row);
+	if (index < 0 || index >= cells.length) return;
+	cells[index].remove();
+}
+
+function equalizeFlexRowColumns(row) {
+	var cells = getFlexRowCells(row);
+	var width = Math.floor(100 / Math.max(1, cells.length));
+	cells.forEach(function(cell) {
+		cell.style.flex = '0 0 ' + width + '%';
+		cell.style.width = width + '%';
+	});
+}
+
+function addRowAfterBlock(block) {
+	var canvas = getCanvas();
+	if (!canvas || !block) return;
+	var row = createFlexRowGroup(block, block);
+	if (row) {
+		canvas.insertBefore(row, block.nextSibling);
+		block.remove();
+	}
+}
+
+function hydrateWorkbenchSection(section) {
+	var block = document.createElement('div');
+	block.className = 'canvas-block';
+	block.id = getNextBlockId();
+	block.style.width = CANVAS_WIDTH + 'px';
+	block.style.left = '0px';
+	block.style.top = '0px';
+	var blockType = section.getAttribute('data-wb-type') || 'cell';
+	blockType = normalizeWorkbenchType(blockType);
+	if (blockType === 'cell') {
+		if (section.querySelector('img') && !section.querySelector('p')) blockType = 'image';
+	}
+	var hasChildSections = section.querySelectorAll(':scope > section').length > 0;
+	var finalType = hasChildSections && blockType === 'cell' ? 'group' : blockType;
+	block.setAttribute('data-type', finalType);
+	block.setAttribute('data-role', inferRole(finalType));
+	block.setAttribute('data-wb-type', getWorkbenchType(finalType));
+	block.setAttribute('data-lock-ratio', '0');
+	block.innerHTML = section.innerHTML;
+	copyWorkbenchAttributes(section, block);
+	if (finalType === 'flex-row') {
+		block.style.display = 'flex';
+		block.style.flexWrap = 'nowrap';
+		block.style.justifyContent = 'space-between';
+		block.style.alignItems = 'flex-start';
+	} else if (finalType === 'flex-col') {
+		block.style.display = 'flex';
+		block.style.flexDirection = 'column';
+	}
+	block.querySelectorAll(':scope > section').forEach(function(childSec) {
+		var childBlock = hydrateWorkbenchSection(childSec);
+		if (childBlock) {
+			block.appendChild(childBlock);
+			childSec.remove();
+		}
+	});
+	return block;
+}
+
+function groupSideBySideRowsForFlow() {
+	var canvas = getCanvas();
+	if (!canvas) return;
+	var blocks = getSortedTopLevelBlocks();
+	var groups = [];
+	var i = 0;
+	while (i < blocks.length - 1) {
+		var a = blocks[i];
+		var b = blocks[i + 1];
+		var aType = a.getAttribute('data-type');
+		var bType = b.getAttribute('data-type');
+		if (aType === 'group' || aType === 'flex-row' || aType === 'flex-col' ||
+			bType === 'group' || bType === 'flex-row' || bType === 'flex-col') {
+			i++;
+			continue;
+		}
+		var aLeft = parseBlockNumber(a, 'left');
+		var aTop = parseBlockNumber(a, 'top');
+		var bLeft = parseBlockNumber(b, 'left');
+		var bTop = parseBlockNumber(b, 'top');
+		var sameRow = Math.abs(aTop - bTop) < 20;
+		var sideBySide = aLeft < bLeft && (bLeft - (aLeft + a.offsetWidth)) < 20;
+		if (sameRow && sideBySide) {
+			var group = createFlexRowGroup(a, b);
+			if (group) {
+				groups.push(group);
+				blocks = getSortedTopLevelBlocks();
+				i = 0;
+				continue;
+			}
+		}
+		i++;
+	}
+	return groups;
+}
+
 function importXiumiToCanvas(rawHtml) {
 	var imported = importXiumiHTML(rawHtml);
 	var parser = new DOMParser();
@@ -6491,11 +6854,25 @@ function importXiumiToCanvas(rawHtml) {
 	saveState();
 	canvas.innerHTML = '';
 
+	var isWorkbenchHTML = rootWrapper.getAttribute('data-wb-root') === '1';
 	var blocks = [];
 	directChildren.forEach(function(child) {
 		if (child.tagName !== 'SECTION') return;
+		var block;
+		if (isWorkbenchHTML) {
+			block = hydrateWorkbenchSection(child);
+			if (!block) return;
+			block.style.height = 'auto';
+			block.style.minHeight = '40px';
+			canvas.appendChild(block);
+			ensureBlockMetadata(block);
+			ensureResizeHandles(block);
+			makeInteractable(block);
+			blocks.push(block);
+			return;
+		}
 		var wbType = child.getAttribute('data-wb-type') || 'cell';
-		var block = document.createElement('div');
+		block = document.createElement('div');
 		block.className = 'canvas-block';
 		block.id = getNextBlockId();
 		block.style.width = CANVAS_WIDTH + 'px';
