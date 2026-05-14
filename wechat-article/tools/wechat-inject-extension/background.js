@@ -95,11 +95,8 @@ async function injectContent(payload) {
 
 // ---- MAIN world injection function (self-contained) ----
 
-function injectIntoEditor(payload) {
+async function injectIntoEditor(payload) {
   function log(msg) { console.log('[WeChatInject]', msg); }
-
-  // WeChat editor auto-applies text-indent, strip it from injected HTML to avoid double indentation
-  payload.html = payload.html.replace(/text-indent\s*:\s*[^;"']+;?/gi, '');
 
   function writeValue(el, text) {
     var nativeSetter = Object.getOwnPropertyDescriptor(
@@ -112,6 +109,52 @@ function injectIntoEditor(payload) {
     }
     el.dispatchEvent(new Event('input', { bubbles: true }));
     el.dispatchEvent(new Event('change', { bubbles: true }));
+  }
+
+  function readEditorHTML() {
+    var pmHost = document.querySelector('.edui-editor-iframeholder .editor-v-root') ||
+                 document.querySelector('[class*="editor"][class*="root"]');
+    if (pmHost && pmHost.shadowRoot) {
+      var pmContent = pmHost.shadowRoot.querySelector(
+        '.mock-iframe-document .mock-iframe-body .rich_media_content > .ProseMirror'
+      ) || pmHost.shadowRoot.querySelector('[contenteditable="true"]');
+      if (pmContent) return pmContent.innerHTML || '';
+    }
+    var allEls = document.querySelectorAll('*');
+    for (var i = 0; i < allEls.length; i++) {
+      if (!allEls[i].shadowRoot) continue;
+      var inner = allEls[i].shadowRoot.querySelector('.ProseMirror') ||
+                  allEls[i].shadowRoot.querySelector('[contenteditable="true"]');
+      if (inner) return inner.innerHTML || '';
+    }
+    var iframe = document.querySelector('.edui-editor-iframeholder > iframe') ||
+                 document.querySelector('#ueditor_0') ||
+                 document.querySelector('iframe[name="ueditor_0"]');
+    if (iframe) {
+      try {
+        var doc = iframe.contentDocument || iframe.contentWindow.document;
+        return doc.body ? doc.body.innerHTML || '' : '';
+      } catch (_) {}
+    }
+    return '';
+  }
+
+  function normalizedText(html) {
+    var div = document.createElement('div');
+    div.innerHTML = html || '';
+    return (div.textContent || '').replace(/\s+/g, ' ').trim();
+  }
+
+  function verifyInjectedHTML() {
+    var currentHtml = readEditorHTML();
+    var expectedText = normalizedText(payload.html);
+    var currentText = normalizedText(currentHtml);
+    var expectedProbe = expectedText.slice(0, Math.min(40, expectedText.length));
+    return {
+      verified: !!currentHtml && (!expectedProbe || currentText.indexOf(expectedProbe) !== -1),
+      readLength: currentHtml.length,
+      expectedTextLength: expectedText.length
+    };
   }
 
   // --- metadata fields ---
@@ -162,18 +205,39 @@ function injectIntoEditor(payload) {
 
   // --- body HTML: three-strategy fallback ---
   var done = false;
+  var strategy = '';
 
   // Strategy A: WeChat JSAPI
   if (!done && typeof window.__MP_Editor_JSAPI__ !== 'undefined') {
     try {
-      window.__MP_Editor_JSAPI__.invoke({
-        apiName: 'mp_editor_set_content',
-        apiParam: { content: payload.html },
-        sucCb: function() { log('JSAPI success'); },
-        errCb: function(e) { log('JSAPI error: ' + JSON.stringify(e)); }
+      await new Promise(function(resolve, reject) {
+        var settled = false;
+        var timer = setTimeout(function() {
+          if (settled) return;
+          settled = true;
+          reject(new Error('JSAPI timeout'));
+        }, 5000);
+        window.__MP_Editor_JSAPI__.invoke({
+          apiName: 'mp_editor_set_content',
+          apiParam: { content: payload.html },
+          sucCb: function() {
+            if (settled) return;
+            settled = true;
+            clearTimeout(timer);
+            log('JSAPI success');
+            resolve();
+          },
+          errCb: function(e) {
+            if (settled) return;
+            settled = true;
+            clearTimeout(timer);
+            reject(new Error('JSAPI error: ' + JSON.stringify(e)));
+          }
+        });
       });
       log('JSAPI invoked');
       done = true;
+      strategy = 'jsapi';
     } catch(e) { log('JSAPI exception: ' + e.message); }
   }
 
@@ -188,8 +252,11 @@ function injectIntoEditor(payload) {
         ) || pmHost.shadowRoot.querySelector('[contenteditable="true"]');
         if (pmContent) {
           pmContent.innerHTML = payload.html;
+          pmContent.dispatchEvent(new InputEvent('input', { bubbles: true, inputType: 'insertHTML', data: null }));
+          pmContent.dispatchEvent(new Event('change', { bubbles: true }));
           log('ProseMirror written');
           done = true;
+          strategy = 'prosemirror';
         }
       } catch(e) { log('ProseMirror error: ' + e.message); }
     }
@@ -203,8 +270,11 @@ function injectIntoEditor(payload) {
                         allEls[i].shadowRoot.querySelector('[contenteditable="true"]');
             if (inner) {
               inner.innerHTML = payload.html;
+              inner.dispatchEvent(new InputEvent('input', { bubbles: true, inputType: 'insertHTML', data: null }));
+              inner.dispatchEvent(new Event('change', { bubbles: true }));
               log('ProseMirror (fallback) written');
               done = true;
+              strategy = 'prosemirror-shadow-fallback';
               break;
             }
           } catch(_) {}
@@ -231,15 +301,26 @@ function injectIntoEditor(payload) {
       try {
         var doc = iframe.contentDocument || iframe.contentWindow.document;
         doc.body.innerHTML = payload.html;
+        doc.body.dispatchEvent(new InputEvent('input', { bubbles: true, inputType: 'insertHTML', data: null }));
+        doc.body.dispatchEvent(new Event('change', { bubbles: true }));
         log('UEditor iframe written');
         done = true;
+        strategy = 'ueditor-iframe';
       } catch(e) { log('UEditor error: ' + e.message); }
     }
   }
 
   if (done) {
+    await new Promise(function(resolve) { setTimeout(resolve, 250); });
+    var verification = verifyInjectedHTML();
     log('DONE');
-    return { success: true };
+    return {
+      success: true,
+      strategy: strategy,
+      verified: verification.verified,
+      readLength: verification.readLength,
+      expectedTextLength: verification.expectedTextLength
+    };
   }
   return { success: false, error: 'All injection strategies failed. Refresh WeChat page and retry.' };
 }

@@ -73,6 +73,9 @@
 	.canvas-block:hover { outline: 1px dashed rgba(7, 193, 96, 0.65); outline-offset: 3px; }
 	.canvas-block.selected { outline: 2px solid var(--wechat-primary); outline-offset: 5px; z-index: 100; box-shadow: 0 12px 28px rgba(7, 193, 96, 0.13); }
 	.canvas-block.multi-selected { outline: 2px dashed #22c55e; outline-offset: 4px; box-shadow: 0 10px 24px rgba(34,197,94,0.10); }
+	.canvas-block[data-leaf-selected="1"] { outline: 2px solid #3b82f6; outline-offset: 5px; box-shadow: 0 12px 28px rgba(59,130,246,0.16); }
+	.canvas-block[data-type="flex-row"] > .canvas-block[data-column-selected="1"] { outline: 2px solid #3b82f6; outline-offset: 2px; box-shadow: 0 8px 18px rgba(59,130,246,0.14); }
+	.wechat-column-resizer { position: absolute; top: 6px; bottom: 6px; width: 10px; margin-left: -5px; z-index: 32; cursor: col-resize; border-radius: 999px; background: rgba(59,130,246,0.20); border: 1px solid rgba(59,130,246,0.36); }
 	#block-canvas.flow-mode { position: relative; display: block; padding: 0; }
 	#block-canvas.flow-mode > .canvas-block { position: relative !important; left: auto !important; top: auto !important; transform: none !important; cursor: default; user-select: text; touch-action: auto; }
 	#block-canvas.flow-mode .canvas-block:hover { outline-color: rgba(59,130,246,0.55); }
@@ -173,8 +176,8 @@
 	#wechat-inspector .inspector-actions button.danger { background: #fff1f2; color: #be123c; }
 	#wechat-inspector .inspector-actions button.danger:hover { background: #ffe4e6; }
 	#wechat-inspector .hint { color: var(--wechat-muted); line-height: 1.6; background: #f6fbf8; border: 1px dashed rgba(7,193,96,0.25); border-radius: 12px; padding: 10px; }
-	#top-panel { position: relative; z-index: 10; min-height: 38px !important; height: auto !important; padding: 4px 8px !important; gap: 6px; align-items: center; overflow: visible; flex-wrap: wrap; }
-	#top-panel > .btn-group, #top-panel > div, #top-panel .btn-group { align-items: center; flex-wrap: nowrap; }
+	#top-panel { position: relative; z-index: 10; min-height: 38px !important; height: 38px !important; padding: 4px 8px !important; gap: 6px; align-items: center; overflow-x: auto; overflow-y: hidden; flex-wrap: nowrap; }
+	#top-panel > .btn-group, #top-panel > div, #top-panel .btn-group { align-items: center; flex: 0 0 auto; flex-wrap: nowrap; }
 	#top-panel .btn { min-height: 30px; padding: 4px 8px !important; font-size: 12px; line-height: 1.2; white-space: nowrap; }
 	#top-panel .btn:hover { transform: none; }
 	#top-panel .wechat-toolbar-main { gap: 4px; }
@@ -3123,7 +3126,11 @@ const AUTO_SAVE_KEY = 'wechat-editor-layout-state-v1';
 const WORKBENCH_VERSION = '2.0';
 var globalFlowStyles = {
 	blockGap: '20px',
-	align: 'center'
+	align: 'center',
+	pageMarginX: '0px',
+	lineHeight: '1.75',
+	letterSpacing: '0.5px',
+	paragraphAfter: '8px'
 };
 const SNAP_THRESHOLD = 3;
 const SIDE_SNAP_DISTANCE = 30;
@@ -3202,7 +3209,18 @@ function getCanvasWrapper() {
 	return document.getElementById('iframe-wrapper');
 }
 
+function isContainerBlock(block) {
+	if (!block) return false;
+	var type = block.getAttribute('data-type');
+	return type === 'group' || type === 'flex-row' || type === 'flex-col';
+}
+
+function isLeafSelected(block) {
+	return block && block.getAttribute('data-leaf-selected') === '1';
+}
+
 function syncBlockDataset(block) {
+	if (!block) return;
 	block.setAttribute('data-x', '0');
 	block.setAttribute('data-y', '0');
 	block.style.transform = '';
@@ -3509,7 +3527,7 @@ function getInsertionPosition(width) {
 		blocks.forEach(function(block) {
 			var blockTop = parseFloat(block.style.top) || 0;
 			var blockBottom = blockTop + (block.offsetHeight || 100);
-			if (top >= blockTop - BLOCK_GAP && top <= blockBottom + BLOCK_GAP) {
+			if (top >= blockTop - BLOCK_GAP && top < blockBottom + BLOCK_GAP) {
 				top = blockBottom + BLOCK_GAP;
 				changed = true;
 			}
@@ -3557,6 +3575,13 @@ function setSelectedBlocks(blocks, primary) {
 
 	document.querySelectorAll('#block-canvas .canvas-block.selected, #block-canvas .canvas-block.multi-selected').forEach(function(block) {
 		block.classList.remove('selected', 'multi-selected');
+	});
+	document.querySelectorAll('#block-canvas .canvas-block[data-leaf-selected="1"]').forEach(function(block) {
+		block.removeAttribute('data-leaf-selected');
+		makeInteractable(block);
+	});
+	document.querySelectorAll('#block-canvas .canvas-block[data-column-selected="1"]').forEach(function(block) {
+		block.removeAttribute('data-column-selected');
 	});
 	selectedBlocks = Array.from(new Set((blocks || []).filter(Boolean)));
 	selectedBlock = primary || selectedBlocks[selectedBlocks.length - 1] || null;
@@ -3892,7 +3917,15 @@ function renderWechatInspector(block) {
 	var panel = ensureWechatInspector();
 	if (!panel) return;
 	if (!block) {
-		panel.innerHTML = '<h6>微信精调</h6><div class="hint">选择一个组件后，可精确调整位置、尺寸、图片、文字、样式和 AI 说明。布局会自动保存。</div>';
+		panel.innerHTML = '<h6>微信精调</h6><div class="hint">选择一个组件后，可精确调整位置、尺寸、图片、文字、样式和 AI 说明。布局会自动保存。双击组合内元素可选中最底层图片或文本块。</div>' +
+			'<div class="inspector-section"><label>全局文档流样式</label><div class="inspector-grid">' +
+			'<div><label>页面左右边距</label><input data-global-flow-key="pageMarginX" value="' + escapeAttrValue(globalFlowStyles.pageMarginX) + '"></div>' +
+			'<div><label>组件间距</label><input data-global-flow-key="blockGap" value="' + escapeAttrValue(globalFlowStyles.blockGap) + '"></div>' +
+			'<div><label>全文行高</label><input data-global-flow-key="lineHeight" value="' + escapeAttrValue(globalFlowStyles.lineHeight) + '"></div>' +
+			'<div><label>全文字距</label><input data-global-flow-key="letterSpacing" value="' + escapeAttrValue(globalFlowStyles.letterSpacing) + '"></div>' +
+			'<div><label>段后距</label><input data-global-flow-key="paragraphAfter" value="' + escapeAttrValue(globalFlowStyles.paragraphAfter) + '"></div>' +
+			'</div><div class="inspector-actions"><button type="button" data-global-flow-action="apply">应用全文</button><button type="button" data-global-flow-action="flow">切到文档流</button></div></div>';
+		bindGlobalFlowInspector(panel);
 		return;
 	}
 	ensureBlockMetadata(block);
@@ -3924,6 +3957,7 @@ function renderWechatInspector(block) {
 		'<label>文字</label><textarea data-inspector-key="text">' + escapeAttrValue(getBlockText(block)) + '</textarea>' +
 		'<div class="inspector-grid">' +
 		'<div><label>字距</label><input data-inspector-key="letterSpacing" value="' + escapeAttrValue(letterSpacing) + '" placeholder="0px"></div>' +
+		'<div><label>字号</label><input data-inspector-key="fontSize" value="' + escapeAttrValue(textTarget ? textTarget.style.fontSize || '' : '') + '" placeholder="15px"></div>' +
 		'<div><label>行距</label><input data-inspector-key="lineHeight" value="' + escapeAttrValue(lineHeight) + '" placeholder="1.5"></div>' +
 		'<div><label>首行缩进</label><input data-inspector-key="textIndent" value="' + escapeAttrValue(textIndent) + '" placeholder="0px"></div>' +
 		'<div><label>背景</label><input data-inspector-key="backgroundColor" value="' + escapeAttrValue(content ? content.style.backgroundColor || '' : '') + '" placeholder="#f8f9fa"></div>' +
@@ -3935,6 +3969,7 @@ function renderWechatInspector(block) {
 		'</div>' +
 		(isFlow ? '<div class="inspector-section"><label>间距精调</label><div class="inspector-grid"><div><label>上边距</label><input data-inspector-key="marginTop" value="' + escapeAttrValue(marginTop) + '" placeholder="0px"></div><div><label>下边距</label><input data-inspector-key="marginBottom" value="' + escapeAttrValue(marginBottom) + '" placeholder="0px"></div></div></div>' : '') +
 		(isFlow && block === getCanvas().querySelector('.canvas-block') ? '<div class="inspector-section"><label>全局文档流样式</label><div class="inspector-grid"><div><label>全局块间距</label><input data-inspector-key="globalBlockGap" value="' + escapeAttrValue(globalFlowStyles.blockGap) + '"></div><div><label>全局对齐</label><select data-inspector-key="globalAlign"><option value="left"' + (globalFlowStyles.align === 'left' ? ' selected' : '') + '>左对齐</option><option value="center"' + (globalFlowStyles.align === 'center' ? ' selected' : '') + '>居中</option><option value="right"' + (globalFlowStyles.align === 'right' ? ' selected' : '') + '>右对齐</option></select></div></div></div>' : '') +
+		(type === 'flex-row' ? '<div class="inspector-section"><label>行容器操作</label><div class="inspector-actions"><button type="button" data-inspector-action="addColumn">加列</button><button type="button" data-inspector-action="removeColumn">删列</button><button type="button" data-inspector-action="moveColumnLeft">列左移</button><button type="button" data-inspector-action="moveColumnRight">列右移</button><button type="button" data-inspector-action="equalColumns">均分列宽</button></div></div>' : '') +
 		(isFlexCol ? '<div class="inspector-section"><label>flex-col 操作</label><div class="inspector-actions"><button type="button" data-inspector-action="addFlexColChildAbove">上方添加</button><button type="button" data-inspector-action="addFlexColChildBelow">下方添加</button><button type="button" data-inspector-action="removeFlexColChild">删除子项</button><button type="button" data-inspector-action="moveFlexColChildUp">上移</button><button type="button" data-inspector-action="moveFlexColChildDown">下移</button><button type="button" data-inspector-action="equalizeFlexColChildren">均分高度</button></div></div>' : '') +
 		'<label>给 AI 的排版说明</label><textarea data-inspector-key="aiNote" placeholder="例如：这张图压住下方卡片，做海报感">' + escapeAttrValue(note) + '</textarea>' +
 		'<div class="inspector-actions">' + (isFlow ? '' : '<button type="button" data-inspector-action="center">居中</button>') + '<button type="button" data-inspector-action="duplicate">复制</button><button type="button" class="danger" data-inspector-action="delete">删除</button></div>';
@@ -3946,6 +3981,42 @@ function updateBlockText(block, text) {
 	if (!target) return;
 	if (target.tagName && target.tagName.toLowerCase() === 'blockquote') target.textContent = text;
 	else target.textContent = text;
+}
+
+function bindGlobalFlowInspector(panel) {
+	panel.querySelectorAll('[data-global-flow-key]').forEach(function(input) {
+		input.addEventListener('input', function() {
+			globalFlowStyles[input.getAttribute('data-global-flow-key')] = input.value;
+			scheduleAutoSave();
+		});
+	});
+	panel.querySelectorAll('[data-global-flow-action]').forEach(function(btn) {
+		btn.addEventListener('click', function() {
+			var action = btn.getAttribute('data-global-flow-action');
+			if (action === 'apply') applyGlobalFlowStyles();
+			if (action === 'flow') setWorkbenchMode('flow');
+		});
+	});
+}
+
+function applyGlobalFlowStyles() {
+	var canvas = getCanvas();
+	if (!canvas) return;
+	saveState();
+	var blocks = Array.from(canvas.querySelectorAll(':scope > .canvas-block'));
+	blocks.forEach(function(block, index) {
+		block.style.marginLeft = normalizeCssLength(globalFlowStyles.pageMarginX, '0px');
+		block.style.marginRight = normalizeCssLength(globalFlowStyles.pageMarginX, '0px');
+		if (index > 0) block.style.marginTop = normalizeCssLength(globalFlowStyles.blockGap, '20px');
+		block.querySelectorAll('p,h1,h2,h3,h4,h5,h6,blockquote,span,li').forEach(function(el) {
+			el.style.lineHeight = globalFlowStyles.lineHeight;
+			el.style.letterSpacing = normalizeCssLength(globalFlowStyles.letterSpacing, '0.5px');
+			if (/^(p|blockquote|li)$/i.test(el.tagName)) el.style.marginBottom = normalizeCssLength(globalFlowStyles.paragraphAfter, '8px');
+		});
+		syncWorkbenchBlockMetadata(block);
+	});
+	ensureCanvasHeight();
+	scheduleAutoSave();
 }
 
 function bindWechatInspector(panel, block) {
@@ -4027,6 +4098,17 @@ function bindWechatInspector(panel, block) {
 				}
 			} else if (action === 'equalizeFlexColChildren') {
 				equalizeFlexColChildren(block);
+			} else if (action === 'addColumn') {
+				addColumnToFlexRow(block);
+				equalizeFlexRowColumns(block);
+			} else if (action === 'removeColumn') {
+				removeSelectedColumnFromFlexRow(block);
+			} else if (action === 'moveColumnLeft') {
+				moveSelectedColumnInFlexRow(block, -1);
+			} else if (action === 'moveColumnRight') {
+				moveSelectedColumnInFlexRow(block, 1);
+			} else if (action === 'equalColumns') {
+				equalizeFlexRowColumns(block);
 			}
 			ensureCanvasHeight();
 			scheduleAutoSave();
@@ -4074,6 +4156,7 @@ function applyInspectorValue(block, input, live) {
 	else if (key === 'border' && content) content.style.border = value;
 	else if (key === 'boxShadow' && content) content.style.boxShadow = value;
 	else if (key === 'letterSpacing' && textTarget) textTarget.style.letterSpacing = value;
+	else if (key === 'fontSize' && textTarget) textTarget.style.fontSize = normalizeCssLength(value, value);
 	else if (key === 'lineHeight' && textTarget) textTarget.style.lineHeight = value;
 	else if (key === 'textIndent' && textTarget) textTarget.style.textIndent = value;
 	else if (key === 'marginTop') block.style.marginTop = value;
@@ -4098,6 +4181,32 @@ function selectBlock(block) {
 		Vvveb.Builder.selectedEl = null;
 		if (Vvveb.Builder.selectNode) Vvveb.Builder.selectNode(false);
 	}
+}
+
+function getDeepestCanvasBlockFromEvent(event) {
+	var canvas = getCanvas();
+	if (!canvas || !event) return null;
+	var elements = document.elementsFromPoint ? document.elementsFromPoint(event.clientX, event.clientY) : [];
+	for (var i = 0; i < elements.length; i++) {
+		var block = elements[i].closest && elements[i].closest('.canvas-block');
+		if (block && canvas.contains(block)) return block;
+	}
+	return event.target && event.target.closest ? event.target.closest('.canvas-block') : null;
+}
+
+function selectLeafBlock(block) {
+	if (!block) return;
+	ensureBlockMetadata(block);
+	setSelectedBlocks([block], block);
+	block.setAttribute('data-leaf-selected', '1');
+	if (block.parentElement && block.parentElement.getAttribute('data-type') === 'flex-row') {
+		getFlexRowCells(block.parentElement).forEach(function(cell) {
+			cell.toggleAttribute('data-column-selected', cell === block);
+		});
+	}
+	makeInteractable(block);
+	updateSelectionBox(block);
+	renderWechatInspector(block);
 }
 
 function toggleBlockSelection(block) {
@@ -4318,10 +4427,7 @@ function dragMoveListener(event) {
 			}
 			block.style.left = left + 'px';
 			block.style.top = top + 'px';
-			syncBlockDataset(block);
 		});
-		ensureCanvasHeight();
-		scheduleAutoSave();
 		return;
 	}
 	let left = (parseFloat(target.style.left) || 0) + event.dx;
@@ -4339,7 +4445,7 @@ function dragMoveListener(event) {
 	snapToSideBlock = null;
 	var tRight = left + target.offsetWidth;
 	var tVertCenter = top + target.offsetHeight / 2;
-	if (streamMode && target.getAttribute('data-type') !== 'flex-row') {
+	if (streamMode && target.parentElement === canvas && target.getAttribute('data-type') !== 'flex-row') {
 		canvas.querySelectorAll(':scope > .canvas-block').forEach(function(block) {
 			if (block === target) return;
 			if (block.getAttribute('data-type') === 'flex-row') return;
@@ -4368,11 +4474,6 @@ function dragMoveListener(event) {
 
 	target.style.left = left + 'px';
 	target.style.top = top + 'px';
-	syncBlockDataset(target);
-	ensureCanvasHeight(top + target.offsetHeight);
-	updateSelectionBox(target);
-	renderWechatInspector(target);
-	scheduleAutoSave();
 }
 
 function resizeMoveListener(event) {
@@ -4459,16 +4560,10 @@ function resizeMoveListener(event) {
 	}
 	target.style.left = left + 'px';
 	target.style.top = top + 'px';
-	syncBlockDataset(target);
 	
 	// Sync inner section width
 	var inner = target.querySelector(':scope > section');
 	if (inner) inner.style.width = width + 'px';
-	
-	ensureCanvasHeight(top + height);
-	updateSelectionBox(target);
-	renderWechatInspector(target);
-	scheduleAutoSave();
 }
 
 function makeInteractable(element) {
@@ -4490,11 +4585,20 @@ function makeInteractable(element) {
 	if (parentGroup) {
 		// Nested inside a group: downgrade any top-level interact.js bindings, remove resize handles, then bind only selection events
 		var isFlexColChild = parentGroup.getAttribute('data-type') === 'flex-col';
-		if (element._interactable && !isFlexColChild) {
-			interact(element).unset();
-			element._interactable = false;
-		}
-		if (!isFlexColChild) {
+		if (isLeafSelected(element)) {
+			ensureResizeHandles(element);
+		} else if (isFlexColChild) {
+			// Flex-col children: completely remove interact.js, let ensureFlexColChildEditing manage their drag
+			if (element._interactable) {
+				interact(element).unset();
+				element._interactable = false;
+			}
+			element.querySelectorAll(':scope > .resize-handle').forEach(function(h) { h.remove(); });
+		} else {
+			if (element._interactable) {
+				interact(element).unset();
+				element._interactable = false;
+			}
 			element.querySelectorAll(':scope > .resize-handle').forEach(function(h) { h.remove(); });
 		}
 		if (!element._wechatNativeEventsBound) {
@@ -4503,7 +4607,7 @@ function makeInteractable(element) {
 			element.addEventListener('contextmenu', function(e) { e.preventDefault(); if (getSelectedBlocks().indexOf(element) === -1) selectBlock(element); showWechatContextMenu(e.clientX, e.clientY); });
 			element._wechatNativeEventsBound = true;
 		}
-		return;
+		if (!isLeafSelected(element)) return;
 	}
 	ensureResizeHandles(element);
 	if (element._interactable) interact(element).unset();
@@ -4521,7 +4625,22 @@ function makeInteractable(element) {
 			listeners: {
 				start(event) { saveState(); if (getSelectedBlocks().indexOf(element) === -1) selectBlock(element); },
 				move: dragMoveListener,
-				end() { hideSnapGuides(); if (snapToSideBlock && currentDragBlock && streamMode) { saveState(); createFlexRowGroup(snapToSideBlock, currentDragBlock); snapToSideBlock = null; currentDragBlock = null; } else { scheduleAutoSave(); } }
+				end() {
+					hideSnapGuides();
+					if (snapToSideBlock && currentDragBlock && streamMode) {
+						saveState();
+						createFlexRowGroup(snapToSideBlock, currentDragBlock);
+						snapToSideBlock = null;
+						currentDragBlock = null;
+					} else {
+						syncBlockDataset(currentDragBlock);
+						ensureCanvasHeight();
+						updateSelectionBox(currentDragBlock);
+						renderWechatInspector(currentDragBlock);
+						scheduleAutoSave();
+					}
+					currentDragBlock = null;
+				}
 			}
 		})
 		.resizable({
@@ -4545,7 +4664,14 @@ function makeInteractable(element) {
 					};
 				},
 				move: resizeMoveListener,
-				end() { element._resizeStart = null; scheduleAutoSave(); }
+				end() {
+					element._resizeStart = null;
+					syncBlockDataset(element);
+					ensureCanvasHeight();
+					updateSelectionBox(element);
+					renderWechatInspector(element);
+					scheduleAutoSave();
+				}
 			}
 		});
 	element._interactable = true;
@@ -5158,84 +5284,103 @@ function groupSelection() {
 	scheduleAutoSave();
 }
 
+function getBlockCanvasRect(block) {
+	var canvas = getCanvas();
+	var canvasRect = canvas.getBoundingClientRect();
+	var rect = block.getBoundingClientRect();
+	return {
+		left: Math.round(rect.left - canvasRect.left + canvas.scrollLeft),
+		top: Math.round(rect.top - canvasRect.top + canvas.scrollTop),
+		width: Math.round(rect.width || block.offsetWidth || MIN_BLOCK_WIDTH),
+		height: Math.round(rect.height || block.offsetHeight || MIN_BLOCK_HEIGHT)
+	};
+}
+
+function moveLeafBlockToCanvas(block, moved) {
+	var canvas = getCanvas();
+	var rect = getBlockCanvasRect(block);
+	block.style.position = 'absolute';
+	block.style.left = clamp(rect.left, 0, CANVAS_WIDTH - Math.min(rect.width, CANVAS_WIDTH)) + 'px';
+	block.style.top = Math.max(0, rect.top) + 'px';
+	block.style.width = Math.min(rect.width || CANVAS_WIDTH, CANVAS_WIDTH) + 'px';
+	if (rect.height > 0) block.style.height = rect.height + 'px';
+	block.style.margin = '';
+	block.style.flex = '';
+	block.style.display = '';
+	block.style.verticalAlign = '';
+	block.style.transform = '';
+	block.removeAttribute('data-y');
+	block.removeAttribute('data-x');
+	canvas.appendChild(block);
+	ensureBlockMetadata(block);
+	makeInteractable(block);
+	moved.push(block);
+}
+
+function createLeafBlockFromSection(section, fallbackRect, moved) {
+	var canvas = getCanvas();
+	var rect = section.getBoundingClientRect && section.getBoundingClientRect().width ? getBlockCanvasRect(section) : fallbackRect;
+	var block = document.createElement('div');
+	block.className = 'canvas-block';
+	block.id = getNextBlockId();
+	block.style.position = 'absolute';
+	block.style.left = clamp(rect.left || 0, 0, CANVAS_WIDTH - Math.min(rect.width || CANVAS_WIDTH, CANVAS_WIDTH)) + 'px';
+	block.style.top = Math.max(0, rect.top || 0) + 'px';
+	block.style.width = Math.min(rect.width || CANVAS_WIDTH, CANVAS_WIDTH) + 'px';
+	block.style.height = 'auto';
+	block.style.minHeight = '40px';
+	var sectionType = normalizeWorkbenchType(section.getAttribute('data-wb-type') || 'component');
+	if (sectionType === 'cell') sectionType = section.querySelector('img') ? 'image' : 'component';
+	block.setAttribute('data-type', sectionType);
+	block.setAttribute('data-role', inferRole(sectionType));
+	block.setAttribute('data-lock-ratio', sectionType === 'image' ? '1' : '0');
+	block.appendChild(section);
+	canvas.appendChild(block);
+	ensureBlockMetadata(block);
+	ensureResizeHandles(block);
+	makeInteractable(block);
+	moved.push(block);
+}
+
+function flattenContainerToCanvas(container, moved) {
+	var childBlocks = Array.from(container.children).filter(function(child) {
+		return child.classList && child.classList.contains('canvas-block');
+	});
+	if (childBlocks.length) {
+		childBlocks.forEach(function(child) {
+			if (isContainerBlock(child)) flattenContainerToCanvas(child, moved);
+			else moveLeafBlockToCanvas(child, moved);
+		});
+	} else {
+		var baseRect = getBlockCanvasRect(container);
+		var offsetY = 0;
+		Array.from(container.children).filter(function(child) {
+			return child.tagName === 'SECTION' && !child.classList.contains('resize-handle');
+		}).forEach(function(section) {
+			createLeafBlockFromSection(section, {
+				left: baseRect.left,
+				top: baseRect.top + offsetY,
+				width: baseRect.width,
+				height: section.offsetHeight || 40
+			}, moved);
+			offsetY += (section.offsetHeight || 80) + BLOCK_GAP;
+		});
+	}
+	container.remove();
+}
+
 function ungroupSelection() {
 	WECHAT_EDITOR_LOG.info('GROUP', 'ungroupSelection called');
 
 	var canvas = getCanvas();
 	if (!canvas) return;
-	var groups = getSelectedBlocks().filter(function(block) {
-		var t = block.getAttribute('data-type');
-		return t === 'group' || t === 'flex-row' || t === 'flex-col';
-	});
+	var groups = getSelectedBlocks().filter(isContainerBlock);
 	if (!groups.length) return;
 	saveState();
 	var moved = [];
 	groups.forEach(function(group) {
-		var gx = parseBlockNumber(group, 'left'), gy = parseBlockNumber(group, 'top');
-		var children = Array.from(group.children).filter(function(child) {
-			return child.classList && child.classList.contains('canvas-block');
-		});
-			WECHAT_EDITOR_LOG.info('GROUP', 'ungroupSelection processing group', {type: group.getAttribute('data-type'), children: children.length});
-			var isFlexRow = group.getAttribute('data-type') === 'flex-row';
-			var isFlexCol = group.getAttribute('data-type') === 'flex-col';
-		if (children.length > 0) {
-			if (!isFlexRow) {
-				children.sort(function(a, b) { return parseBlockNumber(a, 'top') - parseBlockNumber(b, 'top'); });
-			}
-			// Pre-record visual offsets before any DOM mutation (flex-row layout recomputes on removal)
-			var offsets = children.map(function(child) {
-				return { child: child, left: child.offsetLeft, top: child.offsetTop };
-			});
-			offsets.forEach(function(item) {
-				var child = item.child;
-				if (isFlexRow) {
-					child.style.left = (gx + item.left) + 'px';
-					child.style.top  = (gy + item.top) + 'px';
-				} else if (isFlexCol) {
-					child.style.left = gx + 'px';
-					child.style.top  = (gy + item.top) + 'px';
-				} else {
-					child.style.left = (gx + parseBlockNumber(child, 'left')) + 'px';
-					child.style.top  = (gy + parseBlockNumber(child, 'top')) + 'px';
-				}
-				child.style.position = currentWorkbenchMode === 'flow' ? 'relative' : 'absolute';
-				child.style.flex = '';
-				child.style.display = '';
-				child.style.verticalAlign = '';
-				canvas.appendChild(child);
-				ensureBlockMetadata(child);
-				makeInteractable(child);
-				moved.push(child);
-			});
-		} else {
-			var sections = Array.from(group.children).filter(function(child) {
-				return child.tagName === 'SECTION' && !child.classList.contains('resize-handle');
-			});
-			var offsetY = 0;
-			sections.forEach(function(section) {
-				var block = document.createElement('div');
-				block.className = 'canvas-block';
-				block.id = getNextBlockId();
-				block.style.left = gx + 'px';
-				block.style.top = (gy + offsetY) + 'px';
-				block.style.width = CANVAS_WIDTH + 'px';
-				block.style.height = 'auto';
-				block.style.minHeight = '40px';
-				var sectionType = section.getAttribute('data-wb-type') || 'component';
-				if (sectionType === 'cell') sectionType = 'component';
-				block.setAttribute('data-type', sectionType);
-				block.setAttribute('data-role', inferRole(sectionType));
-				block.setAttribute('data-lock-ratio', '0');
-				block.appendChild(section);
-				canvas.appendChild(block);
-				ensureBlockMetadata(block);
-				ensureResizeHandles(block);
-				makeInteractable(block);
-				moved.push(block);
-				offsetY += (block.offsetHeight || 100) + BLOCK_GAP;
-			});
-		}
-		group.remove();
+		WECHAT_EDITOR_LOG.info('GROUP', 'ungroupSelection processing group', {type: group.getAttribute('data-type')});
+		flattenContainerToCanvas(group, moved);
 	});
 	if (moved.length) setSelectedBlocks(moved, moved[moved.length - 1]);
 	ensureCanvasHeight();
@@ -5845,8 +5990,12 @@ document.addEventListener('DOMContentLoaded', function() {
 			e.preventDefault();
 		});
 		canvas.addEventListener('dblclick', function(e) {
-			const block = e.target.closest('.canvas-block');
-			if (block) startInlineEdit(block, e);
+			const block = getDeepestCanvasBlockFromEvent(e);
+			if (block) {
+				selectLeafBlock(block);
+				e.preventDefault();
+				e.stopPropagation();
+			}
 		});
 	}
 	setTimeout(restoreAutoSavedLayout, 800);
@@ -5884,7 +6033,7 @@ document.addEventListener('DOMContentLoaded', function() {
 })();
 
 function removeEditorArtifacts(node) {
-	node.querySelectorAll('.resize-handle').forEach(function(h) { h.remove(); });
+	node.querySelectorAll('.resize-handle, .wechat-column-resizer').forEach(function(h) { h.remove(); });
 	node.querySelectorAll('#wechat-selection-box, #wechat-context-menu, .wechat-snap-guide, #wechat-snap-purple').forEach(function(el) { el.remove(); });
 	node.querySelectorAll('[contenteditable]').forEach(function(el) { el.removeAttribute('contenteditable'); });
 	node.querySelectorAll('.selected, .multi-selected, .grid-visible').forEach(function(el) { el.classList.remove('selected', 'multi-selected', 'grid-visible'); });
@@ -5898,6 +6047,9 @@ function cleanWorkbenchExportNode(node) {
 		el.removeAttribute('id');
 		el.removeAttribute('data-x');
 		el.removeAttribute('data-y');
+		el.removeAttribute('data-leaf-selected');
+		el.removeAttribute('data-column-selected');
+		el.removeAttribute('draggable');
 		['position', 'left', 'top', 'transform', 'aspectRatio'].forEach(function(prop) {
 			el.style[prop] = '';
 		});
@@ -5913,9 +6065,10 @@ function cleanWorkbenchExportNode(node) {
 function stripWorkbenchAttributes(node) {
 	var all = [node].concat(Array.from(node.querySelectorAll('*')));
 	all.forEach(function(el) {
+		el.removeAttribute('draggable');
 		Array.from(el.attributes || []).forEach(function(attr) {
 			var name = attr.name.toLowerCase();
-			if (name === 'data-id' || name === 'data-type' || name === 'data-layout' || name === 'data-source' || name === 'data-risk' || name === 'data-role' || name === 'data-ai-note' || name === 'data-lock-ratio' || name === 'data-catalog-id' || name === 'data-source-provider' || name === 'data-license-status' || name === 'data-wechat-compat' || name === 'data-external-asset' || name === 'data-x' || name === 'data-y' || name.indexOf('data-wb-') === 0 || name.indexOf('data-wx-') === 0 || name.indexOf('data-flow-') === 0 || name.indexOf('data-canvas-') === 0 || name.indexOf('data-layer-') === 0 || name.indexOf('data-overlap-') === 0) {
+			if (name === 'data-id' || name === 'data-type' || name === 'data-layout' || name === 'data-source' || name === 'data-risk' || name === 'data-role' || name === 'data-ai-note' || name === 'data-lock-ratio' || name === 'data-catalog-id' || name === 'data-source-provider' || name === 'data-license-status' || name === 'data-wechat-compat' || name === 'data-external-asset' || name === 'data-x' || name === 'data-y' || name === 'data-leaf-selected' || name === 'data-column-selected' || name === 'data-column-index' || name === 'data-resize-column-index' || name.indexOf('data-wb-') === 0 || name.indexOf('data-wx-') === 0 || name.indexOf('data-flow-') === 0 || name.indexOf('data-canvas-') === 0 || name.indexOf('data-layer-') === 0 || name.indexOf('data-overlap-') === 0) {
 				el.removeAttribute(attr.name);
 			}
 		});
@@ -5938,6 +6091,26 @@ function copyWorkbenchAttributes(source, target) {
 	});
 }
 
+function serializeWorkbenchBlockRecursive(block) {
+	ensureBlockMetadata(block);
+	var node = document.createElement('section');
+	copyWorkbenchAttributes(block, node);
+	node.setAttribute('data-wb-block', '1');
+	node.setAttribute('data-wb-id', block.getAttribute('data-wb-id') || block.getAttribute('data-id') || block.id);
+	node.setAttribute('data-wb-type', block.getAttribute('data-wb-type') || getWorkbenchType(block.getAttribute('data-type') || 'cell'));
+	node.style.cssText = 'margin:' + (block.getAttribute('data-flow-margin') || block.style.margin || '0') + ';width:' + (block.getAttribute('data-flow-width') || block.style.width || '100%') + ';box-sizing:border-box;';
+	var children = Array.from(block.children).filter(function(child) {
+		return child.classList && child.classList.contains('canvas-block');
+	});
+	if (children.length) {
+		node.innerHTML = children.map(serializeWorkbenchBlockRecursive).join('\n');
+	} else {
+		var clone = cleanWorkbenchExportNode(block.cloneNode(true));
+		node.innerHTML = clone.innerHTML.trim();
+	}
+	return node.outerHTML;
+}
+
 function buildWorkbenchHTML() {
 	WECHAT_EDITOR_LOG.info('EXPORT', 'buildWorkbenchHTML called');
 
@@ -5945,20 +6118,9 @@ function buildWorkbenchHTML() {
 	var canvas = getCanvas();
 	if (!canvas) return '';
 	var blocks = getSortedTopLevelBlocks();
-	var html = blocks.map(function(block) {
-		ensureBlockMetadata(block);
-		var node = document.createElement('section');
-		copyWorkbenchAttributes(block, node);
-		node.setAttribute('data-wb-block', '1');
-		node.setAttribute('data-wb-id', block.getAttribute('data-wb-id') || block.getAttribute('data-id') || block.id);
-		node.setAttribute('data-wb-type', block.getAttribute('data-wb-type') || getWorkbenchType(block.getAttribute('data-type') || 'cell'));
-		node.style.cssText = 'margin:' + (block.getAttribute('data-flow-margin') || '0') + ';width:' + (block.getAttribute('data-flow-width') || '100%') + ';box-sizing:border-box;';
-		var clone = cleanWorkbenchExportNode(block.cloneNode(true));
-		node.innerHTML = clone.innerHTML.trim();
-		return node.outerHTML;
-	}).join('\n');
+	var html = blocks.map(serializeWorkbenchBlockRecursive).join('\n');
 	saveEditorSnapshot('export-workbench');
-	return '<section data-wb-root="1" data-wb-version="' + WORKBENCH_VERSION + '" data-wb-mode="' + currentWorkbenchMode + '" style="width:100%;max-width:375px;margin-left:auto;margin-right:auto;text-align:center;box-sizing:border-box;">\n' + html + '\n</section>';
+	return '<section data-wb-root="1" data-wb-version="' + WORKBENCH_VERSION + '" data-wb-mode="' + currentWorkbenchMode + '" data-flow-page-margin-x="' + escapeAttrValue(globalFlowStyles.pageMarginX) + '" data-flow-block-gap="' + escapeAttrValue(globalFlowStyles.blockGap) + '" data-flow-line-height="' + escapeAttrValue(globalFlowStyles.lineHeight) + '" data-flow-letter-spacing="' + escapeAttrValue(globalFlowStyles.letterSpacing) + '" data-flow-paragraph-after="' + escapeAttrValue(globalFlowStyles.paragraphAfter) + '" style="width:100%;max-width:375px;margin-left:auto;margin-right:auto;text-align:center;box-sizing:border-box;">\n' + html + '\n</section>';
 }
 
 function cleanBlockForExport(block) {
@@ -6852,12 +7014,29 @@ function moveFlexRowColumn(row, fromIndex, toIndex) {
 	row.insertBefore(cell, ref);
 }
 
+function getSelectedFlexRowColumnIndex(row) {
+	var cells = getFlexRowCells(row);
+	var selected = getSelectedBlocks().find(function(block) { return block.parentElement === row; });
+	if (selected) return cells.indexOf(selected);
+	return Math.max(0, cells.length - 1);
+}
+
+function moveSelectedColumnInFlexRow(row, direction) {
+	var index = getSelectedFlexRowColumnIndex(row);
+	moveFlexRowColumn(row, index, index + direction);
+}
+
 function removeFlexRowColumn(row, index) {
 	WECHAT_EDITOR_LOG.info('FLEX_ROW', 'removeFlexRowColumn called', {row:row,index:index});
 
 	var cells = getFlexRowCells(row);
 	if (index < 0 || index >= cells.length) return;
 	cells[index].remove();
+}
+
+function removeSelectedColumnFromFlexRow(row) {
+	removeFlexRowColumn(row, getSelectedFlexRowColumnIndex(row));
+	equalizeFlexRowColumns(row);
 }
 
 function equalizeFlexRowColumns(row) {
@@ -6869,6 +7048,53 @@ function equalizeFlexRowColumns(row) {
 		cell.style.flex = '0 0 ' + width + '%';
 		cell.style.width = width + '%';
 	});
+	ensureColumnResizeHandles(row);
+}
+
+function ensureColumnResizeHandles(row) {
+	if (!row || row.getAttribute('data-type') !== 'flex-row') return;
+	row.querySelectorAll(':scope > .wechat-column-resizer').forEach(function(handle) { handle.remove(); });
+	var cells = getFlexRowCells(row);
+	cells.slice(0, -1).forEach(function(cell, index) {
+		var handle = document.createElement('div');
+		handle.className = 'wechat-column-resizer';
+		handle.setAttribute('data-resize-column-index', String(index));
+		handle.style.left = Math.round(cell.offsetLeft + cell.offsetWidth) + 'px';
+		handle.addEventListener('mousedown', function(event) { startColumnResize(row, index, event); });
+		row.appendChild(handle);
+	});
+}
+
+function startColumnResize(row, index, event) {
+	if (!row || row.getAttribute('data-type') !== 'flex-row') return;
+	event.preventDefault();
+	var cells = getFlexRowCells(row);
+	var leftCell = cells[index];
+	var rightCell = cells[index + 1];
+	if (!leftCell || !rightCell) return;
+	saveState();
+	var startX = event.clientX;
+	var rowWidth = Math.max(1, row.offsetWidth);
+	var leftWidth = parseFloat(leftCell.style.width) || (100 / cells.length);
+	var rightWidth = parseFloat(rightCell.style.width) || (100 / cells.length);
+	function move(e) {
+		var delta = ((e.clientX - startX) / rowWidth) * 100;
+		var total = leftWidth + rightWidth;
+		var nextLeft = clamp(leftWidth + delta, 8, total - 8);
+		var nextRight = total - nextLeft;
+		leftCell.style.width = nextLeft.toFixed(2) + '%';
+		leftCell.style.flex = '0 0 ' + leftCell.style.width;
+		rightCell.style.width = nextRight.toFixed(2) + '%';
+		rightCell.style.flex = '0 0 ' + rightCell.style.width;
+	}
+	function up() {
+		document.removeEventListener('mousemove', move);
+		document.removeEventListener('mouseup', up);
+		ensureColumnResizeHandles(row);
+		scheduleAutoSave();
+	}
+	document.addEventListener('mousemove', move);
+	document.addEventListener('mouseup', up);
 }
 
 function addRowAfterBlock(block) {

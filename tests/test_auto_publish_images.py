@@ -48,6 +48,14 @@ class AutoPublishImageTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             auto_publish.process_html_images("token", '<img src="//example.com/a.png">')
 
+    def test_rejects_relative_image_url(self):
+        with self.assertRaises(ValueError):
+            auto_publish.process_html_images("token", '<img src="images/a.jpg">')
+
+    def test_rejects_non_https_wechat_cdn(self):
+        with self.assertRaises(ValueError):
+            auto_publish.process_html_images("token", '<img src="http://mmbiz.qpic.cn/a.jpg">')
+
     def test_does_not_rewrite_non_image_xlink(self):
         html = '<svg><use xlink:href="#shape"></use><image xlink:href="https://example.com/a.png"></image></svg>'
         out = auto_publish.process_html_images("token", html)

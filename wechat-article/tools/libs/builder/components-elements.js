@@ -136,7 +136,7 @@ Vvveb.Components.extend("_base","elements/font-icon", {
 			return element;
 		},
 		data: {
-			url: "" // resources removed,
+			url: "", // resources removed
 			clickElement:"li",
 			insertElement:"i",
 			elements: 'Loading ...',
@@ -212,7 +212,7 @@ Vvveb.Components.extend("_base","elements/svg-image", {
 		return newElement;
 	},
 	data: {
-		url: "" // SVG icons resources removed,
+		url: "", // SVG icons resources removed
 		clickElement:"li",
 		insertElement:"svg",
 		elements: 'Loading ...',

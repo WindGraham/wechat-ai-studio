@@ -21,9 +21,13 @@ def build_digest(html_content, digest=None):
 
 def get_access_token(appid, appsecret):
     url = f"https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid={appid}&secret={appsecret}"
-    response = requests.get(url)
+    response = requests.get(url, timeout=20)
+    response.raise_for_status()
     data = response.json()
-    return data.get("access_token")
+    token = data.get("access_token")
+    if not token:
+        raise ValueError(f"Failed to get WeChat access_token: {data}")
+    return token
 
 def upload_thumb_image(access_token, thumb_source):
     """Upload user-provided thumbnail image (required)."""
@@ -32,28 +36,41 @@ def upload_thumb_image(access_token, thumb_source):
     if not thumb_source:
         raise ValueError("thumb_source is required; provide a local image path or HTTPS image URL.")
 
+    tmp_path = None
     if thumb_source.startswith(("http://", "https://")):
-        response = requests.get(thumb_source)
+        response = requests.get(thumb_source, timeout=30)
         response.raise_for_status()
-        with open("/tmp/wechat_thumb.jpg", "wb") as f:
-            f.write(response.content)
-        upload_path = "/tmp/wechat_thumb.jpg"
+        suffix = os.path.splitext(thumb_source.split("?", 1)[0])[1] or ".jpg"
+        with tempfile.NamedTemporaryFile(suffix=suffix, delete=False) as tmp:
+            tmp.write(response.content)
+            tmp_path = tmp.name
+        upload_path = tmp_path
     else:
         upload_path = thumb_source
 
     if not os.path.exists(upload_path):
         raise FileNotFoundError(f"Thumbnail image not found: {upload_path}")
 
-    with open(upload_path, "rb") as f:
-        files = {"media": f}
-        response = requests.post(url, files=files)
-        data = response.json()
-    
-    return data.get("media_id")
+    try:
+        with open(upload_path, "rb") as f:
+            files = {"media": f}
+            response = requests.post(url, files=files, timeout=30)
+            response.raise_for_status()
+            data = response.json()
+        media_id = data.get("media_id")
+        if not media_id:
+            raise ValueError(f"Failed to upload thumbnail to WeChat: {data}")
+        return media_id
+    finally:
+        if tmp_path:
+            try:
+                os.unlink(tmp_path)
+            except OSError:
+                pass
 
 def upload_content_image(access_token, image_url):
     """Upload content image to WeChat CDN"""
-    response = requests.get(image_url)
+    response = requests.get(image_url, timeout=30)
     if response.status_code != 200:
         return None
 
@@ -66,7 +83,8 @@ def upload_content_image(access_token, image_url):
         url = f"https://api.weixin.qq.com/cgi-bin/media/uploadimg?access_token={access_token}"
         with open(tmp_path, "rb") as f:
             files = {"media": f}
-            response = requests.post(url, files=files)
+            response = requests.post(url, files=files, timeout=30)
+            response.raise_for_status()
             data = response.json()
         return data.get("url")
     finally:
@@ -84,12 +102,16 @@ def process_html_images(access_token, html_content):
             return original
         if normalized.startswith("data:") or normalized.startswith("file:") or normalized.startswith("//"):
             raise ValueError(f"Unsupported embedded/local image URL for WeChat API publish: {url[:40]}")
+        if "mmbiz.qpic.cn" in normalized:
+            if not normalized.startswith("https://"):
+                raise ValueError(f"WeChat CDN image URL must be HTTPS: {url}")
+            return original
         if normalized.startswith(("http://", "https://")) and "mmbiz.qpic.cn" not in normalized:
             wechat_url = upload_content_image(access_token, url)
             if not wechat_url:
                 raise ValueError(f"Failed to upload content image to WeChat CDN: {url}")
             return f"{prefix}{wechat_url}{suffix}"
-        return original
+        raise ValueError(f"Image URL must be public HTTP(S) or WeChat CDN before API publish: {url}")
 
     def replace_url(match):
         prefix, url, suffix = match.groups()
@@ -164,6 +186,7 @@ def create_or_update_draft(access_token, title, content, thumb_source, author, d
         data=json.dumps(data, ensure_ascii=False).encode("utf-8"),
         headers={"Content-Type": "application/json; charset=utf-8"}
     )
+    response.raise_for_status()
     result = response.json()
     
     if "media_id" in result:
@@ -174,14 +197,11 @@ def create_or_update_draft(access_token, title, content, thumb_source, author, d
     elif result.get("errcode") == 0:
         return media_id  # Update success
     else:
-        print(f"Error: {result}")
-        return None
+        raise ValueError(f"WeChat draft API failed: {result}")
 
 def publish_article(appid, appsecret, title, html_content, thumb_source, author, digest=None):
     """Main entry point"""
     token = get_access_token(appid, appsecret)
-    if not token:
-        return None
     
     # Process images
     html_content = process_html_images(token, html_content)

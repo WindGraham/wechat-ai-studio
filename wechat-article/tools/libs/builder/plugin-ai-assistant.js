@@ -1,4 +1,5 @@
-document.querySelector("#select-actions #edit-code-btn").after(generateElements('<a id="ai-assistant-btn" href="" title="AI assistant"><i class="icon-color-wand"></i></a>')[0]);
+let aiAssistantAnchor = document.querySelector("#select-actions #edit-code-btn");
+if (aiAssistantAnchor) aiAssistantAnchor.after(generateElements('<a id="ai-assistant-btn" href="" title="AI assistant"><i class="icon-color-wand"></i></a>')[0]);
 
 let aiResponseTemplate = `
 <div class="response">
@@ -79,14 +80,14 @@ let aiModalTemplate = `<div class="modal fade" id="ai-assistant-modal" tabindex=
 document.body.append(generateElements(aiModalTemplate)[0]);
 
 let aiModal = document.getElementById("ai-assistant-modal");
-let bsModal = bootstrap.Modal.getOrCreateInstance(aiModal);
+let bsModal = null;
 
-aiModal.querySelector(".btn-ask-ai").addEventListener("click", function(event) {
+if (aiModal && aiModal.querySelector(".btn-ask-ai")) aiModal.querySelector(".btn-ask-ai").addEventListener("click", function(event) {
 	aiAssistantSendQuery();
 	return false;
 });
 
-aiModal.querySelector(".btn-insert-content",).addEventListener("click", function(event) {
+if (aiModal && aiModal.querySelector(".btn-insert-content")) aiModal.querySelector(".btn-insert-content",).addEventListener("click", function(event) {
 	let selectedEl = Vvveb.Builder.selectedEl;
 	let text = selectedEl.innerHTML.trim();
 	let textarea = aiModal.querySelector("textarea");
@@ -101,14 +102,15 @@ aiModal.querySelector(".btn-save").addEventListener("click", function(event) {
 	$("textarea", aiModal).val("")
 });
 */
-aiModal.querySelector(".close-btn").addEventListener("click", function(event) {
+if (aiModal && aiModal.querySelector(".close-btn")) aiModal.querySelector(".close-btn").addEventListener("click", function(event) {
 	aiModal.querySelector("textarea").value = "";
 	let responses =  aiModal.querySelector(".responses");
 	responses.innerHTML = "";
 	responses.style.display = "none";
 });
 
-document.getElementById("ai-assistant-btn").addEventListener("click", function(event) {
+if (document.getElementById("ai-assistant-btn") && aiModal && bootstrap && bootstrap.Modal) document.getElementById("ai-assistant-btn").addEventListener("click", function(event) {
+	bsModal = bsModal || bootstrap.Modal.getOrCreateInstance(aiModal);
 	bsModal.show();
 	
 	event.preventDefault();
@@ -158,6 +160,7 @@ document.addEventListener("click", function(event) {
 });
 
 function aiAssistantSendQuery()  {
+		if (!aiModal) return;
 		if (!chatgptOptions["key"] ) {
 			displayToast("danger", "错误", 'No ChatGPT key configured! Enter a valid key in the plugin settings page.');
 			return;

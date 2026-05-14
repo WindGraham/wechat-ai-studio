@@ -2943,7 +2943,8 @@ Vvveb.Gui = {
 	//layout
 	togglePanel: function (panel, cssVar) {
 		panel = document.querySelector(panel);
-		let body = document.querySelector("页面主体");
+		let body = document.body;
+		if (!panel || !body) return false;
 		let prevValue = getComputedStyle(body).getPropertyValue(cssVar);
 		let visible = false;
 		

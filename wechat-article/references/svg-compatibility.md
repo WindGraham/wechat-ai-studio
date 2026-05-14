@@ -8,6 +8,54 @@
 
 ---
 
+## Static Contract Summary
+
+This section is the contract used by `tests/wechat-svg-compatibility-contract.test.js`.
+When guidance below changes, update the test in the same change so agents do not
+regress WeChat SVG assumptions silently.
+
+| ID | Feature | WeChat Status | Contract |
+|:---|:---|:---:|:---|
+| `SVG-SMIL-ANIMATE` | `<animate>` | ✅ Supported | Use for attribute animation such as `opacity`, `r`, `fill`, `stroke-width`, `stroke-dashoffset`, `x`, `y`, `cx`, and `cy`. |
+| `SVG-SMIL-ANIMATE-TRANSFORM` | `<animateTransform>` | ✅ Supported | Use only with 2D transform types `translate`, `scale`, `rotate`, `skewX`, and `skewY`. |
+| `SVG-FOREIGNOBJECT` | `<foreignObject>` | ❌ Blocked | Do not embed HTML inside SVG. Build the layout as normal article HTML instead. |
+| `SVG-FILTER` | `<filter>` and `<fe*>` | ❌ Blocked | No blur, shadow, blend, color matrix, component transfer, merge, offset, flood, tile, or composite effects inside SVG. |
+| `SVG-GRADIENT` | `<linearGradient>`, `<radialGradient>`, `<stop>` | ❌ Blocked | Replace gradients with solid fills, layered shapes, or pre-rendered bitmap assets uploaded to WeChat CDN. |
+| `SVG-CLIP-MASK-TEXTPATH` | `<clipPath>`, `clip-path`, `<mask>`, `mask`, `<textPath>` | ❌ Blocked | Do not rely on clipping, masking, or text-on-path. Use viewBox cropping, simple shapes, or pre-rendered images. |
+| `SVG-XLINK-HREF` | `xlink:href` | ❌ Blocked | Use SVG2 `href` on `<image>`. Auto-publish may rewrite `<image xlink:href>` to `href`, but generated source should not use it. |
+| `SVG-DATA-URI` | `data:` / Base64 URLs | ❌ Blocked | Never use data URIs in `<img src>`, `<image href>`, CSS `url()`, or SVG attributes. |
+| `SVG-MATRIX-3D` | `matrix()`, matrix SMIL, `matrix3d()`, `rotateX/Y/Z`, `translateZ`, `perspective` | ❌ Blocked | Use simple 2D `translate`, `scale`, `rotate`, `skewX`, or `skewY` only. |
+| `SVG-CSS-ANIMATION` | CSS `@keyframes`, `animation`, `transition` | ❌ Blocked | Use SMIL animation attributes instead of CSS animation or transition. |
+| `SVG-IMAGE-CDN` | SVG `<image href>` | ⚠️ Workflow dependent | For API publish, image URLs must already be WeChat CDN (`https://mmbiz.qpic.cn/...`) or be uploaded and rewritten before draft creation. Manual paste can render some public HTTPS external images, but external SVG image links are not a safe contract. |
+
+### Static Fixture Rules
+
+Allowed fixture:
+
+```svg
+<svg width="100%" height="80" viewBox="0 0 375 80">
+  <image x="0" y="0" width="120" height="80" href="https://mmbiz.qpic.cn/example.jpg">
+    <animate attributeName="opacity" values="1;0.5;1" dur="2s" repeatCount="indefinite"/>
+    <animateTransform attributeName="transform" type="translate" values="0,0;20,0;0,0" dur="2s" repeatCount="indefinite"/>
+  </image>
+</svg>
+```
+
+Blocked fixture patterns include:
+
+```svg
+<foreignObject/>
+<filter><feGaussianBlur/></filter>
+<linearGradient><stop/></linearGradient>
+<clipPath/><mask/><textPath/>
+<image xlink:href="https://example.com/a.png"/>
+<image href="data:image/png;base64,AAA"/>
+<g transform="matrix(1 0 0 1 0 0)"/>
+<g style="animation: spin 1s linear infinite; transition: opacity 1s;"/>
+```
+
+---
+
 ## Green Zone — Confirmed Working
 
 ### 1. Basic Shapes
@@ -25,6 +73,7 @@
 | `<path>` | ✅ | Path, supports d attribute animation |
 | `<text>` | ✅ | Text |
 | `<tspan>` | ✅ | Text span, supports color change |
+| `<foreignObject>` | ❌ | Filtered/blocked; do not embed HTML inside SVG |
 
 ### 2. Basic Attributes
 
@@ -120,6 +169,7 @@
 | Feature | Status | Notes |
 |:---|:---:|:---|
 | `clipPath` / `clip-path` | ❌ | Clipping is filtered |
+| `mask` / `<mask>` | ❌ | Masking is filtered |
 | `textPath` | ❌ | Text path is filtered |
 | `visibility` | ❌ | Layout attribute is filtered |
 | `matrix()` / `matrix` SMIL | ❌ | Matrix transform is filtered |
@@ -128,8 +178,9 @@
 | `href` (SVG2) | ✅ | Replacement for xlink:href, works |
 | `style` attribute | ❌ | Filtered |
 | `class` / `id` | ❌ | Removed |
-| `rotateX()` / `rotateY()` / `rotateZ()` | ❌ | 3D transforms unsupported |
-| CSS `@keyframes` / `animation` | ❌ | Completely filtered |
+| `matrix()` / `matrix3d()` | ❌ | Matrix transforms unsupported |
+| `rotateX()` / `rotateY()` / `rotateZ()` / `translateZ()` / `perspective()` | ❌ | 3D transforms unsupported |
+| CSS `@keyframes` / `animation` / `transition` | ❌ | Completely filtered |
 | `<script>` / events | ❌ | Completely prohibited |
 
 ---
@@ -176,7 +227,7 @@ Since filters and clipping are unavailable, **image effects in WeChat SVG are li
 
 ## Mandatory Rules
 
-1. **Images MUST use WeChat CDN** — any external URL, Base64, Data URI will be filtered
+1. **API-published images MUST use WeChat CDN** — external SVG image URLs are not a safe API contract; Base64/Data URI is always disallowed
 2. **Animations MUST use SMIL** — CSS animation completely unsupported
 3. **Styles MUST use inline attributes** — `style` tags/attributes filtered
 4. **Do NOT use class/id** — will be removed
@@ -208,21 +259,15 @@ Three images slide horizontally with bottom dot indicators.
 
 ```svg
 <svg width="100%" height="200" viewBox="0 0 375 200">
-  <defs>
-    <clipPath id="carousel-clip">
-      <rect x="0" y="0" width="375" height="200" rx="8"/>
-    </clipPath>
-  </defs>
-  <g clip-path="url(#carousel-clip)">
-    <g>
-      <image x="0" y="0" width="375" height="200" href="WECHAT_CDN_URL_1"/>
-      <image x="375" y="0" width="375" height="200" href="WECHAT_CDN_URL_2"/>
-      <image x="750" y="0" width="375" height="200" href="WECHAT_CDN_URL_3"/>
-      <animateTransform attributeName="transform" type="translate"
-        values="0,0;-375,0;-750,0;0,0" dur="6s" repeatCount="indefinite"
-        calcMode="spline" keySplines="0.42 0 0.58 1;0.42 0 0.58 1;0.42 0 0.58 1"
-        keyTimes="0;0.33;0.66;1"/>
-    </g>
+  <rect x="0" y="0" width="375" height="200" rx="8" fill="rgb(245,245,247)"/>
+  <g>
+    <image x="0" y="0" width="375" height="200" href="WECHAT_CDN_URL_1"/>
+    <image x="375" y="0" width="375" height="200" href="WECHAT_CDN_URL_2"/>
+    <image x="750" y="0" width="375" height="200" href="WECHAT_CDN_URL_3"/>
+    <animateTransform attributeName="transform" type="translate"
+      values="0,0;-375,0;-750,0;0,0" dur="6s" repeatCount="indefinite"
+      calcMode="spline" keySplines="0.42 0 0.58 1;0.42 0 0.58 1;0.42 0 0.58 1"
+      keyTimes="0;0.33;0.66;1"/>
   </g>
   <!-- Indicator dots -->
   <circle cx="165" cy="185" r="4" fill="rgba(255,255,255,0.5)">
@@ -249,21 +294,15 @@ Two images fade in and out alternately.
 
 ```svg
 <svg width="100%" height="200" viewBox="0 0 375 200">
-  <defs>
-    <clipPath id="fade-clip">
-      <rect x="0" y="0" width="375" height="200" rx="8"/>
-    </clipPath>
-  </defs>
-  <g clip-path="url(#fade-clip)">
-    <image x="0" y="0" width="375" height="200" href="WECHAT_CDN_URL_1">
-      <animate attributeName="opacity" values="1;1;0;0;1" dur="5s"
-        repeatCount="indefinite" keyTimes="0;0.4;0.5;0.9;1"/>
-    </image>
-    <image x="0" y="0" width="375" height="200" href="WECHAT_CDN_URL_2" opacity="0">
-      <animate attributeName="opacity" values="0;0;1;1;0" dur="5s"
-        repeatCount="indefinite" keyTimes="0;0.4;0.5;0.9;1"/>
-    </image>
-  </g>
+  <rect x="0" y="0" width="375" height="200" rx="8" fill="rgb(245,245,247)"/>
+  <image x="0" y="0" width="375" height="200" href="WECHAT_CDN_URL_1">
+    <animate attributeName="opacity" values="1;1;0;0;1" dur="5s"
+      repeatCount="indefinite" keyTimes="0;0.4;0.5;0.9;1"/>
+  </image>
+  <image x="0" y="0" width="375" height="200" href="WECHAT_CDN_URL_2" opacity="0">
+    <animate attributeName="opacity" values="0;0;1;1;0" dur="5s"
+      repeatCount="indefinite" keyTimes="0;0.4;0.5;0.9;1"/>
+  </image>
 </svg>
 ```
 
@@ -273,20 +312,14 @@ Top image slides away to reveal the bottom image.
 
 ```svg
 <svg width="100%" height="200" viewBox="0 0 375 200">
-  <defs>
-    <clipPath id="reveal-clip">
-      <rect x="0" y="0" width="375" height="200" rx="8"/>
-    </clipPath>
-  </defs>
-  <g clip-path="url(#reveal-clip)">
-    <image x="0" y="0" width="375" height="200" href="WECHAT_CDN_URL_1"/>
-    <image x="0" y="0" width="375" height="200" href="WECHAT_CDN_URL_2">
-      <animateTransform attributeName="transform" type="translate"
-        values="0,0;-375,0;-375,0;0,0" dur="4s" repeatCount="indefinite"
-        calcMode="spline" keySplines="0.42 0 0.58 1;0.42 0 0.58 1;0.42 0 0.58 1"
-        keyTimes="0;0.4;0.6;1"/>
-    </image>
-  </g>
+  <rect x="0" y="0" width="375" height="200" rx="8" fill="rgb(245,245,247)"/>
+  <image x="0" y="0" width="375" height="200" href="WECHAT_CDN_URL_1"/>
+  <image x="0" y="0" width="375" height="200" href="WECHAT_CDN_URL_2">
+    <animateTransform attributeName="transform" type="translate"
+      values="0,0;-375,0;-375,0;0,0" dur="4s" repeatCount="indefinite"
+      calcMode="spline" keySplines="0.42 0 0.58 1;0.42 0 0.58 1;0.42 0 0.58 1"
+      keyTimes="0;0.4;0.6;1"/>
+  </image>
 </svg>
 ```
 
