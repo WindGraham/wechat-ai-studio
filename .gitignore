@@ -10,3 +10,4 @@ layout-draft.json
 template-source.html
 template-meta.json
 wechat_inject.py
+tests/artifacts/
