@@ -20,6 +20,9 @@ const requiredSnippets = [
   "function equalizeFlexRowColumns",
   "function addRowAfterBlock",
   "function validateWechatHtml",
+  "function buildWechatAcceptanceReport",
+  "function detectCanvasLayoutIssues",
+  "function detectExportPollution",
   "function serializeWorkbenchBlockRecursive",
   "function hydrateWorkbenchSection",
   "function applyWorkbenchRootMetadata",
@@ -42,6 +45,8 @@ const requiredSnippets = [
   "data-wb-block=\"1\"",
   "data-drag-column-index",
   "SVG animateTransform matrix/3D",
+  "large-visual-overlap",
+  "leaked-workbench-data",
 ];
 
 for (const snippet of requiredSnippets) {

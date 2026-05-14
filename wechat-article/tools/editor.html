@@ -6374,29 +6374,101 @@ function validateWechatHtml(html, mode) {
 	return issues;
 }
 
-function runWechatCompatibilityCheck(mode) {
+function getRectIntersectionArea(a, b) {
+	var left = Math.max(a.x, b.x);
+	var right = Math.min(a.x + a.width, b.x + b.width);
+	var top = Math.max(a.y, b.y);
+	var bottom = Math.min(a.y + a.height, b.y + b.height);
+	return Math.max(0, right - left) * Math.max(0, bottom - top);
+}
+
+function detectCanvasLayoutIssues(components) {
+	var issues = [];
+	components = components || collectLayoutComponents();
+	components.forEach(function(comp) {
+		var b = comp.bounds || {};
+		if (b.x < 0 || b.x + b.width > CANVAS_WIDTH) {
+			issues.push({ severity: 'error', code: 'canvas-overflow-x', message: comp.id + ' 超出 375px 画布宽度' });
+		}
+		if (b.width < MIN_BLOCK_WIDTH || b.height < MIN_BLOCK_HEIGHT) {
+			issues.push({ severity: 'warn', code: 'tiny-component', message: comp.id + ' 尺寸过小，可能难以在微信编辑器中稳定选中' });
+		}
+		if (comp.type === 'image' && comp.content.images.some(function(img) { return !img.src; })) {
+			issues.push({ severity: 'error', code: 'empty-image-src', message: comp.id + ' 图片 URL 为空' });
+		}
+	});
+	for (var i = 0; i < components.length; i++) {
+		for (var j = i + 1; j < components.length; j++) {
+			var a = components[i];
+			var b = components[j];
+			var area = getRectIntersectionArea(a.bounds, b.bounds);
+			if (!area) continue;
+			var smaller = Math.max(1, Math.min(a.bounds.width * a.bounds.height, b.bounds.width * b.bounds.height));
+			var ratio = area / smaller;
+			if (ratio > 0.45) {
+				issues.push({ severity: 'warn', code: 'large-visual-overlap', message: a.id + ' 与 ' + b.id + ' 大面积重叠，导出微信文档流时可能需要人工确认' });
+			} else if (ratio > 0.12) {
+				issues.push({ severity: 'info', code: 'visual-overlap', message: a.id + ' 与 ' + b.id + ' 存在轻微重叠，导出会尝试用 margin 保留层叠' });
+			}
+		}
+	}
+	return issues;
+}
+
+function detectExportPollution(html) {
+	var issues = [];
+	[
+		{ code: 'leaked-canvas-class', regex: /\bcanvas-block\b/i, message: '导出 HTML 泄漏 canvas-block 编辑器类名' },
+		{ code: 'leaked-workbench-data', regex: /\sdata-(?:wb|wx|canvas|flow|layer|overlap)-/i, message: '导出 HTML 泄漏 Workbench/编辑器 data-* 属性' },
+		{ code: 'leaked-draggable', regex: /\sdraggable\s*=/i, message: '导出 HTML 泄漏 draggable 属性' },
+		{ code: 'leaked-resizer', regex: /wechat-column-resizer|resize-handle/i, message: '导出 HTML 泄漏编辑器拖拽柄' }
+	].forEach(function(check) {
+		if (check.regex.test(html)) issues.push({ severity: 'error', code: check.code, message: check.message });
+	});
+	return issues;
+}
+
+function buildWechatAcceptanceReport(mode) {
 	mode = mode || 'manual-paste';
 	var html = buildWechatHTML();
-	var issues = validateWechatHtml(html, mode);
-	collectLayoutComponents().forEach(function(comp) {
-		if (comp.bounds.x < 0 || comp.bounds.x + comp.bounds.width > CANVAS_WIDTH) issues.push({ severity: 'error', message: comp.id + ' 超出 375px 画布宽度' });
-		if (comp.type === 'image' && comp.content.images.some(function(img) { return !img.src; })) issues.push({ severity: 'error', message: comp.id + ' 图片 URL 为空' });
-		if (!comp.catalog.id) issues.push({ severity: 'warn', message: comp.id + ' 缺少素材来源元数据，建议从左侧外接素材库插入' });
-		if (!comp.catalog.licenseStatus) issues.push({ severity: 'warn', message: comp.id + ' 缺少授权状态元数据' });
-		if (comp.catalog.licenseStatus && comp.catalog.licenseStatus !== 'allowed') issues.push({ severity: comp.catalog.externalAsset ? 'warn' : 'error', message: comp.id + ' 授权状态不是 allowed：' + comp.catalog.licenseStatus });
-		if (!comp.catalog.wechatCompat) issues.push({ severity: 'warn', message: comp.id + ' 缺少微信兼容元数据' });
-		if (comp.catalog.wechatCompat && comp.catalog.wechatCompat !== 'safe') issues.push({ severity: comp.catalog.externalAsset ? 'warn' : 'error', message: comp.id + ' 微信兼容状态不是 safe：' + comp.catalog.wechatCompat });
-		if (comp.catalog.externalAsset) issues.push({ severity: 'warn', message: comp.id + ' 是外部素材草稿，正式发布前需确认授权、转存图片，SVG 建议转 PNG/微信 CDN' });
-		if (comp.catalog.sourceProvider === 'iconify') issues.push({ severity: 'warn', message: comp.id + ' 使用 Iconify SVG 外链，禁止内联 SVG，正式发布前建议栅格化' });
-		if (comp.catalog.sourceProvider === 'wikimedia') issues.push({ severity: 'warn', message: comp.id + ' 使用 Wikimedia Commons 图片，正式发布前需确认授权、署名和转存' });
-		if (comp.catalog.sourceProvider === 'bing-cn') issues.push({ severity: 'warn', message: comp.id + ' 使用 Bing 中文每日图，正式发布前需确认原图授权和转存' });
-		if (comp.catalog.sourceProvider === 'nasa') issues.push({ severity: 'warn', message: comp.id + ' 使用 NASA Image Library 图片，正式发布前需确认来源说明和转存' });
-		if (comp.catalog.sourceProvider === 'artic') issues.push({ severity: 'warn', message: comp.id + ' 使用芝加哥艺术博物馆图片，正式发布前需确认公共领域状态和转存' });
-		if (comp.catalog.sourceProvider === 'openverse') issues.push({ severity: 'warn', message: comp.id + ' 使用 Openverse 图片，正式发布前需确认许可证、署名和转存' });
-		if (['picsum', 'loremflickr', 'placehold'].indexOf(comp.catalog.sourceProvider) !== -1) issues.push({ severity: 'warn', message: comp.id + ' 使用外部图片占位源 ' + comp.catalog.sourceProvider + '，正式发布前必须替换' });
-		if (comp.catalog.sourceProvider && comp.catalog.sourceProvider !== 'internal' && comp.catalog.sourceProvider !== 'local') issues.push({ severity: 'warn', message: comp.id + ' 来自外部素材源，导出前需确认授权和图片最终地址' });
-		if (!comp.aiNote) issues.push({ severity: 'info', message: comp.id + ' 没有 AI 排版说明，可选补充' });
+	var components = collectLayoutComponents();
+	var issues = []
+		.concat(validateWechatHtml(html, mode))
+		.concat(detectExportPollution(html))
+		.concat(detectCanvasLayoutIssues(components));
+	components.forEach(function(comp) {
+		if (!comp.catalog.id) issues.push({ severity: 'warn', code: 'missing-catalog-id', message: comp.id + ' 缺少素材来源元数据，建议从左侧外接素材库插入' });
+		if (!comp.catalog.licenseStatus) issues.push({ severity: 'warn', code: 'missing-license-status', message: comp.id + ' 缺少授权状态元数据' });
+		if (comp.catalog.licenseStatus && comp.catalog.licenseStatus !== 'allowed') issues.push({ severity: comp.catalog.externalAsset ? 'warn' : 'error', code: 'license-not-allowed', message: comp.id + ' 授权状态不是 allowed：' + comp.catalog.licenseStatus });
+		if (!comp.catalog.wechatCompat) issues.push({ severity: 'warn', code: 'missing-wechat-compat', message: comp.id + ' 缺少微信兼容元数据' });
+		if (comp.catalog.wechatCompat && comp.catalog.wechatCompat !== 'safe') issues.push({ severity: comp.catalog.externalAsset ? 'warn' : 'error', code: 'wechat-compat-not-safe', message: comp.id + ' 微信兼容状态不是 safe：' + comp.catalog.wechatCompat });
+		if (comp.catalog.externalAsset) issues.push({ severity: 'warn', code: 'external-asset', message: comp.id + ' 是外部素材草稿，正式发布前需确认授权、转存图片，SVG 建议转 PNG/微信 CDN' });
+		if (comp.catalog.sourceProvider === 'iconify') issues.push({ severity: 'warn', code: 'iconify-svg-source', message: comp.id + ' 使用 Iconify SVG 外链，禁止内联 SVG，正式发布前建议栅格化' });
+		if (comp.catalog.sourceProvider === 'wikimedia') issues.push({ severity: 'warn', code: 'wikimedia-source', message: comp.id + ' 使用 Wikimedia Commons 图片，正式发布前需确认授权、署名和转存' });
+		if (comp.catalog.sourceProvider === 'bing-cn') issues.push({ severity: 'warn', code: 'bing-source', message: comp.id + ' 使用 Bing 中文每日图，正式发布前需确认原图授权和转存' });
+		if (comp.catalog.sourceProvider === 'nasa') issues.push({ severity: 'warn', code: 'nasa-source', message: comp.id + ' 使用 NASA Image Library 图片，正式发布前需确认来源说明和转存' });
+		if (comp.catalog.sourceProvider === 'artic') issues.push({ severity: 'warn', code: 'artic-source', message: comp.id + ' 使用芝加哥艺术博物馆图片，正式发布前需确认公共领域状态和转存' });
+		if (comp.catalog.sourceProvider === 'openverse') issues.push({ severity: 'warn', code: 'openverse-source', message: comp.id + ' 使用 Openverse 图片，正式发布前需确认许可证、署名和转存' });
+		if (['picsum', 'loremflickr', 'placehold'].indexOf(comp.catalog.sourceProvider) !== -1) issues.push({ severity: 'warn', code: 'placeholder-source', message: comp.id + ' 使用外部图片占位源 ' + comp.catalog.sourceProvider + '，正式发布前必须替换' });
+		if (comp.catalog.sourceProvider && comp.catalog.sourceProvider !== 'internal' && comp.catalog.sourceProvider !== 'local') issues.push({ severity: 'warn', code: 'external-source', message: comp.id + ' 来自外部素材源，导出前需确认授权和图片最终地址' });
+		if (!comp.aiNote) issues.push({ severity: 'info', code: 'missing-ai-note', message: comp.id + ' 没有 AI 排版说明，可选补充' });
 	});
+	return {
+		ok: !issues.some(function(item) { return item.severity === 'error'; }),
+		mode: mode,
+		issueCount: issues.length,
+		errorCount: issues.filter(function(item) { return item.severity === 'error'; }).length,
+		warnCount: issues.filter(function(item) { return item.severity === 'warn'; }).length,
+		infoCount: issues.filter(function(item) { return item.severity === 'info'; }).length,
+		issues: issues,
+		html: html
+	};
+}
+
+function runWechatCompatibilityCheck(mode) {
+	mode = mode || 'manual-paste';
+	var reportData = buildWechatAcceptanceReport(mode);
+	var issues = reportData.issues;
 	var severityLabel = { error: '必须处理', warn: '建议处理', info: '可选优化' };
 	var report = issues.length ? issues.map(function(item) { return '[' + (severityLabel[item.severity] || item.severity) + '] ' + item.message; }).join('\n') : '未发现明显微信兼容问题。';
 	showTextModal('微信兼容性检查', report, 'wechat-check-report.txt');

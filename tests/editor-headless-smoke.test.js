@@ -474,6 +474,8 @@ const pageSmokeExpression = `new Promise((resolve) => {
       importedBlocks: 0,
       workbenchHasRoot: false,
       wechatIssues: [],
+      acceptanceOk: false,
+      acceptanceErrors: 0,
       leakedEditorMarkers: false
     };
 
@@ -514,6 +516,9 @@ const pageSmokeExpression = `new Promise((resolve) => {
         functional.importedBlocks = document.querySelectorAll('#block-canvas > .canvas-block').length;
         const wechat = buildWechatHTML();
         functional.wechatIssues = validateWechatHtml(wechat).filter((issue) => issue.severity === 'error').map((issue) => issue.message);
+        const acceptance = buildWechatAcceptanceReport('manual-paste');
+        functional.acceptanceOk = acceptance.ok;
+        functional.acceptanceErrors = acceptance.errorCount;
         functional.leakedEditorMarkers = /canvas-block|data-wb-|data-canvas-|draggable=|wechat-column-resizer/.test(wechat);
         functional.ran = true;
       }
@@ -666,6 +671,9 @@ async function main() {
     }
     if (metrics.functional.wechatIssues.length) {
       fail('WeChat export has blocking compatibility issues.', metrics.functional.wechatIssues.join('\n'));
+    }
+    if (!metrics.functional.acceptanceOk || metrics.functional.acceptanceErrors) {
+      fail('Structured WeChat acceptance report has blocking errors.', JSON.stringify(metrics.functional, null, 2));
     }
     if (metrics.functional.leakedEditorMarkers) fail('WeChat export leaked editor/workbench markers.');
 
