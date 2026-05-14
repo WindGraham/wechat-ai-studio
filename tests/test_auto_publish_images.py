@@ -75,6 +75,16 @@ class AutoPublishImageTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             auto_publish.process_html_images("token", '<img src="https://example.com/a.jpg">')
 
+    def test_api_publish_preflight_accepts_rewritten_wechat_cdn_images(self):
+        html = '<section><img src="https://mmbiz.qpic.cn/a.jpg"><svg><image href="https://mmbiz.qpic.cn/b.jpg"></image></svg></section>'
+        report = auto_publish.validate_html_for_api_publish(html)
+        self.assertTrue(report["ok"])
+
+    def test_api_publish_preflight_rejects_complex_svg(self):
+        html = '<section><svg><foreignObject></foreignObject><animateTransform type="matrix"></animateTransform></svg></section>'
+        with self.assertRaisesRegex(ValueError, "preflight failed"):
+            auto_publish.validate_html_for_api_publish(html)
+
 
 if __name__ == "__main__":
     unittest.main()

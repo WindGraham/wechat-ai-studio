@@ -6,6 +6,20 @@ import json
 import re
 import os
 import tempfile
+import importlib.util
+from pathlib import Path
+
+try:
+    from wechat_acceptance import build_report as build_wechat_acceptance_report
+except ImportError:
+    acceptance_path = Path(__file__).with_name("wechat_acceptance.py")
+    if acceptance_path.exists():
+        spec = importlib.util.spec_from_file_location("wechat_acceptance", acceptance_path)
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        build_wechat_acceptance_report = module.build_report
+    else:
+        build_wechat_acceptance_report = None
 
 DRAFT_ID_FILE = ".wechat_draft_id"
 DIGEST_MAX_LENGTH = 120
@@ -142,6 +156,17 @@ def process_html_images(access_token, html_content):
     )
     return html_content
 
+def validate_html_for_api_publish(html_content):
+    """Run local WeChat HTML acceptance checks before calling draft APIs."""
+    if not build_wechat_acceptance_report:
+        return {"ok": True, "issues": []}
+    report = build_wechat_acceptance_report(html_content, "api-draft")
+    blocking = [item for item in report.get("issues", []) if item.get("severity") == "error"]
+    if blocking:
+        details = "; ".join(f"{item.get('code')}: {item.get('message')}" for item in blocking[:8])
+        raise ValueError(f"WeChat API publish preflight failed: {details}")
+    return report
+
 def create_or_update_draft(access_token, title, content, thumb_source, author, digest=None, media_id=None):
     """Create new draft or update existing"""
     if not author:
@@ -205,6 +230,9 @@ def publish_article(appid, appsecret, title, html_content, thumb_source, author,
     
     # Process images
     html_content = process_html_images(token, html_content)
+
+    # Validate final API payload after image rewrite, before creating/updating draft.
+    validate_html_for_api_publish(html_content)
     
     # Check for existing draft ID
     media_id = None
