@@ -465,6 +465,61 @@ const pageSmokeExpression = `new Promise((resolve) => {
 
   (async () => {
     await sleep(1000);
+    const functional = {
+      ran: false,
+      errors: [],
+      rowType: '',
+      rowCells: 0,
+      flexColChildren: 0,
+      importedBlocks: 0,
+      workbenchHasRoot: false,
+      wechatIssues: [],
+      leakedEditorMarkers: false
+    };
+
+    try {
+      const blockCanvasEl = document.querySelector('#block-canvas');
+      if (blockCanvasEl && typeof addBlock === 'function') {
+        blockCanvasEl.innerHTML = '';
+        selectedBlock = null;
+        selectedBlocks = [];
+        currentWorkbenchMode = 'canvas';
+        blockCanvasEl.classList.remove('flow-mode');
+        addBlock('text');
+        addBlock('text');
+        const created = Array.from(blockCanvasEl.querySelectorAll(':scope > .canvas-block'));
+        created.forEach((block, index) => {
+          block.style.left = (index * 188) + 'px';
+          block.style.top = '20px';
+          block.style.width = '170px';
+        });
+        groupSideBySideRowsForFlow();
+        const row = blockCanvasEl.querySelector(':scope > .canvas-block[data-type="flex-row"]');
+        functional.rowType = row ? row.getAttribute('data-type') : '';
+        functional.rowCells = row ? row.querySelectorAll(':scope > .canvas-block').length : 0;
+        if (row) {
+          addColumnToFlexRow(row);
+          equalizeFlexRowColumns(row);
+          functional.rowCells = row.querySelectorAll(':scope > .canvas-block').length;
+        }
+        addBlock('text');
+        const trailing = blockCanvasEl.querySelector(':scope > .canvas-block[data-type="text"]');
+        if (trailing) addRowAfterBlock(trailing);
+        const col = blockCanvasEl.querySelector(':scope > .canvas-block[data-type="flex-col"]');
+        functional.flexColChildren = col ? col.querySelectorAll(':scope > .canvas-block').length : 0;
+        const workbench = buildWorkbenchHTML();
+        functional.workbenchHasRoot = /data-wb-root="1"/.test(workbench) && /data-wb-block="1"/.test(workbench);
+        importXiumiToCanvas(workbench);
+        await sleep(450);
+        functional.importedBlocks = document.querySelectorAll('#block-canvas > .canvas-block').length;
+        const wechat = buildWechatHTML();
+        functional.wechatIssues = validateWechatHtml(wechat).filter((issue) => issue.severity === 'error').map((issue) => issue.message);
+        functional.leakedEditorMarkers = /canvas-block|data-wb-|data-canvas-|draggable=|wechat-column-resizer/.test(wechat);
+        functional.ran = true;
+      }
+    } catch (err) {
+      functional.errors.push(err && err.stack ? err.stack : String(err));
+    }
 
     const top = rect('#top-panel');
     const left = rect('#left-panel');
@@ -511,6 +566,7 @@ const pageSmokeExpression = `new Promise((resolve) => {
       sourceCards: document.querySelectorAll('#wechat-source-list .wechat-catalog-card').length,
       canvasBlocks: blocks.length,
       blockTypes: blocks.map((block) => block.getAttribute('data-type')),
+      functional,
       consoleMarker: 'editor-headless-smoke'
     });
   })();
@@ -597,6 +653,21 @@ async function main() {
     if (!metrics.hasAddBlock) fail('addBlock is not available on editor page.');
     if (metrics.componentButtons < 8) fail(`Expected basic component buttons, found ${metrics.componentButtons}.`);
     if (metrics.bodyTextLength < 100) fail(`Page key regions look empty; body text length is ${metrics.bodyTextLength}.`);
+    if (!metrics.functional.ran) fail('Functional editor workflow did not run.', JSON.stringify(metrics.functional, null, 2));
+    if (metrics.functional.errors.length) fail('Functional editor workflow raised errors.', metrics.functional.errors.join('\n'));
+    if (metrics.functional.rowType !== 'flex-row' || metrics.functional.rowCells < 3) {
+      fail('Flex-row workflow did not create and expand a row.', JSON.stringify(metrics.functional, null, 2));
+    }
+    if (metrics.functional.flexColChildren < 2) {
+      fail('Flex-col row insertion workflow did not create two rows.', JSON.stringify(metrics.functional, null, 2));
+    }
+    if (!metrics.functional.workbenchHasRoot || metrics.functional.importedBlocks < 1) {
+      fail('Workbench round-trip workflow failed.', JSON.stringify(metrics.functional, null, 2));
+    }
+    if (metrics.functional.wechatIssues.length) {
+      fail('WeChat export has blocking compatibility issues.', metrics.functional.wechatIssues.join('\n'));
+    }
+    if (metrics.functional.leakedEditorMarkers) fail('WeChat export leaked editor/workbench markers.');
 
     const screenshot = await client.send('Page.captureScreenshot', { format: 'png', captureBeyondViewport: false });
     const screenshotBuffer = Buffer.from(screenshot.data, 'base64');

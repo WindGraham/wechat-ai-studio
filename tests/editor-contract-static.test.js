@@ -22,6 +22,14 @@ const requiredSnippets = [
   "function validateWechatHtml",
   "function serializeWorkbenchBlockRecursive",
   "function hydrateWorkbenchSection",
+  "function applyWorkbenchRootMetadata",
+  "function countWorkbenchSections",
+  "function captureNestedFlowGeometry",
+  "function createFlexRowGroupFromBlocks",
+  "function ensureFlexRowColumnEditing",
+  "function sanitizeImportedSvgForWechat",
+  "function wrapWechatFlowBlock",
+  "function getWechatExportBounds",
   "SVG filter/fe*",
   "text-align:center;font-size:0;box-sizing:border-box;width:100%;",
   "data-flow-page-margin-x",
@@ -31,6 +39,9 @@ const requiredSnippets = [
   "data-inspector-action=\"moveColumnLeft\"",
   "data-column-selected",
   "wechat-column-resizer",
+  "data-wb-block=\"1\"",
+  "data-drag-column-index",
+  "SVG animateTransform matrix/3D",
 ];
 
 for (const snippet of requiredSnippets) {

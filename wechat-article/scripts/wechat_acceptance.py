@@ -48,6 +48,7 @@ def validate_wechat_html(html, mode="manual-paste"):
         ("error", "svg-clip-mask-path", r"<(clipPath|textPath|mask)\b"),
         ("error", "svg-xlink", r"\sxlink:href\s*="),
         ("error", "matrix-or-3d-transform", r"(matrix\s*\(|rotate[XYZ]\s*\(|perspective\s*\()"),
+        ("error", "svg-animate-transform-matrix", r"<animateTransform\b[^>]*\btype=['\"]?(matrix|matrix3d|rotateX|rotateY|rotateZ|translateZ|perspective)"),
         ("error", "data-uri", r"(src|href)\s*=\s*['\"]data:"),
     ]
     for severity, code, pattern in checks:

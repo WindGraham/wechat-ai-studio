@@ -31,13 +31,28 @@ class WeChatAcceptanceTests(unittest.TestCase):
         self.assertIn("svg-image-not-https", codes)
 
     def test_rejects_complex_svg_and_grid(self):
-        html = '<section style="display:grid"><svg><filter></filter><foreignObject></foreignObject><animateTransform></animateTransform></svg></section>'
+        html = '<section style="display:grid"><svg><filter></filter><foreignObject></foreignObject><animateTransform type="matrix"></animateTransform></svg></section>'
         report = wechat_acceptance.build_report(html, "manual-paste")
         self.assertFalse(report["ok"])
         codes = {item["code"] for item in report["issues"]}
         self.assertIn("grid-layout", codes)
         self.assertIn("svg-filter", codes)
         self.assertIn("svg-foreign-object", codes)
+        self.assertIn("svg-animate-transform-matrix", codes)
+
+    def test_accepts_safe_smil_svg_with_wechat_cdn_image(self):
+        html = '''
+        <section>
+          <svg viewBox="0 0 375 80">
+            <image href="https://mmbiz.qpic.cn/example.jpg" width="120" height="80">
+              <animate attributeName="opacity" values="1;0.5;1" dur="2s" repeatCount="indefinite"></animate>
+              <animateTransform attributeName="transform" type="translate" values="0,0;20,0;0,0" dur="2s" repeatCount="indefinite"></animateTransform>
+            </image>
+          </svg>
+        </section>
+        '''
+        report = wechat_acceptance.build_report(html, "api-draft")
+        self.assertTrue(report["ok"], report["issues"])
 
 
 if __name__ == "__main__":

@@ -3810,11 +3810,25 @@ function applyFlowLayoutFromCanvas() {
 	});
 }
 
+function captureNestedFlowGeometry(root) {
+	var canvas = getCanvas();
+	if (!canvas || !root) return;
+	var canvasRect = canvas.getBoundingClientRect();
+	root.querySelectorAll('.canvas-block').forEach(function(block) {
+		var rect = block.getBoundingClientRect();
+		block.setAttribute('data-canvas-x', String(Math.round(rect.left - canvasRect.left + canvas.scrollLeft)));
+		block.setAttribute('data-canvas-y', String(Math.round(rect.top - canvasRect.top + canvas.scrollTop)));
+		block.setAttribute('data-canvas-w', String(Math.round(rect.width || block.offsetWidth || MIN_BLOCK_WIDTH)));
+		block.setAttribute('data-canvas-h', String(Math.round(rect.height || block.offsetHeight || MIN_BLOCK_HEIGHT)));
+	});
+}
+
 function captureFlowLayoutAsCanvas() {
 	WECHAT_EDITOR_LOG.info('MODE', 'captureFlowLayoutAsCanvas called');
 
 	var canvas = getCanvas();
 	if (!canvas) return;
+	captureNestedFlowGeometry(canvas);
 	var canvasRect = canvas.getBoundingClientRect();
 	getSortedTopLevelBlocks().forEach(function(block) {
 		var rect = block.getBoundingClientRect();
@@ -3837,7 +3851,11 @@ function captureFlowLayoutAsCanvas() {
 			child.style.flex = '';
 			child.style.left = '';
 			child.style.top = '';
-			child.style.width = '';
+			if (child.parentElement && child.parentElement.getAttribute('data-type') === 'flex-row') {
+				child.style.width = child.getAttribute('data-flow-width') || child.style.width || '';
+			} else {
+				child.style.width = '';
+			}
 		});
 	});
 }
@@ -4572,6 +4590,11 @@ function makeInteractable(element) {
 	if (typeof interact === 'undefined') {
 		console.warn('Interact.js is not loaded; canvas drag/resize is disabled.');
 		return;
+	}
+	ensureBlockMetadata(element);
+	if (element.getAttribute('data-type') === 'flex-row') {
+		ensureFlexRowColumnEditing(element);
+		ensureColumnResizeHandles(element);
 	}
 	if (currentWorkbenchMode === 'flow') {
 		if (element._interactable) {
@@ -5706,22 +5729,25 @@ function showWechatContextMenu(x, y) {
 function createFlexRowGroup(block1, block2) {
 	WECHAT_EDITOR_LOG.info('FLEX', 'createFlexRowGroup called', {block1:block1,block2:block2});
 
+	if (!block1 || !block2 || block1 === block2) return;
+	return createFlexRowGroupFromBlocks([block1, block2]);
+}
+
+function createFlexRowGroupFromBlocks(blocks) {
+	WECHAT_EDITOR_LOG.info('FLEX', 'createFlexRowGroupFromBlocks called', {count:blocks ? blocks.length : 0});
+
 	var canvas = getCanvas();
-	if (!canvas || !block1 || !block2 || block1 === block2) return;
-	var b1Left = parseBlockNumber(block1, 'left');
-	var b1Top = parseBlockNumber(block1, 'top');
-	var b1Width = block1.offsetWidth;
-	var b1Height = block1.offsetHeight;
-	var b2Left = parseBlockNumber(block2, 'left');
-	var b2Top = parseBlockNumber(block2, 'top');
-	var b2Width = block2.offsetWidth;
-	var b2Height = block2.offsetHeight;
-	var groupLeft = Math.min(b1Left, b2Left);
-	var groupTop = Math.min(b1Top, b2Top);
-	var groupRight = Math.max(b1Left + b1Width, b2Left + b2Width);
-	var groupBottom = Math.max(b1Top + b1Height, b2Top + b2Height);
-	var groupWidth = groupRight - groupLeft;
-	var groupHeight = groupBottom - groupTop;
+	blocks = Array.from(new Set((blocks || []).filter(function(block) {
+		return block && block.parentElement === canvas && !isContainerBlock(block);
+	})));
+	if (!canvas || blocks.length < 2) return null;
+	blocks.sort(function(a, b) { return parseBlockNumber(a, 'left') - parseBlockNumber(b, 'left'); });
+	var groupLeft = Math.min.apply(null, blocks.map(function(block) { return parseBlockNumber(block, 'left'); }));
+	var groupTop = Math.min.apply(null, blocks.map(function(block) { return parseBlockNumber(block, 'top'); }));
+	var groupRight = Math.max.apply(null, blocks.map(function(block) { return parseBlockNumber(block, 'left') + block.offsetWidth; }));
+	var groupBottom = Math.max.apply(null, blocks.map(function(block) { return parseBlockNumber(block, 'top') + block.offsetHeight; }));
+	var groupWidth = Math.min(CANVAS_WIDTH - groupLeft, Math.max(MIN_BLOCK_WIDTH, groupRight - groupLeft));
+	var groupHeight = Math.max(MIN_BLOCK_HEIGHT, groupBottom - groupTop);
 	var group = document.createElement('div');
 	group.className = 'canvas-block';
 	group.id = getNextBlockId();
@@ -5740,17 +5766,14 @@ function createFlexRowGroup(block1, block2) {
 	group.setAttribute('data-ai-note', '并排布局');
 	group.setAttribute('data-lock-ratio', '0');
 
-	// Detach first, check parent
-	if (block1.parentElement === canvas) block1.remove();
-	if (block2.parentElement === canvas) block2.remove();
-
-	var cells = [block1, block2];
-	cells.forEach(function(cell) {
+	blocks.forEach(function(cell) {
+		var originalWidth = Math.max(1, cell.offsetWidth || parseFloat(cell.style.width) || Math.floor(groupWidth / blocks.length));
 		cell.style.position = 'relative';
 		cell.style.left = '0px';
 		cell.style.top = '0px';
-		cell.style.flex = '0 0 48%';
-		cell.style.width = '48%';
+		var pct = Math.max(8, Math.min(100, (originalWidth / Math.max(1, groupWidth)) * 100));
+		cell.style.flex = '0 0 ' + pct.toFixed(2).replace(/\.?0+$/, '') + '%';
+		cell.style.width = pct.toFixed(2).replace(/\.?0+$/, '') + '%';
 		cell.style.boxSizing = 'border-box';
 		cell.style.display = '';
 		cell.style.verticalAlign = '';
@@ -5761,6 +5784,8 @@ function createFlexRowGroup(block1, block2) {
 	rebindChildrenInteractable(group);
 	ensureBlockMetadata(group);
 	makeInteractable(group);
+	ensureFlexRowColumnEditing(group);
+	ensureColumnResizeHandles(group);
 	selectBlock(group);
 	scheduleAutoSave();
 	saveEditorSnapshot('create-flexrow');
@@ -6049,6 +6074,7 @@ function cleanWorkbenchExportNode(node) {
 		el.removeAttribute('data-y');
 		el.removeAttribute('data-leaf-selected');
 		el.removeAttribute('data-column-selected');
+		el.removeAttribute('data-drag-column-index');
 		el.removeAttribute('draggable');
 		['position', 'left', 'top', 'transform', 'aspectRatio'].forEach(function(prop) {
 			el.style[prop] = '';
@@ -6068,7 +6094,7 @@ function stripWorkbenchAttributes(node) {
 		el.removeAttribute('draggable');
 		Array.from(el.attributes || []).forEach(function(attr) {
 			var name = attr.name.toLowerCase();
-			if (name === 'data-id' || name === 'data-type' || name === 'data-layout' || name === 'data-source' || name === 'data-risk' || name === 'data-role' || name === 'data-ai-note' || name === 'data-lock-ratio' || name === 'data-catalog-id' || name === 'data-source-provider' || name === 'data-license-status' || name === 'data-wechat-compat' || name === 'data-external-asset' || name === 'data-x' || name === 'data-y' || name === 'data-leaf-selected' || name === 'data-column-selected' || name === 'data-column-index' || name === 'data-resize-column-index' || name.indexOf('data-wb-') === 0 || name.indexOf('data-wx-') === 0 || name.indexOf('data-flow-') === 0 || name.indexOf('data-canvas-') === 0 || name.indexOf('data-layer-') === 0 || name.indexOf('data-overlap-') === 0) {
+			if (name === 'data-id' || name === 'data-type' || name === 'data-layout' || name === 'data-source' || name === 'data-risk' || name === 'data-role' || name === 'data-ai-note' || name === 'data-lock-ratio' || name === 'data-catalog-id' || name === 'data-source-provider' || name === 'data-license-status' || name === 'data-wechat-compat' || name === 'data-external-asset' || name === 'data-x' || name === 'data-y' || name === 'data-leaf-selected' || name === 'data-column-selected' || name === 'data-column-index' || name === 'data-drag-column-index' || name === 'data-resize-column-index' || name.indexOf('data-wb-') === 0 || name.indexOf('data-wx-') === 0 || name.indexOf('data-flow-') === 0 || name.indexOf('data-canvas-') === 0 || name.indexOf('data-layer-') === 0 || name.indexOf('data-overlap-') === 0) {
 				el.removeAttribute(attr.name);
 			}
 		});
@@ -6200,6 +6226,33 @@ function extractGroupContent(groupBlock) {
 	return result;
 }
 
+function getWechatExportBounds(block) {
+	if (currentWorkbenchMode === 'flow') {
+		return getBlockCanvasRect(block);
+	}
+	return {
+		left: Math.max(0, parseBlockNumber(block, 'left')),
+		top: parseBlockNumber(block, 'top'),
+		width: Math.min(CANVAS_WIDTH, Math.round(block.offsetWidth || parseFloat(block.style.width) || CANVAS_WIDTH)),
+		height: Math.round(block.offsetHeight || parseFloat(block.style.height) || MIN_BLOCK_HEIGHT)
+	};
+}
+
+function wrapWechatFlowBlock(html, block, previousBottom) {
+	html = (html || '').trim();
+	if (!html) return { html: '', bottom: previousBottom || 0 };
+	var bounds = getWechatExportBounds(block);
+	var width = Math.max(1, Math.min(CANVAS_WIDTH, bounds.width || CANVAS_WIDTH));
+	var left = Math.max(0, Math.min(CANVAS_WIDTH - width, bounds.left || 0));
+	var right = Math.max(0, CANVAS_WIDTH - left - width);
+	var gap = Math.round((bounds.top || 0) - (previousBottom || 0));
+	var style = 'margin:' + gap + 'px ' + right + 'px 0 ' + left + 'px;width:' + width + 'px;max-width:100%;box-sizing:border-box;';
+	return {
+		html: '<section style="' + style + '">' + html + '</section>\n',
+		bottom: Math.max(previousBottom || 0, Math.round((bounds.top || 0) + (bounds.height || 0)))
+	};
+}
+
 function buildWechatHTML() {
 	WECHAT_EDITOR_LOG.info('EXPORT', 'buildWechatHTML called');
 
@@ -6207,16 +6260,21 @@ function buildWechatHTML() {
 	var canvas = document.getElementById('block-canvas');
 	if (!canvas) return '';
 	var blocks = Array.from(canvas.querySelectorAll(':scope > .canvas-block'));
-	blocks.sort(function(a, b) { return (parseFloat(a.style.top)||0) - (parseFloat(b.style.top)||0); });
+	blocks.sort(function(a, b) { return getWechatExportBounds(a).top - getWechatExportBounds(b).top; });
 	var html = '';
+	var previousBottom = 0;
 	blocks.forEach(function(b) {
 		// Handle group blocks: extract child sections directly (recursively)
+		var blockHtml;
 		if (['group','flex-row','flex-col'].indexOf(b.getAttribute('data-type')) !== -1) {
-			html += extractGroupContent(b);
+			blockHtml = extractGroupContent(b);
 		} else {
 			var clone = cleanBlockForExport(b);
-			html += clone.innerHTML.trim() + '\n';
+			blockHtml = clone.innerHTML.trim();
 		}
+		var wrapped = wrapWechatFlowBlock(blockHtml, b, previousBottom);
+		html += wrapped.html;
+		previousBottom = wrapped.bottom;
 	});
 	saveEditorSnapshot('export-wechat');
 	return '<section style="width:100%;max-width:375px;margin-left:auto;margin-right:auto;text-align:center;box-sizing:border-box;">\n' + html.trim() + '\n</section>';
@@ -6292,6 +6350,7 @@ function validateWechatHtml(html, mode) {
 		{ name: 'SVG clipPath/textPath/mask', regex: /<(clipPath|textPath|mask)\b/i, severity: 'error' },
 		{ name: 'SVG xlink:href', regex: /\sxlink:href\s*=/i, severity: 'error' },
 		{ name: 'SVG/CSS matrix 或 3D transform', regex: /(matrix\s*\(|rotate[XYZ]\s*\(|perspective\s*\()/i, severity: 'error' },
+		{ name: 'SVG animateTransform matrix/3D', regex: /<animateTransform\b[^>]*\btype=["']?(matrix|matrix3d|rotateX|rotateY|rotateZ|translateZ|perspective)/i, severity: 'error' },
 		{ name: 'Data URI/Base64 资源', regex: /(src|href)=["']data:/i, severity: 'error' },
 		{ name: 'SVG 内联 style/class/id', regex: /<svg[\s\S]*?(\sstyle\s*=|\sclass\s*=|\sid\s*=)/i, severity: 'warn' }
 	];
@@ -6886,14 +6945,58 @@ function classifyXiumiSection(style) {
 	return 'cell';
 }
 
+function sanitizeImportedSvgForWechat(doc) {
+	if (!doc) return;
+	doc.querySelectorAll('script, foreignObject, filter, linearGradient, radialGradient, stop, clipPath, mask, textPath').forEach(function(el) {
+		el.remove();
+	});
+	doc.querySelectorAll('*').forEach(function(el) {
+		var tag = (el.tagName || '').toLowerCase();
+		if (/^fe[a-z]/.test(tag)) el.remove();
+	});
+	doc.querySelectorAll('style').forEach(function(style) {
+		if (style.closest('svg') || /@keyframes|animation\s*:|transition\s*:/i.test(style.textContent || '')) style.remove();
+	});
+	doc.querySelectorAll('[style]').forEach(function(el) {
+		var style = el.getAttribute('style') || '';
+		style = style
+			.replace(/(?:^|;)\s*(?:animation|animation-[\w-]+|transition|transition-[\w-]+)\s*:[^;]*/gi, '')
+			.replace(/(?:matrix(?:3d)?|rotate[XYZ]|translateZ|perspective)\s*\([^)]*\)/gi, '');
+		if (style.trim()) el.setAttribute('style', style);
+		else el.removeAttribute('style');
+	});
+	doc.querySelectorAll('svg [class], svg [id]').forEach(function(el) {
+		el.removeAttribute('class');
+		el.removeAttribute('id');
+	});
+	doc.querySelectorAll('svg [xlink\\:href]').forEach(function(el) {
+		var href = el.getAttribute('xlink:href') || '';
+		if (el.tagName && el.tagName.toLowerCase() === 'image' && href && !el.getAttribute('href')) {
+			el.setAttribute('href', href);
+		}
+		el.removeAttribute('xlink:href');
+	});
+	doc.querySelectorAll('svg image').forEach(function(img) {
+		var href = img.getAttribute('href') || '';
+		if (!/^https:\/\//i.test(href)) img.removeAttribute('href');
+	});
+	doc.querySelectorAll('animateTransform').forEach(function(anim) {
+		var type = (anim.getAttribute('type') || '').toLowerCase();
+		if (!/^(translate|scale|rotate|skewx|skewy)$/.test(type)) anim.remove();
+	});
+	doc.querySelectorAll('[transform]').forEach(function(el) {
+		var value = el.getAttribute('transform') || '';
+		if (/(matrix(?:3d)?|rotate[XYZ]|translateZ|perspective)\s*\(/i.test(value)) el.removeAttribute('transform');
+	});
+}
+
 function importXiumiHTML(rawHtml) {
 	WECHAT_EDITOR_LOG.info('IMPORT', 'importXiumiHTML called', {rawHtml:rawHtml});
 
 	var parser = new DOMParser();
 	var doc = parser.parseFromString(rawHtml, 'text/html');
 
-	var forbidden = doc.querySelectorAll('svg, animate, animateTransform, foreignObject');
-	forbidden.forEach(function(el) { el.remove(); });
+	sanitizeImportedSvgForWechat(doc);
 
 	// Add referrerpolicy to all images for Xiumi hotlink protection bypass
 	doc.querySelectorAll('img').forEach(function(img) {
@@ -6997,6 +7100,8 @@ function addColumnToFlexRow(row, html) {
 	row.appendChild(cell);
 	ensureBlockMetadata(cell);
 	makeInteractable(cell);
+	ensureFlexRowColumnEditing(row);
+	ensureColumnResizeHandles(row);
 	return cell;
 }
 
@@ -7012,6 +7117,8 @@ function moveFlexRowColumn(row, fromIndex, toIndex) {
 		ref = ref.nextSibling;
 	}
 	row.insertBefore(cell, ref);
+	ensureFlexRowColumnEditing(row);
+	ensureColumnResizeHandles(row);
 }
 
 function getSelectedFlexRowColumnIndex(row) {
@@ -7032,6 +7139,8 @@ function removeFlexRowColumn(row, index) {
 	var cells = getFlexRowCells(row);
 	if (index < 0 || index >= cells.length) return;
 	cells[index].remove();
+	ensureFlexRowColumnEditing(row);
+	ensureColumnResizeHandles(row);
 }
 
 function removeSelectedColumnFromFlexRow(row) {
@@ -7048,6 +7157,7 @@ function equalizeFlexRowColumns(row) {
 		cell.style.flex = '0 0 ' + width + '%';
 		cell.style.width = width + '%';
 	});
+	ensureFlexRowColumnEditing(row);
 	ensureColumnResizeHandles(row);
 }
 
@@ -7097,29 +7207,104 @@ function startColumnResize(row, index, event) {
 	document.addEventListener('mouseup', up);
 }
 
+function ensureFlexRowColumnEditing(row) {
+	if (!row || row.getAttribute('data-type') !== 'flex-row') return;
+	var cells = getFlexRowCells(row);
+	cells.forEach(function(cell) {
+		cell.setAttribute('draggable', 'true');
+		if (cell._flexRowColumnEventsBound) return;
+		cell.addEventListener('dragstart', function(event) {
+			if (isLeafSelected(cell)) return;
+			row.setAttribute('data-drag-column-index', String(getFlexRowCells(row).indexOf(cell)));
+			if (event.dataTransfer) {
+				event.dataTransfer.effectAllowed = 'move';
+				event.dataTransfer.setData('text/plain', cell.id || '');
+			}
+			selectLeafBlock(cell);
+		});
+		cell.addEventListener('dragover', function(event) {
+			var from = parseInt(row.getAttribute('data-drag-column-index') || '-1', 10);
+			if (from >= 0) event.preventDefault();
+		});
+		cell.addEventListener('drop', function(event) {
+			var from = parseInt(row.getAttribute('data-drag-column-index') || '-1', 10);
+			var to = getFlexRowCells(row).indexOf(cell);
+			row.removeAttribute('data-drag-column-index');
+			if (from >= 0 && to >= 0 && from !== to) {
+				event.preventDefault();
+				saveState();
+				moveFlexRowColumn(row, from, to);
+				selectLeafBlock(getFlexRowCells(row)[to] || row);
+				scheduleAutoSave();
+			}
+		});
+		cell.addEventListener('dragend', function() {
+			row.removeAttribute('data-drag-column-index');
+		});
+		cell._flexRowColumnEventsBound = true;
+	});
+}
+
 function addRowAfterBlock(block) {
 	var canvas = getCanvas();
 	if (!canvas || !block) return;
-	var row = createFlexRowGroup(block, block);
-	if (row) {
-		canvas.insertBefore(row, block.nextSibling);
-		block.remove();
+	saveState();
+	var col = block.getAttribute('data-type') === 'flex-col' ? block : null;
+	var selectedChild = null;
+	if (!col && block.parentElement && block.parentElement.getAttribute('data-type') === 'flex-col') {
+		col = block.parentElement;
+		selectedChild = block;
 	}
+	if (!col) {
+		col = document.createElement('div');
+		col.className = 'canvas-block';
+		col.id = getNextBlockId();
+		col.style.left = block.style.left || '0px';
+		col.style.top = block.style.top || '0px';
+		col.style.width = block.style.width || CANVAS_WIDTH + 'px';
+		col.style.minHeight = Math.max(block.offsetHeight || 80, 120) + 'px';
+		col.style.display = 'flex';
+		col.style.flexDirection = 'column';
+		col.style.gap = normalizeCssLength(globalFlowStyles.blockGap, '20px');
+		col.setAttribute('data-type', 'flex-col');
+		col.setAttribute('data-role', 'flex-col');
+		col.setAttribute('data-lock-ratio', '0');
+		block.style.position = 'relative';
+		block.style.left = '0px';
+		block.style.top = '0px';
+		block.style.width = '100%';
+		canvas.insertBefore(col, block);
+		col.appendChild(block);
+		selectedChild = block;
+		ensureBlockMetadata(col);
+		makeInteractable(col);
+	}
+	var child = addChildToFlexCol(col);
+	if (selectedChild && selectedChild.nextSibling) col.insertBefore(child, selectedChild.nextSibling);
+	ensureFlexColChildEditing(col);
+	rebindChildrenInteractable(col);
+	selectLeafBlock(child);
+	ensureCanvasHeight();
+	scheduleAutoSave();
 }
 
 function hydrateWorkbenchSection(section) {
 	var block = document.createElement('div');
 	block.className = 'canvas-block';
 	block.id = getNextBlockId();
-	block.style.width = CANVAS_WIDTH + 'px';
-	block.style.left = '0px';
-	block.style.top = '0px';
+	block.style.width = section.style.width || section.getAttribute('data-flow-width') || CANVAS_WIDTH + 'px';
+	block.style.margin = section.style.margin || section.getAttribute('data-flow-margin') || '';
+	block.style.left = section.getAttribute('data-canvas-x') ? section.getAttribute('data-canvas-x') + 'px' : '0px';
+	block.style.top = section.getAttribute('data-canvas-y') ? section.getAttribute('data-canvas-y') + 'px' : '0px';
 	var blockType = section.getAttribute('data-wb-type') || 'cell';
 	blockType = normalizeWorkbenchType(blockType);
 	if (blockType === 'cell') {
 		if (section.querySelector('img') && !section.querySelector('p')) blockType = 'image';
 	}
-	var hasChildSections = section.querySelectorAll(':scope > section').length > 0;
+	var structuralChildren = Array.from(section.children).filter(function(child) {
+		return child.tagName === 'SECTION' && child.getAttribute('data-wb-block') === '1';
+	});
+	var hasChildSections = structuralChildren.length > 0;
 	var finalType = hasChildSections && blockType === 'cell' ? 'group' : blockType;
 	block.setAttribute('data-type', finalType);
 	block.setAttribute('data-role', inferRole(finalType));
@@ -7136,7 +7321,7 @@ function hydrateWorkbenchSection(section) {
 		block.style.display = 'flex';
 		block.style.flexDirection = 'column';
 	}
-	block.querySelectorAll(':scope > section').forEach(function(childSec) {
+	block.querySelectorAll(':scope > section[data-wb-block="1"]').forEach(function(childSec) {
 		var childBlock = hydrateWorkbenchSection(childSec);
 		if (childBlock) {
 			block.appendChild(childBlock);
@@ -7146,41 +7331,65 @@ function hydrateWorkbenchSection(section) {
 	return block;
 }
 
+function countWorkbenchSections(root) {
+	var counts = {};
+	Array.from(root.querySelectorAll('section[data-wb-block="1"], section[data-wb-type]')).forEach(function(section) {
+		var type = normalizeWorkbenchType(section.getAttribute('data-wb-type') || 'cell');
+		counts[type] = (counts[type] || 0) + 1;
+	});
+	return counts;
+}
+
+function applyWorkbenchRootMetadata(root) {
+	if (!root) return;
+	var map = {
+		pageMarginX: 'data-flow-page-margin-x',
+		blockGap: 'data-flow-block-gap',
+		lineHeight: 'data-flow-line-height',
+		letterSpacing: 'data-flow-letter-spacing',
+		paragraphAfter: 'data-flow-paragraph-after'
+	};
+	Object.keys(map).forEach(function(key) {
+		var value = root.getAttribute(map[key]);
+		if (value != null && value !== '') globalFlowStyles[key] = value;
+	});
+}
+
 function groupSideBySideRowsForFlow() {
 	WECHAT_EDITOR_LOG.info('MODE', 'groupSideBySideRowsForFlow called');
 
 	var canvas = getCanvas();
 	if (!canvas) return;
-	var blocks = getSortedTopLevelBlocks();
+	var blocks = getSortedTopLevelBlocks().filter(function(block) { return !isContainerBlock(block); });
 	var groups = [];
-	var i = 0;
-	while (i < blocks.length - 1) {
-		var a = blocks[i];
-		var b = blocks[i + 1];
-		var aType = a.getAttribute('data-type');
-		var bType = b.getAttribute('data-type');
-		if (aType === 'group' || aType === 'flex-row' || aType === 'flex-col' ||
-			bType === 'group' || bType === 'flex-row' || bType === 'flex-col') {
-			i++;
-			continue;
+	var consumed = new Set();
+	blocks.forEach(function(anchor) {
+		if (consumed.has(anchor)) return;
+		var anchorCenter = parseBlockNumber(anchor, 'top') + anchor.offsetHeight / 2;
+		var row = blocks.filter(function(block) {
+			if (consumed.has(block)) return false;
+			var center = parseBlockNumber(block, 'top') + block.offsetHeight / 2;
+			return Math.abs(center - anchorCenter) <= 28;
+		}).sort(function(a, b) {
+			return parseBlockNumber(a, 'left') - parseBlockNumber(b, 'left');
+		});
+		if (row.length < 2) return;
+		var totalWidth = row.reduce(function(sum, block) { return sum + Math.max(1, block.offsetWidth); }, 0);
+		var rowLeft = Math.min.apply(null, row.map(function(block) { return parseBlockNumber(block, 'left'); }));
+		var rowRight = Math.max.apply(null, row.map(function(block) { return parseBlockNumber(block, 'left') + block.offsetWidth; }));
+		var mostlySeparated = true;
+		for (var i = 1; i < row.length; i++) {
+			var prevRight = parseBlockNumber(row[i - 1], 'left') + row[i - 1].offsetWidth;
+			var gap = parseBlockNumber(row[i], 'left') - prevRight;
+			if (gap < -8 || gap > 42) mostlySeparated = false;
 		}
-		var aLeft = parseBlockNumber(a, 'left');
-		var aTop = parseBlockNumber(a, 'top');
-		var bLeft = parseBlockNumber(b, 'left');
-		var bTop = parseBlockNumber(b, 'top');
-		var sameRow = Math.abs(aTop - bTop) < 20;
-		var sideBySide = aLeft < bLeft && (bLeft - (aLeft + a.offsetWidth)) < 20;
-		if (sameRow && sideBySide) {
-			var group = createFlexRowGroup(a, b);
-			if (group) {
-				groups.push(group);
-				blocks = getSortedTopLevelBlocks();
-				i = 0;
-				continue;
-			}
+		if (!mostlySeparated || totalWidth > CANVAS_WIDTH || rowRight - rowLeft > CANVAS_WIDTH) return;
+		var group = createFlexRowGroupFromBlocks(row);
+		if (group) {
+			groups.push(group);
+			row.forEach(function(block) { consumed.add(block); });
 		}
-		i++;
-	}
+	});
 	return groups;
 }
 
@@ -7190,16 +7399,28 @@ function importXiumiToCanvas(rawHtml) {
 	console.log('[IMPORT] rawHtml length:', rawHtml ? rawHtml.length : 0);
 	var isWorkbenchHTML = rawHtml.indexOf('data-wb-root="1"') !== -1 || rawHtml.indexOf("data-wb-root='1'") !== -1;
 	console.log('[IMPORT] isWorkbenchHTML:', isWorkbenchHTML);
-	var imported = importXiumiHTML(rawHtml);
+	var parser = new DOMParser();
+	var imported;
+	var doc;
+	var rootWrapper;
+	if (isWorkbenchHTML) {
+		doc = parser.parseFromString(rawHtml, 'text/html');
+		rootWrapper = doc.querySelector('section[data-wb-root="1"], section[data-wx-workbench="1"]') || doc.body.firstElementChild;
+		if (rootWrapper) applyWorkbenchRootMetadata(rootWrapper);
+		imported = { html: rawHtml, counts: rootWrapper ? countWorkbenchSections(rootWrapper) : {} };
+	} else {
+		imported = importXiumiHTML(rawHtml);
+		doc = parser.parseFromString(imported.html, 'text/html');
+		rootWrapper = doc.body.firstElementChild;
+	}
 	console.log('[IMPORT] imported.html length:', imported.html ? imported.html.length : 0);
 	console.log('[IMPORT] imported.counts:', JSON.stringify(imported.counts));
-	var parser = new DOMParser();
-	var doc = parser.parseFromString(imported.html, 'text/html');
-	var rootWrapper = doc.body.firstElementChild;
 	console.log('[IMPORT] rootWrapper:', rootWrapper ? rootWrapper.tagName : 'null');
 	if (!rootWrapper) { console.error('[IMPORT] rootWrapper is null'); return; }
 
-	var directChildren = Array.from(rootWrapper.children);
+	var directChildren = Array.from(rootWrapper.children).filter(function(child) {
+		return child.tagName === 'SECTION' && (!isWorkbenchHTML || child.getAttribute('data-wb-block') === '1' || child.hasAttribute('data-wb-type'));
+	});
 	
 	// If root has only 1 child that's a group/wrapper, unwrap its children
 	if (directChildren.length === 1 && directChildren[0].tagName === 'SECTION') {
@@ -7228,12 +7449,13 @@ function importXiumiToCanvas(rawHtml) {
 		if (isWorkbenchHTML) {
 			block = hydrateWorkbenchSection(child);
 			if (!block) return;
-			block.style.height = 'auto';
+			block.style.height = child.getAttribute('data-canvas-h') ? child.getAttribute('data-canvas-h') + 'px' : 'auto';
 			block.style.minHeight = '40px';
 			canvas.appendChild(block);
 			ensureBlockMetadata(block);
 			ensureResizeHandles(block);
 			makeInteractable(block);
+			rebindChildrenInteractable(block);
 			blocks.push(block);
 			return;
 		}
@@ -7270,6 +7492,11 @@ function importXiumiToCanvas(rawHtml) {
 		blocks.push(block);
 	});
 
+	var importedMode = isWorkbenchHTML && rootWrapper.getAttribute('data-wb-mode') === 'flow' ? 'flow' : 'canvas';
+	currentWorkbenchMode = importedMode;
+	canvas.classList.toggle('flow-mode', importedMode === 'flow');
+	streamMode = importedMode !== 'flow';
+
 	// Reposition after browser renders content (give time for layout)
 	console.log('[IMPORT] blocks created:', blocks.length);
 	WECHAT_EDITOR_LOG.info('IMPORT', 'importXiumiToCanvas result', {blocks: blocks.length, isWorkbench: isWorkbenchHTML, counts: imported.counts});
@@ -7278,10 +7505,18 @@ function importXiumiToCanvas(rawHtml) {
 		console.log('[IMPORT] repositioning', blocks.length, 'blocks');
 		var top = 20;
 		blocks.forEach(function(block) {
+			if (isWorkbenchHTML && (block.getAttribute('data-canvas-y') || block.getAttribute('data-flow-order'))) {
+				if (importedMode === 'canvas') {
+					block.style.left = (block.getAttribute('data-canvas-x') || parseBlockNumber(block, 'left')) + 'px';
+					block.style.top = (block.getAttribute('data-canvas-y') || top) + 'px';
+				}
+				return;
+			}
 			var h = block.scrollHeight || block.offsetHeight || 200;
 			block.style.top = top + 'px';
 			top += h + BLOCK_GAP;
 		});
+		if (importedMode === 'flow') applyFlowLayoutFromCanvas();
 		ensureCanvasHeight();
 		syncBlockIdCounter();
 		selectBlock(null);
